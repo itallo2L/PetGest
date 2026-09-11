@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetGest — Gestão de Estoque</title>
+  <meta name="description" content="PetGest — sistema de gestão de estoque para pet shops e comércios agropecuários." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       BIBLIOTECA DE ICONES (sprite SVG inline - sem dependencias)
+       ============================================================ -->
+  <svg class="svg-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-dashboard" viewBox="0 0 24 24"><path d="M4 13h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm0 8h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1Zm10 0h6a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm-1-17v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1Z"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5"/><path d="M12 12v9"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 17.5 9 5 9-5"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h2.2l2.2 11a1.6 1.6 0 0 0 1.6 1.3h8.9a1.6 1.6 0 0 0 1.6-1.2L21 7.5H6"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h11v9H3z"/><path d="M14 9.5h3.6l3 3.2v2.8H14z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+    <symbol id="i-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.5 4.5V10H15"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5h17l-6.6 7.8V19l-3.8 2v-8.2L3.5 5Z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="m6 14 6 6 6-6"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V4"/><path d="m6 10 6-6 6 6"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.6 2.6L16 9.6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-2 7.5-2 7.5h16s-2-1.5-2-7.5Z"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h8"/><path d="M16.5 3.9a2 2 0 0 1 2.8 2.8L8 18l-4 1 1-4 11.5-11.1Z"/></symbol>
+    <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="7" cy="8.2" rx="2.1" ry="2.7"/><ellipse cx="12" cy="6.4" rx="2.2" ry="2.9"/><ellipse cx="17" cy="8.2" rx="2.1" ry="2.7"/><path d="M12 11.4c2.9 0 5.4 2.1 5.4 4.6 0 2-1.6 3.2-3.5 3.2-.9 0-1.3-.3-1.9-.3s-1 .3-1.9.3c-1.9 0-3.5-1.2-3.5-3.2 0-2.5 2.5-4.6 5.4-4.6Z"/></symbol>
+    <symbol id="i-tools" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.3 6.2a3.8 3.8 0 0 0 5 5l-8.1 8.1a2.4 2.4 0 0 1-3.4-3.4l6.5-9.7Z"/><path d="M5 5l3 3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 2"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 3.5H5a1.6 1.6 0 0 0-1.6 1.8c.5 4.2 2.3 8 5.1 10.8s6.6 4.6 10.8 5.1A1.6 1.6 0 0 0 21 19.6v-3.1a1.6 1.6 0 0 0-1.4-1.6l-2.4-.4a1.6 1.6 0 0 0-1.5.7l-.8 1.2a12.6 12.6 0 0 1-5.3-5.3l1.2-.8a1.6 1.6 0 0 0 .7-1.5l-.4-2.4a1.6 1.6 0 0 0-1.6-1.4Z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.6 6.5 8.4 6 8.4-6"/></symbol>
+  </svg>
+
+  <div class="app">
+
+    <!-- ==========================================================
+         SIDEBAR
+         ========================================================== -->
+    <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+      <div class="sidebar__brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg class="icon"><use href="#i-paw"></use></svg>
+        </span>
+        <span class="brand__text">
+          <strong class="brand__name">PetGest</strong>
+          <span class="brand__tagline">Mais tempo para o que importa</span>
+        </span>
+        <button type="button" class="icon-btn sidebar__close" id="sidebarClose" aria-label="Fechar menu">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar__nav" id="mainNav">
+        <p class="nav__label">Principal</p>
+        <button type="button" class="nav__item is-active" data-view="dashboard">
+          <svg class="icon" aria-hidden="true"><use href="#i-dashboard"></use></svg>
+          <span>Dashboard</span>
+        </button>
+        <button type="button" class="nav__item" data-view="produtos">
+          <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
+          <span>Produtos</span>
+        </button>
+        <button type="button" class="nav__item" data-view="estoque">
+          <svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg>
+          <span>Estoque</span>
+        </button>
+        <button type="button" class="nav__item" data-view="reposicao">
+          <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+          <span>Reposição</span>
+          <span class="nav__badge" id="navBadgeReposicao">0</span>
+        </button>
+
+        <p class="nav__label">Cadastros</p>
+        <button type="button" class="nav__item" data-view="fornecedores">
+          <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+          <span>Fornecedores</span>
+        </button>
+        <button type="button" class="nav__item" data-view="relatorios">
+          <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>
+          <span>Relatórios</span>
+        </button>
+      </nav>
+
+      <div class="sidebar__footer">
+        <button type="button" class="nav__item" data-view="configuracoes">
+          <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg>
+          <span>Configurações</span>
+        </button>
+        <div class="store-chip">
+          <span class="store-chip__avatar" aria-hidden="true">PS</span>
+          <span class="store-chip__info">
+            <strong>Pet Shop Amigo Fiel</strong>
+            <small>Plano Essencial</small>
+          </span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+    <!-- ==========================================================
+         ÁREA PRINCIPAL
+         ========================================================== -->
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar__left">
+          <button type="button" class="icon-btn topbar__menu" id="menuToggle" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+            <svg class="icon"><use href="#i-menu"></use></svg>
+          </button>
+          <div class="topbar__titles">
+            <h1 class="topbar__title" id="pageTitle">Dashboard</h1>
+            <p class="topbar__subtitle" id="pageSubtitle">Visão geral do seu estoque</p>
+          </div>
+        </div>
+
+        <div class="topbar__right">
+          <button type="button" class="icon-btn has-dot" id="btnNotifications" aria-label="Notificações">
+            <svg class="icon"><use href="#i-bell"></use></svg>
+          </button>
+          <div class="user-chip">
+            <span class="user-chip__hello">Olá, <strong>Carlos</strong></span>
+            <span class="user-chip__avatar" aria-hidden="true">C</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" id="content">
+
+        <!-- ------------------ VIEW: DASHBOARD ------------------ -->
+        <section class="view is-active" id="view-dashboard">
+
+          <!-- Indicadores -->
+          <div class="kpi-grid" id="kpiGrid"></div>
+
+          <div class="dash-grid">
+
+            <!-- Produtos em atenção -->
+            <section class="card card--list" aria-labelledby="attentionTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="attentionTitle">Produtos em atenção</h2>
+                  <p class="card__subtitle">Produtos que precisam da sua atenção</p>
+                </div>
+                <div class="card__actions">
+                  <button type="button" class="btn btn--ghost btn--sm" data-view="produtos">
+                    Ver todos
+                    <svg class="icon icon--sm"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                </div>
+              </header>
+
+              <!-- No celular esta tabela dá lugar à lista de cards abaixo. -->
+              <div class="table-wrap table-wrap--stacks">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="col-product">Produto</th>
+                      <th scope="col">Categoria</th>
+                      <th scope="col" class="num">Estoque</th>
+                      <th scope="col" class="num">Mínimo</th>
+                      <th scope="col">Status</th>
+                      <th scope="col" class="right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="attentionBody"></tbody>
+                </table>
+              </div>
+
+              <ul class="record-list" id="attentionCards"></ul>
+            </section>
+
+            <!-- Coluna lateral: movimentações + ações rápidas -->
+            <div class="dash-col">
+
+            <section class="card" aria-labelledby="movementsTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="movementsTitle">Movimentações recentes</h2>
+                  <p class="card__subtitle">Entradas e saídas dos últimos dias</p>
+                </div>
+              </header>
+
+              <ul class="timeline" id="movementsList"></ul>
+
+              <footer class="card__footer">
+                <button type="button" class="btn btn--ghost btn--sm btn--block" data-view="estoque">
+                  Ver todas as movimentações
+                </button>
+              </footer>
+            </section>
+
+            <!-- Ações rápidas -->
+            <section class="card quick-actions" aria-label="Ações rápidas">
+              <div class="quick-actions__text">
+                <h2 class="card__title">Ações rápidas</h2>
+                <p class="card__subtitle">Registre uma movimentação sem sair do painel</p>
+              </div>
+              <div class="quick-actions__buttons">
+                <button type="button" class="btn btn--primary" data-action="open-entry">
+                  <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
+                  Registrar entrada
+                </button>
+                <button type="button" class="btn btn--outline" data-action="open-exit">
+                  <svg class="icon icon--sm"><use href="#i-minus"></use></svg>
+                  Registrar saída
+                </button>
+              </div>
+            </section>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ------------------ VIEW: PRODUTOS ------------------ -->
+        <section class="view" id="view-produtos">
+
+          <!-- Busca, filtro e cadastro -->
+          <div class="toolbar">
+            <div class="search">
+              <svg class="icon icon--sm search__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+              <input
+                type="text"
+                class="input search__input"
+                id="productSearch"
+                placeholder="Buscar por nome ou código..."
+                aria-label="Buscar por nome ou código"
+                autocomplete="off" />
+              <button type="button" class="search__clear" id="productSearchClear" aria-label="Limpar busca" hidden>
+                <svg class="icon icon--sm"><use href="#i-close"></use></svg>
+              </button>
+            </div>
+
+            <button type="button" class="btn btn--outline" id="filterToggle"
+                    data-action="toggle-filters" aria-expanded="false" aria-controls="filterPanel">
+              <svg class="icon icon--sm"><use href="#i-filter"></use></svg>
+              Filtro
+              <span class="btn__badge" id="filterCount" hidden>0</span>
+            </button>
+
+            <button type="button" class="btn btn--primary" data-action="new-product">
+              <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
+              Cadastrar produto
+            </button>
+          </div>
+
+          <!-- Filtros avançados -->
+          <div class="filter-panel" id="filterPanel" hidden>
+            <div class="field">
+              <label class="field__label" for="filterCategory">Categoria</label>
+              <select class="input" id="filterCategory"></select>
+            </div>
+            <div class="field">
+              <label class="field__label" for="filterSupplier">Fornecedor</label>
+              <select class="input" id="filterSupplier"></select>
+            </div>
+            <div class="field">
+              <label class="field__label" for="filterSort">Ordenar por</label>
+              <select class="input" id="filterSort">
+                <option value="name">Nome (A–Z)</option>
+                <option value="stock-asc">Menor estoque primeiro</option>
+                <option value="stock-desc">Maior estoque primeiro</option>
+                <option value="category">Categoria</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn--ghost" data-action="clear-filters">
+              <svg class="icon icon--sm"><use href="#i-refresh"></use></svg>
+              Limpar filtros
+            </button>
+          </div>
+
+          <!-- Filtro rápido por status -->
+          <div class="chip-group" role="group" aria-label="Filtrar por status do estoque">
+            <button type="button" class="chip is-active" data-action="filter-status" data-status="all">
+              Todos <span class="chip__count" id="countAll">0</span>
+            </button>
+            <button type="button" class="chip chip--ok" data-action="filter-status" data-status="ok">
+              Normal <span class="chip__count" id="countOk">0</span>
+            </button>
+            <button type="button" class="chip chip--low" data-action="filter-status" data-status="low">
+              Baixo <span class="chip__count" id="countLow">0</span>
+            </button>
+            <button type="button" class="chip chip--out" data-action="filter-status" data-status="out">
+              Em falta <span class="chip__count" id="countOut">0</span>
+            </button>
+          </div>
+
+          <section class="card card--list card--list-801">
+            <!-- Sem largura para a tabela, esta lista vira cards (ver style.css). -->
+            <div class="table-wrap table-wrap--stacks">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="col-product">Produto</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col" class="num">Estoque</th>
+                    <th scope="col" class="num">Mínimo</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="productsBody"></tbody>
+              </table>
+            </div>
+
+            <ul class="record-list record-list--top" id="productsCards"></ul>
+
+            <footer class="card__footer results-bar">
+              <p class="results-bar__text" id="productsSummary"></p>
+            </footer>
+          </section>
+        </section>
+
+        <!-- ------------------ VIEW: ESTOQUE ------------------ -->
+        <section class="view" id="view-estoque">
+
+          <div class="page-actions">
+            <p class="page-actions__info">
+              Valor em estoque
+              <strong id="stockValue">R$ 0,00</strong>
+            </p>
+            <div class="page-actions__buttons">
+              <button type="button" class="btn btn--outline" data-action="open-exit">
+                <svg class="icon icon--sm"><use href="#i-minus"></use></svg>
+                Saída
+              </button>
+              <button type="button" class="btn btn--primary" data-action="open-entry">
+                <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
+                Entrada
+              </button>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="stockKpis"></div>
+
+          <section class="card card--list card--list-951" aria-labelledby="stockMovementsTitle">
+            <header class="card__header">
+              <div>
+                <h2 class="card__title" id="stockMovementsTitle">Movimentações</h2>
+                <p class="card__subtitle">Entradas e saídas registradas no período</p>
+              </div>
+              <div class="card__actions">
+                <div class="chip-group" role="group" aria-label="Filtrar por tipo de movimentação">
+                  <button type="button" class="chip is-active" data-action="filter-movement" data-type="all">
+                    Todas <span class="chip__count" id="countMovAll">0</span>
+                  </button>
+                  <button type="button" class="chip chip--ok" data-action="filter-movement" data-type="in">
+                    Entradas <span class="chip__count" id="countMovIn">0</span>
+                  </button>
+                  <button type="button" class="chip chip--out" data-action="filter-movement" data-type="out">
+                    Saídas <span class="chip__count" id="countMovOut">0</span>
+                  </button>
+                </div>
+                <select class="input input--sm" id="stockPeriod" aria-label="Período">
+                  <option value="7">Últimos 7 dias</option>
+                  <option value="30" selected>Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                  <option value="all">Todo o período</option>
+                </select>
+              </div>
+            </header>
+
+            <!-- Sem largura para a tabela, este extrato vira cards (ver style.css). -->
+            <div class="table-wrap table-wrap--stacks">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Data</th>
+                    <th scope="col" class="col-product">Produto</th>
+                    <th scope="col">Movimentação</th>
+                    <th scope="col">Observação</th>
+                    <th scope="col" class="num">Quantidade</th>
+                    <th scope="col" class="num">Saldo após</th>
+                  </tr>
+                </thead>
+                <tbody id="stockMovementsBody"></tbody>
+              </table>
+            </div>
+
+            <ul class="record-list record-list--top" id="stockMovementsCards"></ul>
+
+            <footer class="card__footer results-bar">
+              <p class="results-bar__text" id="stockSummary"></p>
+            </footer>
+          </section>
+        </section>
+
+        <!-- ------------------ VIEW: REPOSIÇÃO ------------------ -->
+        <section class="view" id="view-reposicao">
+
+          <div class="page-actions">
+            <p class="page-actions__info">
+              Custo estimado da reposição
+              <strong id="replenishCost">R$ 0,00</strong>
+            </p>
+            <div class="page-actions__buttons">
+              <button type="button" class="btn btn--ghost" data-action="clear-selection" id="btnClearSelection" hidden>
+                Limpar seleção
+              </button>
+              <button type="button" class="btn btn--primary" data-action="open-order" id="btnCreateOrder" disabled>
+                <svg class="icon icon--sm"><use href="#i-cart"></use></svg>
+                Criar pedido
+                <span class="btn__badge" id="selectionCount" hidden>0</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="chip-group" role="group" aria-label="Filtrar produtos para reposição">
+            <button type="button" class="chip is-active" data-action="filter-replenish" data-scope="pending">
+              Precisam de pedido <span class="chip__count" id="countPending">0</span>
+            </button>
+            <button type="button" class="chip" data-action="filter-replenish" data-scope="ordered">
+              Já em pedido <span class="chip__count" id="countOrdered">0</span>
+            </button>
+            <button type="button" class="chip" data-action="filter-replenish" data-scope="all">
+              Todos <span class="chip__count" id="countBelow">0</span>
+            </button>
+          </div>
+
+          <section class="card card--list card--list-801" aria-labelledby="replenishTitle">
+            <header class="card__header">
+              <div>
+                <h2 class="card__title" id="replenishTitle">Produtos para comprar</h2>
+                <p class="card__subtitle">
+                  A sugestão recompõe o dobro do estoque mínimo. Selecione os itens e gere o pedido.
+                </p>
+              </div>
+            </header>
+
+            <!-- Sem largura para a tabela, esta lista vira cards (ver style.css). -->
+            <div class="table-wrap table-wrap--stacks">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="check">
+                      <input type="checkbox" class="checkbox" id="selectAll" aria-label="Selecionar todos os produtos" />
+                    </th>
+                    <th scope="col" class="col-product">Produto</th>
+                    <th scope="col" class="num">Estoque</th>
+                    <th scope="col" class="num">Mínimo</th>
+                    <th scope="col" class="num col-wrap-head">Sugestão de compra</th>
+                    <th scope="col" class="col-supplier">Fornecedor</th>
+                    <th scope="col" class="right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="replenishBody"></tbody>
+              </table>
+            </div>
+
+            <ul class="record-list" id="replenishCards"></ul>
+
+            <footer class="card__footer results-bar">
+              <p class="results-bar__text" id="replenishSummary"></p>
+            </footer>
+          </section>
+
+          <section class="card card--list card--list-801" aria-labelledby="ordersTitle">
+            <header class="card__header">
+              <div>
+                <h2 class="card__title" id="ordersTitle">Pedidos de compra</h2>
+                <p class="card__subtitle">Pedidos gerados a partir da reposição</p>
+              </div>
+            </header>
+
+            <div class="table-wrap table-wrap--stacks">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Pedido</th>
+                    <th scope="col" class="col-supplier">Fornecedor</th>
+                    <th scope="col" class="num">Itens</th>
+                    <th scope="col" class="num">Unidades</th>
+                    <th scope="col" class="num col-wrap-head">Valor estimado</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+              </table>
+            </div>
+
+            <ul class="record-list" id="ordersCards"></ul>
+          </section>
+        </section>
+
+        <!-- ------------------ VIEW: FORNECEDORES ------------------ -->
+        <section class="view" id="view-fornecedores">
+
+          <div class="page-actions">
+            <p class="page-actions__info">
+              Compras em aberto
+              <strong id="supplierOpenValue">R$ 0,00</strong>
+            </p>
+            <div class="page-actions__buttons">
+              <button type="button" class="btn btn--outline" data-view="reposicao">
+                <svg class="icon icon--sm"><use href="#i-cart"></use></svg>
+                Ver reposição
+              </button>
+            </div>
+          </div>
+
+          <section class="card card--list card--list-841" aria-labelledby="suppliersTitle">
+            <header class="card__header">
+              <div>
+                <h2 class="card__title" id="suppliersTitle">Fornecedores</h2>
+                <p class="card__subtitle">Parceiros de compra da loja</p>
+              </div>
+            </header>
+
+            <!-- Sem largura para a tabela, esta lista vira cards (ver style.css). -->
+              <div class="table-wrap table-wrap--stacks">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="col-product">Fornecedor</th>
+                    <th scope="col">Contato</th>
+                    <th scope="col" class="num col-wrap-head">Produtos cadastrados</th>
+                    <th scope="col" class="num col-wrap-head">Pedidos em aberto</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="right">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="suppliersBody"></tbody>
+              </table>
+            </div>
+
+            <ul class="record-list" id="suppliersCards"></ul>
+
+            <footer class="card__footer results-bar">
+              <p class="results-bar__text" id="suppliersSummary"></p>
+            </footer>
+          </section>
+        </section>
+
+        <!-- ------------------ VIEW: RELATÓRIOS ------------------ -->
+        <section class="view" id="view-relatorios">
+
+          <div class="page-actions">
+            <p class="page-actions__info">
+              Período analisado
+              <strong id="reportRange">—</strong>
+            </p>
+            <div class="page-actions__buttons">
+              <select class="input input--sm" id="reportPeriod" aria-label="Período do relatório">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="reportKpis"></div>
+
+          <div class="report-grid">
+            <section class="card" aria-labelledby="chartFlowTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="chartFlowTitle">Entradas e saídas</h2>
+                  <p class="card__subtitle">Unidades movimentadas no período</p>
+                </div>
+                <div class="card__actions">
+                  <ul class="chart-legend">
+                    <li class="legend-item legend-item--in">Entradas</li>
+                    <li class="legend-item legend-item--out">Saídas</li>
+                  </ul>
+                </div>
+              </header>
+              <div class="card__body" id="chartFlow"></div>
+            </section>
+
+            <section class="card" aria-labelledby="chartStatusTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="chartStatusTitle">Situação do estoque</h2>
+                  <p class="card__subtitle">Distribuição dos produtos</p>
+                </div>
+              </header>
+              <div class="card__body" id="chartStatus"></div>
+            </section>
+          </div>
+
+          <div class="report-grid report-grid--even">
+            <section class="card" aria-labelledby="chartCategoryTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="chartCategoryTitle">Valor em estoque por categoria</h2>
+                  <p class="card__subtitle">Onde o dinheiro da loja está parado</p>
+                </div>
+              </header>
+              <div class="card__body" id="chartCategory"></div>
+            </section>
+
+            <section class="card" aria-labelledby="chartTopTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="chartTopTitle">Produtos com maior saída</h2>
+                  <p class="card__subtitle">Unidades que saíram no período</p>
+                </div>
+              </header>
+              <div class="card__body" id="chartTop"></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- ------------------ VIEW: CONFIGURAÇÕES ------------------ -->
+        <section class="view" id="view-configuracoes">
+          <div class="settings-grid">
+
+            <section class="card" aria-labelledby="storeTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="storeTitle">Dados da loja</h2>
+                  <p class="card__subtitle">Aparecem na barra lateral e nos registros do sistema</p>
+                </div>
+              </header>
+
+              <form class="card__body form" id="storeForm" novalidate>
+                <div class="field-row">
+                  <div class="field">
+                    <label class="field__label" for="setStoreName">Nome do estabelecimento</label>
+                    <input class="input" type="text" id="setStoreName" required />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="setOwnerName">Responsável</label>
+                    <input class="input" type="text" id="setOwnerName" required />
+                    <p class="field__hint">Assina as movimentações registradas.</p>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label class="field__label" for="setPhone">Telefone</label>
+                    <input class="input" type="text" id="setPhone" />
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="setCity">Cidade</label>
+                    <input class="input" type="text" id="setCity" />
+                  </div>
+                </div>
+
+                <p class="form__error" id="storeError" hidden></p>
+
+                <div class="form__actions">
+                  <button type="submit" class="btn btn--primary">
+                    <svg class="icon icon--sm"><use href="#i-check"></use></svg>
+                    Salvar dados da loja
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" aria-labelledby="stockPrefsTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="stockPrefsTitle">Preferências de estoque</h2>
+                  <p class="card__subtitle">Como o PetGest calcula mínimos e sugestões</p>
+                </div>
+              </header>
+
+              <form class="card__body form" id="stockPrefsForm" novalidate>
+                <div class="field">
+                  <label class="field__label" for="setDefaultMin">Estoque mínimo padrão</label>
+                  <input class="input" type="number" id="setDefaultMin" min="0" step="1" />
+                  <p class="field__hint">Sugerido ao cadastrar um produto novo.</p>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="setFactor">Sugestão de compra</label>
+                  <select class="input" id="setFactor">
+                    <option value="1.5">Repor até 1,5× o estoque mínimo</option>
+                    <option value="2">Repor até 2× o estoque mínimo</option>
+                    <option value="3">Repor até 3× o estoque mínimo</option>
+                  </select>
+                  <p class="field__hint" id="factorPreview"></p>
+                </div>
+
+                <p class="form__error" id="prefsError" hidden></p>
+
+                <div class="form__actions">
+                  <button type="submit" class="btn btn--primary">
+                    <svg class="icon icon--sm"><use href="#i-check"></use></svg>
+                    Salvar preferências
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" aria-labelledby="alertsTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="alertsTitle">Alertas</h2>
+                  <p class="card__subtitle">O que o sino no topo deve avisar</p>
+                </div>
+              </header>
+
+              <div class="card__body switch-list">
+                <label class="switch">
+                  <input type="checkbox" id="setAlertOut" />
+                  <span class="switch__track" aria-hidden="true"></span>
+                  <span class="switch__text">
+                    <strong>Produtos em falta</strong>
+                    <small>Avisar quando um produto zerar o estoque</small>
+                  </span>
+                </label>
+
+                <label class="switch">
+                  <input type="checkbox" id="setAlertLow" />
+                  <span class="switch__track" aria-hidden="true"></span>
+                  <span class="switch__text">
+                    <strong>Estoque baixo</strong>
+                    <small>Avisar quando um produto ficar abaixo do mínimo</small>
+                  </span>
+                </label>
+
+                <label class="switch">
+                  <input type="checkbox" id="setDigest" />
+                  <span class="switch__track" aria-hidden="true"></span>
+                  <span class="switch__text">
+                    <strong>Resumo diário</strong>
+                    <small>Enviar um panorama do estoque por e-mail toda manhã</small>
+                  </span>
+                </label>
+              </div>
+            </section>
+
+            <section class="card" aria-labelledby="themeTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="themeTitle">Aparência</h2>
+                  <p class="card__subtitle">Cor principal do sistema</p>
+                </div>
+              </header>
+
+              <div class="card__body">
+                <div class="swatches" id="swatches" role="radiogroup" aria-label="Cor principal"></div>
+                <p class="field__hint swatches__hint">
+                  A identidade visual inteira vem de variáveis CSS — trocar a cor aqui
+                  atualiza menu, botões, gráficos e indicadores na hora.
+                </p>
+              </div>
+            </section>
+
+            <section class="card settings-grid__wide" aria-labelledby="demoTitle">
+              <header class="card__header">
+                <div>
+                  <h2 class="card__title" id="demoTitle">Dados de demonstração</h2>
+                  <p class="card__subtitle">Este protótipo trabalha com dados fictícios em memória</p>
+                </div>
+                <div class="card__actions">
+                  <button type="button" class="btn btn--outline" data-action="reset-demo">
+                    <svg class="icon icon--sm"><use href="#i-refresh"></use></svg>
+                    Restaurar dados iniciais
+                  </button>
+                </div>
+              </header>
+
+              <div class="card__body">
+                <p class="settings-note" id="demoSummary"></p>
+              </div>
+            </section>
+
+          </div>
+        </section>
+
+        <!-- ------------------ VIEW: PLACEHOLDER ------------------ -->
+        <section class="view" id="view-placeholder">
+          <div class="card empty-state">
+            <span class="empty-state__icon" aria-hidden="true">
+              <svg class="icon"><use href="#i-tools"></use></svg>
+            </span>
+            <h2 class="empty-state__title" id="placeholderTitle">Tela em construção</h2>
+            <p class="empty-state__text" id="placeholderText">
+              Esta área faz parte do PetGest, mas ainda não entrou nesta versão do protótipo.
+            </p>
+            <button type="button" class="btn btn--primary" data-view="dashboard">
+              <svg class="icon icon--sm"><use href="#i-dashboard"></use></svg>
+              Voltar ao Dashboard
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAIS
+       ============================================================ -->
+
+  <!-- Detalhes do produto -->
+  <div class="modal" id="modal-product" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="productModalTitle">Produto</h2>
+          <p class="modal__subtitle" id="productModalMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <div class="modal__body" id="productModalBody"></div>
+
+      <footer class="modal__footer">
+        <button type="button" class="btn btn--ghost" data-action="edit-product">
+          <svg class="icon icon--sm"><use href="#i-edit"></use></svg>
+          Editar produto
+        </button>
+        <div class="modal__footer-right">
+          <button type="button" class="btn btn--outline" data-action="exit-current">
+            <svg class="icon icon--sm"><use href="#i-minus"></use></svg>
+            Registrar saída
+          </button>
+          <button type="button" class="btn btn--primary" data-action="entry-current">
+            <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
+            Registrar entrada
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Registrar entrada -->
+  <div class="modal" id="modal-entry" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="entryModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="entryModalTitle">Registrar entrada</h2>
+          <p class="modal__subtitle">Lance a chegada de mercadoria no estoque</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <form class="modal__body form" id="entryForm" novalidate>
+        <div class="field">
+          <label class="field__label" for="entryProduct">Produto</label>
+          <select class="input" id="entryProduct" required></select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="entryQty">Quantidade</label>
+            <input class="input" type="number" id="entryQty" min="1" step="1" value="1" required data-autofocus />
+          </div>
+          <div class="field">
+            <label class="field__label" for="entrySupplier">Fornecedor</label>
+            <select class="input" id="entrySupplier"></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="entryNote">Observação <span class="field__optional">(opcional)</span></label>
+          <textarea class="input" id="entryNote" rows="2" placeholder="Ex.: Nota fiscal 1042 — entrega parcial"></textarea>
+        </div>
+
+        <div class="preview" id="entryPreview" hidden></div>
+        <p class="form__error" id="entryError" hidden></p>
+      </form>
+
+      <footer class="modal__footer modal__footer--end">
+        <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn--primary" form="entryForm">
+          <svg class="icon icon--sm"><use href="#i-check"></use></svg>
+          Confirmar entrada
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Registrar saída -->
+  <div class="modal" id="modal-exit" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="exitModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="exitModalTitle">Registrar saída</h2>
+          <p class="modal__subtitle">Baixe produtos vendidos, perdidos ou ajustados</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <form class="modal__body form" id="exitForm" novalidate>
+        <div class="field">
+          <label class="field__label" for="exitProduct">Produto</label>
+          <select class="input" id="exitProduct" required></select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="exitQty">Quantidade</label>
+            <input class="input" type="number" id="exitQty" min="1" step="1" value="1" required data-autofocus />
+          </div>
+          <div class="field">
+            <label class="field__label" for="exitReason">Motivo</label>
+            <select class="input" id="exitReason">
+              <option value="Venda">Venda</option>
+              <option value="Perda">Perda</option>
+              <option value="Ajuste">Ajuste</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="exitNote">Observação <span class="field__optional">(opcional)</span></label>
+          <textarea class="input" id="exitNote" rows="2" placeholder="Ex.: Venda no balcão — cliente Maria"></textarea>
+        </div>
+
+        <div class="preview" id="exitPreview" hidden></div>
+        <p class="form__error" id="exitError" hidden></p>
+      </form>
+
+      <footer class="modal__footer modal__footer--end">
+        <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn--primary" form="exitForm">
+          <svg class="icon icon--sm"><use href="#i-check"></use></svg>
+          Confirmar saída
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Editar produto -->
+  <div class="modal" id="modal-edit" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="editModalTitle">Editar produto</h2>
+          <p class="modal__subtitle" id="editModalMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <form class="modal__body form" id="editForm" novalidate>
+        <div class="field">
+          <label class="field__label" for="editName">Nome do produto</label>
+          <input class="input" type="text" id="editName" required data-autofocus />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="editCategory">Categoria</label>
+            <select class="input" id="editCategory"></select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="editSupplier">Fornecedor</label>
+            <select class="input" id="editSupplier"></select>
+          </div>
+        </div>
+
+        <div class="field-row" data-only="create">
+          <div class="field">
+            <label class="field__label" for="editSku">Código interno <span class="field__optional">(opcional)</span></label>
+            <input class="input" type="text" id="editSku" placeholder="Gerado automaticamente" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="editUnit">Unidade de medida</label>
+            <select class="input" id="editUnit">
+              <option value="un">un — unidade</option>
+              <option value="cx">cx — caixa</option>
+              <option value="pct">pct — pacote</option>
+              <option value="sc">sc — saco</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field" data-only="create">
+            <label class="field__label" for="editStock">Estoque inicial</label>
+            <input class="input" type="number" id="editStock" min="0" step="1" value="0" />
+            <p class="field__hint">Vira uma entrada no histórico do produto.</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="editMin">Estoque mínimo</label>
+            <input class="input" type="number" id="editMin" min="0" step="1" required />
+            <p class="field__hint">O status do produto é recalculado automaticamente.</p>
+          </div>
+          <div class="field" data-only="edit">
+            <label class="field__label" for="editStatus">Situação</label>
+            <select class="input" id="editStatus">
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="editCost">Preço de custo (R$)</label>
+            <input class="input" type="number" id="editCost" min="0" step="0.01" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="editPrice">Preço de venda (R$)</label>
+            <input class="input" type="number" id="editPrice" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <p class="form__error" id="editError" hidden></p>
+      </form>
+
+      <footer class="modal__footer modal__footer--end">
+        <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+        <button type="submit" class="btn btn--primary" form="editForm" id="editSubmit">
+          <svg class="icon icon--sm"><use href="#i-check"></use></svg>
+          <span id="editSubmitLabel">Salvar alterações</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Novo pedido de compra -->
+  <div class="modal" id="modal-order" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="orderModalTitle">Novo pedido de compra</h2>
+          <p class="modal__subtitle" id="orderModalMeta">Revise as quantidades antes de gerar o pedido</p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <form class="modal__body" id="orderForm" novalidate>
+        <div id="orderModalBody"></div>
+        <p class="form__error" id="orderError" hidden></p>
+      </form>
+
+      <footer class="modal__footer">
+        <p class="order-total" id="orderTotal"></p>
+        <div class="modal__footer-right">
+          <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+          <button type="submit" class="btn btn--primary" form="orderForm">
+            <svg class="icon icon--sm"><use href="#i-check"></use></svg>
+            Criar pedido
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Detalhes do fornecedor -->
+  <div class="modal" id="modal-supplier" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="supplierModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="supplierModalTitle">Fornecedor</h2>
+          <p class="modal__subtitle" id="supplierModalMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <div class="modal__body modal__body--list" id="supplierModalBody"></div>
+
+      <footer class="modal__footer modal__footer--end">
+        <button type="button" class="btn btn--ghost" data-close-modal>Fechar</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Receber pedido -->
+  <div class="modal" id="modal-receive" hidden>
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="receiveModalTitle">
+      <header class="modal__header">
+        <div class="modal__heading">
+          <h2 class="modal__title" id="receiveModalTitle">Receber pedido</h2>
+          <p class="modal__subtitle" id="receiveModalMeta"></p>
+        </div>
+        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <form class="modal__body" id="receiveForm" novalidate>
+        <div id="receiveModalBody"></div>
+
+        <div class="field receive-invoice">
+          <label class="field__label" for="receiveInvoice">
+            Nota fiscal <span class="field__optional">(opcional)</span>
+          </label>
+          <input class="input" type="text" id="receiveInvoice" placeholder="Ex.: 3402" autocomplete="off" />
+          <p class="field__hint">
+            Confirme apenas o que chegou. As quantidades viram entradas no estoque e o pedido é encerrado.
+          </p>
+        </div>
+
+        <p class="form__error" id="receiveError" hidden></p>
+      </form>
+
+      <footer class="modal__footer">
+        <p class="order-total" id="receiveTotal"></p>
+        <div class="modal__footer-right">
+          <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+          <button type="submit" class="btn btn--primary" form="receiveForm">
+            <svg class="icon icon--sm"><use href="#i-arrow-down"></use></svg>
+            Confirmar recebimento
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
