@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PetGest — Gestão de Estoque</title>
-  <meta name="description" content="PetGest — sistema de gestão de estoque para pet shops e comércios agropecuários." />
+  <title>PetGest V0 — Cadastro por código de barras</title>
+  <meta name="description" content="Protótipo navegável do V0 do PetGest: cadastro de produto via scanner de código de barras e dados da loja." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -45,7 +45,70 @@
     <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.2 3.5H5a1.6 1.6 0 0 0-1.6 1.8c.5 4.2 2.3 8 5.1 10.8s6.6 4.6 10.8 5.1A1.6 1.6 0 0 0 21 19.6v-3.1a1.6 1.6 0 0 0-1.4-1.6l-2.4-.4a1.6 1.6 0 0 0-1.5.7l-.8 1.2a12.6 12.6 0 0 1-5.3-5.3l1.2-.8a1.6 1.6 0 0 0 .7-1.5l-.4-2.4a1.6 1.6 0 0 0-1.6-1.4Z"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.6 6.5 8.4 6 8.4-6"/></symbol>
+    <symbol id="i-barcode" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 6v12M6.5 6v12M10 6v8M13.5 6v12M17 6v8M20.5 6v12"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5a2 2 0 0 1 2-2h2.2l1.3-2h6l1.3 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="12.8" r="3.4"/></symbol>
+    <symbol id="i-camera-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5a2 2 0 0 1 2-2h1.8"/><path d="M10.5 4.5h3l1.3 2H19a2 2 0 0 1 2 2v7.2"/><path d="M3 10v7.5a2 2 0 0 0 2 2h12.5"/><path d="m3.5 3.5 17 17"/></symbol>
+    <symbol id="i-flash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2.5 4.5 13.5H11L10 21.5 19.5 10H13Z"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7.5 10-7.5S22 12 22 12s-3.6 7.5-10 7.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3.2"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a13.8 13.8 0 0 1-3.4 4.3"/><path d="M6.1 6.4C3.5 8.1 2 12 2 12a13.7 13.7 0 0 0 4.6 5.2A10.4 10.4 0 0 0 12 19c1.1 0 2.1-.1 3-.4"/><path d="M9.9 9.9a3.2 3.2 0 0 0 4.3 4.3"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.6A1.6 1.6 0 0 0 4 5.6v12.8A1.6 1.6 0 0 0 5.6 20H9"/><path d="m15.5 16 4-4-4-4"/><path d="M19 12H9"/></symbol>
   </svg>
+
+  <!-- ============================================================
+       TELA DE LOGIN
+       ============================================================ -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg class="icon"><use href="#i-paw"></use></svg>
+        </span>
+        <span class="auth-brand__name">PetGest</span>
+      </div>
+
+      <h1 class="auth-card__title">Entrar</h1>
+      <p class="auth-card__subtitle">Acesse o painel do seu petshop</p>
+
+      <form class="auth-form" id="loginForm" novalidate>
+        <div class="field">
+          <label class="field__label" for="loginEmail">E-mail</label>
+          <input class="input" type="email" id="loginEmail" inputmode="email"
+                 autocomplete="username" placeholder="voce@petshop.com.br" data-autofocus />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="loginPassword">Senha</label>
+          <div class="field-with-action">
+            <input class="input" type="password" id="loginPassword"
+                   autocomplete="current-password" placeholder="Sua senha" />
+            <button type="button" class="btn btn--outline field-with-action__btn"
+                    id="togglePassword" data-action="toggle-password"
+                    aria-label="Mostrar senha" aria-pressed="false">
+              <svg class="icon icon--sm"><use href="#i-eye"></use></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-form__row">
+          <label class="auth-checkbox">
+            <input type="checkbox" id="loginRemember" checked />
+            <span>Manter conectado</span>
+          </label>
+          <button type="button" class="btn btn--link auth-form__forgot" data-action="forgot-password">
+            Esqueci minha senha
+          </button>
+        </div>
+
+        <p class="form__error" id="loginError" hidden></p>
+
+        <button type="submit" class="btn btn--primary auth-submit" id="loginSubmit">
+          <span id="loginSubmitLabel">Entrar</span>
+        </button>
+      </form>
+
+      <p class="auth-hint">Protótipo visual — use qualquer e-mail e senha para entrar.</p>
+    </div>
+  </div>
 
   <div class="app">
 
@@ -59,7 +122,7 @@
         </span>
         <span class="brand__text">
           <strong class="brand__name">PetGest</strong>
-          <span class="brand__tagline">Mais tempo para o que importa</span>
+          <span class="brand__tagline">V0 — cadastro por código de barras</span>
         </span>
         <button type="button" class="icon-btn sidebar__close" id="sidebarClose" aria-label="Fechar menu">
           <svg class="icon"><use href="#i-close"></use></svg>
@@ -67,33 +130,9 @@
       </div>
 
       <nav class="sidebar__nav" id="mainNav">
-        <p class="nav__label">Principal</p>
-        <button type="button" class="nav__item is-active" data-view="dashboard">
-          <svg class="icon" aria-hidden="true"><use href="#i-dashboard"></use></svg>
-          <span>Dashboard</span>
-        </button>
-        <button type="button" class="nav__item" data-view="produtos">
+        <button type="button" class="nav__item is-active" data-view="produtos">
           <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
           <span>Produtos</span>
-        </button>
-        <button type="button" class="nav__item" data-view="estoque">
-          <svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg>
-          <span>Estoque</span>
-        </button>
-        <button type="button" class="nav__item" data-view="reposicao">
-          <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
-          <span>Reposição</span>
-          <span class="nav__badge" id="navBadgeReposicao">0</span>
-        </button>
-
-        <p class="nav__label">Cadastros</p>
-        <button type="button" class="nav__item" data-view="fornecedores">
-          <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
-          <span>Fornecedores</span>
-        </button>
-        <button type="button" class="nav__item" data-view="relatorios">
-          <svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg>
-          <span>Relatórios</span>
         </button>
       </nav>
 
@@ -103,12 +142,15 @@
           <span>Configurações</span>
         </button>
         <div class="store-chip">
-          <span class="store-chip__avatar" aria-hidden="true">PS</span>
+          <span class="store-chip__avatar" aria-hidden="true" id="storeAvatar">PS</span>
           <span class="store-chip__info">
-            <strong>Pet Shop Amigo Fiel</strong>
-            <small>Plano Essencial</small>
+            <strong id="storeChipName">Pet Shop Amigo Fiel</strong>
           </span>
         </div>
+        <button type="button" class="sidebar__logout" data-action="logout">
+          <svg class="icon icon--sm" aria-hidden="true"><use href="#i-logout"></use></svg>
+          Sair
+        </button>
       </div>
     </aside>
 
@@ -124,111 +166,16 @@
             <svg class="icon"><use href="#i-menu"></use></svg>
           </button>
           <div class="topbar__titles">
-            <h1 class="topbar__title" id="pageTitle">Dashboard</h1>
-            <p class="topbar__subtitle" id="pageSubtitle">Visão geral do seu estoque</p>
-          </div>
-        </div>
-
-        <div class="topbar__right">
-          <button type="button" class="icon-btn has-dot" id="btnNotifications" aria-label="Notificações">
-            <svg class="icon"><use href="#i-bell"></use></svg>
-          </button>
-          <div class="user-chip">
-            <span class="user-chip__hello">Olá, <strong>Carlos</strong></span>
-            <span class="user-chip__avatar" aria-hidden="true">C</span>
+            <h1 class="topbar__title" id="pageTitle">Produtos</h1>
+            <p class="topbar__subtitle" id="pageSubtitle">Gerencie os produtos cadastrados</p>
           </div>
         </div>
       </header>
 
       <main class="content" id="content">
 
-        <!-- ------------------ VIEW: DASHBOARD ------------------ -->
-        <section class="view is-active" id="view-dashboard">
-
-          <!-- Indicadores -->
-          <div class="kpi-grid" id="kpiGrid"></div>
-
-          <div class="dash-grid">
-
-            <!-- Produtos em atenção -->
-            <section class="card card--list" aria-labelledby="attentionTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="attentionTitle">Produtos em atenção</h2>
-                  <p class="card__subtitle">Produtos que precisam da sua atenção</p>
-                </div>
-                <div class="card__actions">
-                  <button type="button" class="btn btn--ghost btn--sm" data-view="produtos">
-                    Ver todos
-                    <svg class="icon icon--sm"><use href="#i-arrow-right"></use></svg>
-                  </button>
-                </div>
-              </header>
-
-              <!-- No celular esta tabela dá lugar à lista de cards abaixo. -->
-              <div class="table-wrap table-wrap--stacks">
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th scope="col" class="col-product">Produto</th>
-                      <th scope="col">Categoria</th>
-                      <th scope="col" class="num">Estoque</th>
-                      <th scope="col" class="num">Mínimo</th>
-                      <th scope="col">Status</th>
-                      <th scope="col" class="right">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="attentionBody"></tbody>
-                </table>
-              </div>
-
-              <ul class="record-list" id="attentionCards"></ul>
-            </section>
-
-            <!-- Coluna lateral: movimentações + ações rápidas -->
-            <div class="dash-col">
-
-            <section class="card" aria-labelledby="movementsTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="movementsTitle">Movimentações recentes</h2>
-                  <p class="card__subtitle">Entradas e saídas dos últimos dias</p>
-                </div>
-              </header>
-
-              <ul class="timeline" id="movementsList"></ul>
-
-              <footer class="card__footer">
-                <button type="button" class="btn btn--ghost btn--sm btn--block" data-view="estoque">
-                  Ver todas as movimentações
-                </button>
-              </footer>
-            </section>
-
-            <!-- Ações rápidas -->
-            <section class="card quick-actions" aria-label="Ações rápidas">
-              <div class="quick-actions__text">
-                <h2 class="card__title">Ações rápidas</h2>
-                <p class="card__subtitle">Registre uma movimentação sem sair do painel</p>
-              </div>
-              <div class="quick-actions__buttons">
-                <button type="button" class="btn btn--primary" data-action="open-entry">
-                  <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
-                  Registrar entrada
-                </button>
-                <button type="button" class="btn btn--outline" data-action="open-exit">
-                  <svg class="icon icon--sm"><use href="#i-minus"></use></svg>
-                  Registrar saída
-                </button>
-              </div>
-            </section>
-
-            </div>
-          </div>
-        </section>
-
         <!-- ------------------ VIEW: PRODUTOS ------------------ -->
-        <section class="view" id="view-produtos">
+        <section class="view is-active" id="view-produtos">
 
           <!-- Busca, filtro e cadastro -->
           <div class="toolbar">
@@ -259,44 +206,22 @@
             </button>
           </div>
 
-          <!-- Filtros avançados -->
+          <!-- Filtros -->
           <div class="filter-panel" id="filterPanel" hidden>
             <div class="field">
               <label class="field__label" for="filterCategory">Categoria</label>
               <select class="input" id="filterCategory"></select>
             </div>
             <div class="field">
-              <label class="field__label" for="filterSupplier">Fornecedor</label>
-              <select class="input" id="filterSupplier"></select>
-            </div>
-            <div class="field">
               <label class="field__label" for="filterSort">Ordenar por</label>
               <select class="input" id="filterSort">
                 <option value="name">Nome (A–Z)</option>
-                <option value="stock-asc">Menor estoque primeiro</option>
-                <option value="stock-desc">Maior estoque primeiro</option>
                 <option value="category">Categoria</option>
               </select>
             </div>
             <button type="button" class="btn btn--ghost" data-action="clear-filters">
               <svg class="icon icon--sm"><use href="#i-refresh"></use></svg>
               Limpar filtros
-            </button>
-          </div>
-
-          <!-- Filtro rápido por status -->
-          <div class="chip-group" role="group" aria-label="Filtrar por status do estoque">
-            <button type="button" class="chip is-active" data-action="filter-status" data-status="all">
-              Todos <span class="chip__count" id="countAll">0</span>
-            </button>
-            <button type="button" class="chip chip--ok" data-action="filter-status" data-status="ok">
-              Normal <span class="chip__count" id="countOk">0</span>
-            </button>
-            <button type="button" class="chip chip--low" data-action="filter-status" data-status="low">
-              Baixo <span class="chip__count" id="countLow">0</span>
-            </button>
-            <button type="button" class="chip chip--out" data-action="filter-status" data-status="out">
-              Em falta <span class="chip__count" id="countOut">0</span>
             </button>
           </div>
 
@@ -308,9 +233,8 @@
                   <tr>
                     <th scope="col" class="col-product">Produto</th>
                     <th scope="col">Categoria</th>
-                    <th scope="col" class="num">Estoque</th>
-                    <th scope="col" class="num">Mínimo</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Código de barras</th>
+                    <th scope="col" class="num">Preço</th>
                     <th scope="col" class="right">Ações</th>
                   </tr>
                 </thead>
@@ -326,297 +250,6 @@
           </section>
         </section>
 
-        <!-- ------------------ VIEW: ESTOQUE ------------------ -->
-        <section class="view" id="view-estoque">
-
-          <div class="page-actions">
-            <p class="page-actions__info">
-              Valor em estoque
-              <strong id="stockValue">R$ 0,00</strong>
-            </p>
-            <div class="page-actions__buttons">
-              <button type="button" class="btn btn--outline" data-action="open-exit">
-                <svg class="icon icon--sm"><use href="#i-minus"></use></svg>
-                Saída
-              </button>
-              <button type="button" class="btn btn--primary" data-action="open-entry">
-                <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
-                Entrada
-              </button>
-            </div>
-          </div>
-
-          <div class="kpi-grid" id="stockKpis"></div>
-
-          <section class="card card--list card--list-951" aria-labelledby="stockMovementsTitle">
-            <header class="card__header">
-              <div>
-                <h2 class="card__title" id="stockMovementsTitle">Movimentações</h2>
-                <p class="card__subtitle">Entradas e saídas registradas no período</p>
-              </div>
-              <div class="card__actions">
-                <div class="chip-group" role="group" aria-label="Filtrar por tipo de movimentação">
-                  <button type="button" class="chip is-active" data-action="filter-movement" data-type="all">
-                    Todas <span class="chip__count" id="countMovAll">0</span>
-                  </button>
-                  <button type="button" class="chip chip--ok" data-action="filter-movement" data-type="in">
-                    Entradas <span class="chip__count" id="countMovIn">0</span>
-                  </button>
-                  <button type="button" class="chip chip--out" data-action="filter-movement" data-type="out">
-                    Saídas <span class="chip__count" id="countMovOut">0</span>
-                  </button>
-                </div>
-                <select class="input input--sm" id="stockPeriod" aria-label="Período">
-                  <option value="7">Últimos 7 dias</option>
-                  <option value="30" selected>Últimos 30 dias</option>
-                  <option value="90">Últimos 90 dias</option>
-                  <option value="all">Todo o período</option>
-                </select>
-              </div>
-            </header>
-
-            <!-- Sem largura para a tabela, este extrato vira cards (ver style.css). -->
-            <div class="table-wrap table-wrap--stacks">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Data</th>
-                    <th scope="col" class="col-product">Produto</th>
-                    <th scope="col">Movimentação</th>
-                    <th scope="col">Observação</th>
-                    <th scope="col" class="num">Quantidade</th>
-                    <th scope="col" class="num">Saldo após</th>
-                  </tr>
-                </thead>
-                <tbody id="stockMovementsBody"></tbody>
-              </table>
-            </div>
-
-            <ul class="record-list record-list--top" id="stockMovementsCards"></ul>
-
-            <footer class="card__footer results-bar">
-              <p class="results-bar__text" id="stockSummary"></p>
-            </footer>
-          </section>
-        </section>
-
-        <!-- ------------------ VIEW: REPOSIÇÃO ------------------ -->
-        <section class="view" id="view-reposicao">
-
-          <div class="page-actions">
-            <p class="page-actions__info">
-              Custo estimado da reposição
-              <strong id="replenishCost">R$ 0,00</strong>
-            </p>
-            <div class="page-actions__buttons">
-              <button type="button" class="btn btn--ghost" data-action="clear-selection" id="btnClearSelection" hidden>
-                Limpar seleção
-              </button>
-              <button type="button" class="btn btn--primary" data-action="open-order" id="btnCreateOrder" disabled>
-                <svg class="icon icon--sm"><use href="#i-cart"></use></svg>
-                Criar pedido
-                <span class="btn__badge" id="selectionCount" hidden>0</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="chip-group" role="group" aria-label="Filtrar produtos para reposição">
-            <button type="button" class="chip is-active" data-action="filter-replenish" data-scope="pending">
-              Precisam de pedido <span class="chip__count" id="countPending">0</span>
-            </button>
-            <button type="button" class="chip" data-action="filter-replenish" data-scope="ordered">
-              Já em pedido <span class="chip__count" id="countOrdered">0</span>
-            </button>
-            <button type="button" class="chip" data-action="filter-replenish" data-scope="all">
-              Todos <span class="chip__count" id="countBelow">0</span>
-            </button>
-          </div>
-
-          <section class="card card--list card--list-801" aria-labelledby="replenishTitle">
-            <header class="card__header">
-              <div>
-                <h2 class="card__title" id="replenishTitle">Produtos para comprar</h2>
-                <p class="card__subtitle">
-                  A sugestão recompõe o dobro do estoque mínimo. Selecione os itens e gere o pedido.
-                </p>
-              </div>
-            </header>
-
-            <!-- Sem largura para a tabela, esta lista vira cards (ver style.css). -->
-            <div class="table-wrap table-wrap--stacks">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col" class="check">
-                      <input type="checkbox" class="checkbox" id="selectAll" aria-label="Selecionar todos os produtos" />
-                    </th>
-                    <th scope="col" class="col-product">Produto</th>
-                    <th scope="col" class="num">Estoque</th>
-                    <th scope="col" class="num">Mínimo</th>
-                    <th scope="col" class="num col-wrap-head">Sugestão de compra</th>
-                    <th scope="col" class="col-supplier">Fornecedor</th>
-                    <th scope="col" class="right">Ação</th>
-                  </tr>
-                </thead>
-                <tbody id="replenishBody"></tbody>
-              </table>
-            </div>
-
-            <ul class="record-list" id="replenishCards"></ul>
-
-            <footer class="card__footer results-bar">
-              <p class="results-bar__text" id="replenishSummary"></p>
-            </footer>
-          </section>
-
-          <section class="card card--list card--list-801" aria-labelledby="ordersTitle">
-            <header class="card__header">
-              <div>
-                <h2 class="card__title" id="ordersTitle">Pedidos de compra</h2>
-                <p class="card__subtitle">Pedidos gerados a partir da reposição</p>
-              </div>
-            </header>
-
-            <div class="table-wrap table-wrap--stacks">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Pedido</th>
-                    <th scope="col" class="col-supplier">Fornecedor</th>
-                    <th scope="col" class="num">Itens</th>
-                    <th scope="col" class="num">Unidades</th>
-                    <th scope="col" class="num col-wrap-head">Valor estimado</th>
-                    <th scope="col">Status</th>
-                    <th scope="col" class="right">Ação</th>
-                  </tr>
-                </thead>
-                <tbody id="ordersBody"></tbody>
-              </table>
-            </div>
-
-            <ul class="record-list" id="ordersCards"></ul>
-          </section>
-        </section>
-
-        <!-- ------------------ VIEW: FORNECEDORES ------------------ -->
-        <section class="view" id="view-fornecedores">
-
-          <div class="page-actions">
-            <p class="page-actions__info">
-              Compras em aberto
-              <strong id="supplierOpenValue">R$ 0,00</strong>
-            </p>
-            <div class="page-actions__buttons">
-              <button type="button" class="btn btn--outline" data-view="reposicao">
-                <svg class="icon icon--sm"><use href="#i-cart"></use></svg>
-                Ver reposição
-              </button>
-            </div>
-          </div>
-
-          <section class="card card--list card--list-841" aria-labelledby="suppliersTitle">
-            <header class="card__header">
-              <div>
-                <h2 class="card__title" id="suppliersTitle">Fornecedores</h2>
-                <p class="card__subtitle">Parceiros de compra da loja</p>
-              </div>
-            </header>
-
-            <!-- Sem largura para a tabela, esta lista vira cards (ver style.css). -->
-              <div class="table-wrap table-wrap--stacks">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col" class="col-product">Fornecedor</th>
-                    <th scope="col">Contato</th>
-                    <th scope="col" class="num col-wrap-head">Produtos cadastrados</th>
-                    <th scope="col" class="num col-wrap-head">Pedidos em aberto</th>
-                    <th scope="col">Status</th>
-                    <th scope="col" class="right">Ação</th>
-                  </tr>
-                </thead>
-                <tbody id="suppliersBody"></tbody>
-              </table>
-            </div>
-
-            <ul class="record-list" id="suppliersCards"></ul>
-
-            <footer class="card__footer results-bar">
-              <p class="results-bar__text" id="suppliersSummary"></p>
-            </footer>
-          </section>
-        </section>
-
-        <!-- ------------------ VIEW: RELATÓRIOS ------------------ -->
-        <section class="view" id="view-relatorios">
-
-          <div class="page-actions">
-            <p class="page-actions__info">
-              Período analisado
-              <strong id="reportRange">—</strong>
-            </p>
-            <div class="page-actions__buttons">
-              <select class="input input--sm" id="reportPeriod" aria-label="Período do relatório">
-                <option value="7">Últimos 7 dias</option>
-                <option value="30" selected>Últimos 30 dias</option>
-                <option value="90">Últimos 90 dias</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="kpi-grid" id="reportKpis"></div>
-
-          <div class="report-grid">
-            <section class="card" aria-labelledby="chartFlowTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="chartFlowTitle">Entradas e saídas</h2>
-                  <p class="card__subtitle">Unidades movimentadas no período</p>
-                </div>
-                <div class="card__actions">
-                  <ul class="chart-legend">
-                    <li class="legend-item legend-item--in">Entradas</li>
-                    <li class="legend-item legend-item--out">Saídas</li>
-                  </ul>
-                </div>
-              </header>
-              <div class="card__body" id="chartFlow"></div>
-            </section>
-
-            <section class="card" aria-labelledby="chartStatusTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="chartStatusTitle">Situação do estoque</h2>
-                  <p class="card__subtitle">Distribuição dos produtos</p>
-                </div>
-              </header>
-              <div class="card__body" id="chartStatus"></div>
-            </section>
-          </div>
-
-          <div class="report-grid report-grid--even">
-            <section class="card" aria-labelledby="chartCategoryTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="chartCategoryTitle">Valor em estoque por categoria</h2>
-                  <p class="card__subtitle">Onde o dinheiro da loja está parado</p>
-                </div>
-              </header>
-              <div class="card__body" id="chartCategory"></div>
-            </section>
-
-            <section class="card" aria-labelledby="chartTopTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="chartTopTitle">Produtos com maior saída</h2>
-                  <p class="card__subtitle">Unidades que saíram no período</p>
-                </div>
-              </header>
-              <div class="card__body" id="chartTop"></div>
-            </section>
-          </div>
-        </section>
-
         <!-- ------------------ VIEW: CONFIGURAÇÕES ------------------ -->
         <section class="view" id="view-configuracoes">
           <div class="settings-grid">
@@ -625,31 +258,24 @@
               <header class="card__header">
                 <div>
                   <h2 class="card__title" id="storeTitle">Dados da loja</h2>
-                  <p class="card__subtitle">Aparecem na barra lateral e nos registros do sistema</p>
+                  <p class="card__subtitle">Aparecem na barra lateral e no cadastro do petshop</p>
                 </div>
               </header>
 
               <form class="card__body form" id="storeForm" novalidate>
-                <div class="field-row">
-                  <div class="field">
-                    <label class="field__label" for="setStoreName">Nome do estabelecimento</label>
-                    <input class="input" type="text" id="setStoreName" required />
-                  </div>
-                  <div class="field">
-                    <label class="field__label" for="setOwnerName">Responsável</label>
-                    <input class="input" type="text" id="setOwnerName" required />
-                    <p class="field__hint">Assina as movimentações registradas.</p>
-                  </div>
+                <div class="field">
+                  <label class="field__label" for="setStoreName">Nome do petshop</label>
+                  <input class="input" type="text" id="setStoreName" required data-autofocus />
                 </div>
 
                 <div class="field-row">
                   <div class="field">
-                    <label class="field__label" for="setPhone">Telefone</label>
-                    <input class="input" type="text" id="setPhone" />
+                    <label class="field__label" for="setEmail">E-mail</label>
+                    <input class="input" type="email" id="setEmail" required />
                   </div>
                   <div class="field">
-                    <label class="field__label" for="setCity">Cidade</label>
-                    <input class="input" type="text" id="setCity" />
+                    <label class="field__label" for="setPhone">Telefone</label>
+                    <input class="input" type="tel" id="setPhone" required />
                   </div>
                 </div>
 
@@ -664,133 +290,6 @@
               </form>
             </section>
 
-            <section class="card" aria-labelledby="stockPrefsTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="stockPrefsTitle">Preferências de estoque</h2>
-                  <p class="card__subtitle">Como o PetGest calcula mínimos e sugestões</p>
-                </div>
-              </header>
-
-              <form class="card__body form" id="stockPrefsForm" novalidate>
-                <div class="field">
-                  <label class="field__label" for="setDefaultMin">Estoque mínimo padrão</label>
-                  <input class="input" type="number" id="setDefaultMin" min="0" step="1" />
-                  <p class="field__hint">Sugerido ao cadastrar um produto novo.</p>
-                </div>
-
-                <div class="field">
-                  <label class="field__label" for="setFactor">Sugestão de compra</label>
-                  <select class="input" id="setFactor">
-                    <option value="1.5">Repor até 1,5× o estoque mínimo</option>
-                    <option value="2">Repor até 2× o estoque mínimo</option>
-                    <option value="3">Repor até 3× o estoque mínimo</option>
-                  </select>
-                  <p class="field__hint" id="factorPreview"></p>
-                </div>
-
-                <p class="form__error" id="prefsError" hidden></p>
-
-                <div class="form__actions">
-                  <button type="submit" class="btn btn--primary">
-                    <svg class="icon icon--sm"><use href="#i-check"></use></svg>
-                    Salvar preferências
-                  </button>
-                </div>
-              </form>
-            </section>
-
-            <section class="card" aria-labelledby="alertsTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="alertsTitle">Alertas</h2>
-                  <p class="card__subtitle">O que o sino no topo deve avisar</p>
-                </div>
-              </header>
-
-              <div class="card__body switch-list">
-                <label class="switch">
-                  <input type="checkbox" id="setAlertOut" />
-                  <span class="switch__track" aria-hidden="true"></span>
-                  <span class="switch__text">
-                    <strong>Produtos em falta</strong>
-                    <small>Avisar quando um produto zerar o estoque</small>
-                  </span>
-                </label>
-
-                <label class="switch">
-                  <input type="checkbox" id="setAlertLow" />
-                  <span class="switch__track" aria-hidden="true"></span>
-                  <span class="switch__text">
-                    <strong>Estoque baixo</strong>
-                    <small>Avisar quando um produto ficar abaixo do mínimo</small>
-                  </span>
-                </label>
-
-                <label class="switch">
-                  <input type="checkbox" id="setDigest" />
-                  <span class="switch__track" aria-hidden="true"></span>
-                  <span class="switch__text">
-                    <strong>Resumo diário</strong>
-                    <small>Enviar um panorama do estoque por e-mail toda manhã</small>
-                  </span>
-                </label>
-              </div>
-            </section>
-
-            <section class="card" aria-labelledby="themeTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="themeTitle">Aparência</h2>
-                  <p class="card__subtitle">Cor principal do sistema</p>
-                </div>
-              </header>
-
-              <div class="card__body">
-                <div class="swatches" id="swatches" role="radiogroup" aria-label="Cor principal"></div>
-                <p class="field__hint swatches__hint">
-                  A identidade visual inteira vem de variáveis CSS — trocar a cor aqui
-                  atualiza menu, botões, gráficos e indicadores na hora.
-                </p>
-              </div>
-            </section>
-
-            <section class="card settings-grid__wide" aria-labelledby="demoTitle">
-              <header class="card__header">
-                <div>
-                  <h2 class="card__title" id="demoTitle">Dados de demonstração</h2>
-                  <p class="card__subtitle">Este protótipo trabalha com dados fictícios em memória</p>
-                </div>
-                <div class="card__actions">
-                  <button type="button" class="btn btn--outline" data-action="reset-demo">
-                    <svg class="icon icon--sm"><use href="#i-refresh"></use></svg>
-                    Restaurar dados iniciais
-                  </button>
-                </div>
-              </header>
-
-              <div class="card__body">
-                <p class="settings-note" id="demoSummary"></p>
-              </div>
-            </section>
-
-          </div>
-        </section>
-
-        <!-- ------------------ VIEW: PLACEHOLDER ------------------ -->
-        <section class="view" id="view-placeholder">
-          <div class="card empty-state">
-            <span class="empty-state__icon" aria-hidden="true">
-              <svg class="icon"><use href="#i-tools"></use></svg>
-            </span>
-            <h2 class="empty-state__title" id="placeholderTitle">Tela em construção</h2>
-            <p class="empty-state__text" id="placeholderText">
-              Esta área faz parte do PetGest, mas ainda não entrou nesta versão do protótipo.
-            </p>
-            <button type="button" class="btn btn--primary" data-view="dashboard">
-              <svg class="icon icon--sm"><use href="#i-dashboard"></use></svg>
-              Voltar ao Dashboard
-            </button>
           </div>
         </section>
 
@@ -799,155 +298,14 @@
   </div>
 
   <!-- ============================================================
-       MODAIS
+       MODAL — CADASTRAR / EDITAR PRODUTO
        ============================================================ -->
-
-  <!-- Detalhes do produto -->
-  <div class="modal" id="modal-product" hidden>
-    <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
-      <header class="modal__header">
-        <div class="modal__heading">
-          <h2 class="modal__title" id="productModalTitle">Produto</h2>
-          <p class="modal__subtitle" id="productModalMeta"></p>
-        </div>
-        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
-          <svg class="icon"><use href="#i-close"></use></svg>
-        </button>
-      </header>
-
-      <div class="modal__body" id="productModalBody"></div>
-
-      <footer class="modal__footer">
-        <button type="button" class="btn btn--ghost" data-action="edit-product">
-          <svg class="icon icon--sm"><use href="#i-edit"></use></svg>
-          Editar produto
-        </button>
-        <div class="modal__footer-right">
-          <button type="button" class="btn btn--outline" data-action="exit-current">
-            <svg class="icon icon--sm"><use href="#i-minus"></use></svg>
-            Registrar saída
-          </button>
-          <button type="button" class="btn btn--primary" data-action="entry-current">
-            <svg class="icon icon--sm"><use href="#i-plus"></use></svg>
-            Registrar entrada
-          </button>
-        </div>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Registrar entrada -->
-  <div class="modal" id="modal-entry" hidden>
-    <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="entryModalTitle">
-      <header class="modal__header">
-        <div class="modal__heading">
-          <h2 class="modal__title" id="entryModalTitle">Registrar entrada</h2>
-          <p class="modal__subtitle">Lance a chegada de mercadoria no estoque</p>
-        </div>
-        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
-          <svg class="icon"><use href="#i-close"></use></svg>
-        </button>
-      </header>
-
-      <form class="modal__body form" id="entryForm" novalidate>
-        <div class="field">
-          <label class="field__label" for="entryProduct">Produto</label>
-          <select class="input" id="entryProduct" required></select>
-        </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label class="field__label" for="entryQty">Quantidade</label>
-            <input class="input" type="number" id="entryQty" min="1" step="1" value="1" required data-autofocus />
-          </div>
-          <div class="field">
-            <label class="field__label" for="entrySupplier">Fornecedor</label>
-            <select class="input" id="entrySupplier"></select>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field__label" for="entryNote">Observação <span class="field__optional">(opcional)</span></label>
-          <textarea class="input" id="entryNote" rows="2" placeholder="Ex.: Nota fiscal 1042 — entrega parcial"></textarea>
-        </div>
-
-        <div class="preview" id="entryPreview" hidden></div>
-        <p class="form__error" id="entryError" hidden></p>
-      </form>
-
-      <footer class="modal__footer modal__footer--end">
-        <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
-        <button type="submit" class="btn btn--primary" form="entryForm">
-          <svg class="icon icon--sm"><use href="#i-check"></use></svg>
-          Confirmar entrada
-        </button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Registrar saída -->
-  <div class="modal" id="modal-exit" hidden>
-    <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="exitModalTitle">
-      <header class="modal__header">
-        <div class="modal__heading">
-          <h2 class="modal__title" id="exitModalTitle">Registrar saída</h2>
-          <p class="modal__subtitle">Baixe produtos vendidos, perdidos ou ajustados</p>
-        </div>
-        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
-          <svg class="icon"><use href="#i-close"></use></svg>
-        </button>
-      </header>
-
-      <form class="modal__body form" id="exitForm" novalidate>
-        <div class="field">
-          <label class="field__label" for="exitProduct">Produto</label>
-          <select class="input" id="exitProduct" required></select>
-        </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label class="field__label" for="exitQty">Quantidade</label>
-            <input class="input" type="number" id="exitQty" min="1" step="1" value="1" required data-autofocus />
-          </div>
-          <div class="field">
-            <label class="field__label" for="exitReason">Motivo</label>
-            <select class="input" id="exitReason">
-              <option value="Venda">Venda</option>
-              <option value="Perda">Perda</option>
-              <option value="Ajuste">Ajuste</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="field__label" for="exitNote">Observação <span class="field__optional">(opcional)</span></label>
-          <textarea class="input" id="exitNote" rows="2" placeholder="Ex.: Venda no balcão — cliente Maria"></textarea>
-        </div>
-
-        <div class="preview" id="exitPreview" hidden></div>
-        <p class="form__error" id="exitError" hidden></p>
-      </form>
-
-      <footer class="modal__footer modal__footer--end">
-        <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
-        <button type="submit" class="btn btn--primary" form="exitForm">
-          <svg class="icon icon--sm"><use href="#i-check"></use></svg>
-          Confirmar saída
-        </button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Editar produto -->
   <div class="modal" id="modal-edit" hidden>
     <div class="modal__backdrop" data-close-modal></div>
     <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
       <header class="modal__header">
         <div class="modal__heading">
-          <h2 class="modal__title" id="editModalTitle">Editar produto</h2>
+          <h2 class="modal__title" id="editModalTitle">Produto</h2>
           <p class="modal__subtitle" id="editModalMeta"></p>
         </div>
         <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
@@ -961,62 +319,30 @@
           <input class="input" type="text" id="editName" required data-autofocus />
         </div>
 
-        <div class="field-row">
-          <div class="field">
-            <label class="field__label" for="editCategory">Categoria</label>
-            <select class="input" id="editCategory"></select>
-          </div>
-          <div class="field">
-            <label class="field__label" for="editSupplier">Fornecedor</label>
-            <select class="input" id="editSupplier"></select>
-          </div>
+        <div class="field">
+          <label class="field__label" for="editCategory">Categoria</label>
+          <select class="input" id="editCategory"></select>
         </div>
 
-        <div class="field-row" data-only="create">
-          <div class="field">
-            <label class="field__label" for="editSku">Código interno <span class="field__optional">(opcional)</span></label>
-            <input class="input" type="text" id="editSku" placeholder="Gerado automaticamente" />
+        <div class="field">
+          <label class="field__label" for="editBarcode">
+            Código de barras <span class="field__optional">(opcional)</span>
+          </label>
+          <div class="field-with-action">
+            <input class="input" type="text" id="editBarcode" inputmode="numeric"
+                   autocomplete="off" placeholder="Ex.: 7891000315507" />
+            <button type="button" class="btn btn--outline field-with-action__btn"
+                    data-action="scan-barcode">
+              <svg class="icon icon--sm"><use href="#i-barcode"></use></svg>
+              Escanear
+            </button>
           </div>
-          <div class="field">
-            <label class="field__label" for="editUnit">Unidade de medida</label>
-            <select class="input" id="editUnit">
-              <option value="un">un — unidade</option>
-              <option value="cx">cx — caixa</option>
-              <option value="pct">pct — pacote</option>
-              <option value="sc">sc — saco</option>
-            </select>
-          </div>
+          <p class="field__hint">Escaneie com a câmera do celular ou digite o código.</p>
         </div>
 
-        <div class="field-row">
-          <div class="field" data-only="create">
-            <label class="field__label" for="editStock">Estoque inicial</label>
-            <input class="input" type="number" id="editStock" min="0" step="1" value="0" />
-            <p class="field__hint">Vira uma entrada no histórico do produto.</p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="editMin">Estoque mínimo</label>
-            <input class="input" type="number" id="editMin" min="0" step="1" required />
-            <p class="field__hint">O status do produto é recalculado automaticamente.</p>
-          </div>
-          <div class="field" data-only="edit">
-            <label class="field__label" for="editStatus">Situação</label>
-            <select class="input" id="editStatus">
-              <option value="true">Ativo</option>
-              <option value="false">Inativo</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="field">
-            <label class="field__label" for="editCost">Preço de custo (R$)</label>
-            <input class="input" type="number" id="editCost" min="0" step="0.01" />
-          </div>
-          <div class="field">
-            <label class="field__label" for="editPrice">Preço de venda (R$)</label>
-            <input class="input" type="number" id="editPrice" min="0" step="0.01" />
-          </div>
+        <div class="field">
+          <label class="field__label" for="editPrice">Preço de venda (R$)</label>
+          <input class="input" type="number" id="editPrice" min="0" step="0.01" required />
         </div>
 
         <p class="form__error" id="editError" hidden></p>
@@ -1024,107 +350,81 @@
 
       <footer class="modal__footer modal__footer--end">
         <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
-        <button type="submit" class="btn btn--primary" form="editForm" id="editSubmit">
+        <button type="submit" form="editForm" class="btn btn--primary">
           <svg class="icon icon--sm"><use href="#i-check"></use></svg>
-          <span id="editSubmitLabel">Salvar alterações</span>
+          <span id="editSubmitLabel">Salvar</span>
         </button>
       </footer>
     </div>
   </div>
 
-  <!-- Novo pedido de compra -->
-  <div class="modal" id="modal-order" hidden>
+  <!-- ============================================================
+       MODAL — LEITOR DE CÓDIGO DE BARRAS
+       ============================================================ -->
+  <div class="modal" id="modal-scanner" hidden>
     <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="scannerTitle">
       <header class="modal__header">
         <div class="modal__heading">
-          <h2 class="modal__title" id="orderModalTitle">Novo pedido de compra</h2>
-          <p class="modal__subtitle" id="orderModalMeta">Revise as quantidades antes de gerar o pedido</p>
+          <h2 class="modal__title" id="scannerTitle">Código de barras</h2>
+          <p class="modal__subtitle" id="scannerSubtitle">Aponte a câmera para o código do produto</p>
         </div>
         <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
           <svg class="icon"><use href="#i-close"></use></svg>
         </button>
       </header>
 
-      <form class="modal__body" id="orderForm" novalidate>
-        <div id="orderModalBody"></div>
-        <p class="form__error" id="orderError" hidden></p>
-      </form>
+      <!-- data-state: asking | scanning | found | denied | unsupported | error -->
+      <div class="modal__body scanner" id="scanner" data-state="asking">
 
-      <footer class="modal__footer">
-        <p class="order-total" id="orderTotal"></p>
-        <div class="modal__footer-right">
-          <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
-          <button type="submit" class="btn btn--primary" form="orderForm">
-            <svg class="icon icon--sm"><use href="#i-check"></use></svg>
-            Criar pedido
-          </button>
+        <div class="scanner__stage">
+          <div class="scanner__video" id="scannerVideo"></div>
+          <div class="scanner__frame" aria-hidden="true"><span class="scanner__line"></span></div>
         </div>
-      </footer>
-    </div>
-  </div>
 
-  <!-- Detalhes do fornecedor -->
-  <div class="modal" id="modal-supplier" hidden>
-    <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="supplierModalTitle">
-      <header class="modal__header">
-        <div class="modal__heading">
-          <h2 class="modal__title" id="supplierModalTitle">Fornecedor</h2>
-          <p class="modal__subtitle" id="supplierModalMeta"></p>
-        </div>
-        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
-          <svg class="icon"><use href="#i-close"></use></svg>
-        </button>
-      </header>
+        <p class="scanner__hint">Enquadre o código dentro da área e mantenha o celular firme.</p>
 
-      <div class="modal__body modal__body--list" id="supplierModalBody"></div>
-
-      <footer class="modal__footer modal__footer--end">
-        <button type="button" class="btn btn--ghost" data-close-modal>Fechar</button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Receber pedido -->
-  <div class="modal" id="modal-receive" hidden>
-    <div class="modal__backdrop" data-close-modal></div>
-    <div class="modal__dialog modal__dialog--lg" role="dialog" aria-modal="true" aria-labelledby="receiveModalTitle">
-      <header class="modal__header">
-        <div class="modal__heading">
-          <h2 class="modal__title" id="receiveModalTitle">Receber pedido</h2>
-          <p class="modal__subtitle" id="receiveModalMeta"></p>
-        </div>
-        <button type="button" class="icon-btn" data-close-modal aria-label="Fechar">
-          <svg class="icon"><use href="#i-close"></use></svg>
-        </button>
-      </header>
-
-      <form class="modal__body" id="receiveForm" novalidate>
-        <div id="receiveModalBody"></div>
-
-        <div class="field receive-invoice">
-          <label class="field__label" for="receiveInvoice">
-            Nota fiscal <span class="field__optional">(opcional)</span>
-          </label>
-          <input class="input" type="text" id="receiveInvoice" placeholder="Ex.: 3402" autocomplete="off" />
-          <p class="field__hint">
-            Confirme apenas o que chegou. As quantidades viram entradas no estoque e o pedido é encerrado.
+        <div class="scanner__notice" role="status">
+          <span class="scanner__notice-icon" id="scannerNoticeIcon">
+            <svg class="icon"><use href="#i-camera"></use></svg>
+          </span>
+          <p class="scanner__notice-title" id="scannerNoticeTitle">Liberando a câmera…</p>
+          <p class="scanner__notice-text" id="scannerNoticeText">
+            Confirme o acesso à câmera para ler o código.
           </p>
         </div>
 
-        <p class="form__error" id="receiveError" hidden></p>
-      </form>
-
-      <footer class="modal__footer">
-        <p class="order-total" id="receiveTotal"></p>
-        <div class="modal__footer-right">
-          <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
-          <button type="submit" class="btn btn--primary" form="receiveForm">
-            <svg class="icon icon--sm"><use href="#i-arrow-down"></use></svg>
-            Confirmar recebimento
-          </button>
+        <div class="scanner__result" role="status">
+          <span class="scanner__result-icon" id="scannerResultIcon">
+            <svg class="icon"><use href="#i-check-circle"></use></svg>
+          </span>
+          <p class="scanner__result-title" id="scannerResultTitle">Código lido</p>
+          <p class="scanner__code" id="scannerResultCode"></p>
+          <p class="scanner__result-text" id="scannerResultText"></p>
         </div>
+
+        <form class="scanner__manual" id="scannerManualForm" novalidate>
+          <label class="field__label" for="scannerManualInput">Ou digite o código</label>
+          <div class="field-with-action">
+            <input class="input" type="text" id="scannerManualInput" inputmode="numeric"
+                   autocomplete="off" placeholder="Ex.: 7891000315507" />
+            <button type="submit" class="btn btn--primary field-with-action__btn">Usar</button>
+          </div>
+          <p class="form__error" id="scannerError" hidden></p>
+        </form>
+      </div>
+
+      <footer class="modal__footer modal__footer--end">
+        <button type="button" class="btn btn--ghost" data-close-modal>Cancelar</button>
+        <button type="button" class="btn btn--outline" id="scannerRetry"
+                data-action="scanner-retry" hidden>
+          <svg class="icon icon--sm"><use href="#i-refresh"></use></svg>
+          Tentar de novo
+        </button>
+        <button type="button" class="btn btn--primary" id="scannerOpenProduct"
+                data-action="scanner-open-product" hidden>
+          Editar produto
+        </button>
       </footer>
     </div>
   </div>
