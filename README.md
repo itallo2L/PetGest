@@ -2,8 +2,8 @@
 
 Protótipo navegável (HTML/CSS/JS vanilla, sem backend) só com as telas que
 fazem parte do V0 do PetGest: login, cadastro de produto via código de
-barras e dados da loja — ver a seção "Protótipo PetGest — quais telas usar
-no V0" no documento de decisão de stack do projeto.
+barras e dados da loja — ver a seção "Escopo de telas do V0" (§3.8) em
+`PLANOMVP.md`.
 
 ## Como abrir
 
@@ -30,10 +30,10 @@ liberar o app.
 - O botão "Sair", no rodapé da barra lateral, volta para a tela de login
   (sem apagar nenhum dado — é só a experiência de logout).
 
-A implementação real (autenticação contra o backend, emissão e validação de
-JWT, conforme decidido no documento de stack) troca o corpo de
-`submitLogin()` em `script.js`; o restante do fluxo (tela, validação de
-campos, loading, logout) já está pronto para receber isso.
+A implementação real (autenticação contra o Supabase Auth, conforme
+decidido em `PLANOMVP.md` §3.3) troca o corpo de `submitLogin()` em
+`script.js`; o restante do fluxo (tela, validação de campos, loading,
+logout) já está pronto para receber isso.
 
 ## Leitor de código de barras — visual, não funcional
 
@@ -53,14 +53,14 @@ A entrada manual do código (campo "Ou digite o código") continua funcionando
 de verdade — é só texto, não depende de câmera.
 
 Isso é intencional: é um protótipo de tela, não o app final. A implementação
-real (câmera do navegador via `getUserMedia` + `BarcodeDetector`, com
-fallback para digitação manual) é o "menor protótipo possível" descrito no
-roadmap técnico, e deve ser testada isoladamente — só o corpo da função
-`iniciarCamera()` em `script.js` precisa trocar quando chegar a hora; o
-resto do fluxo já está pronto para receber um código de verdade.
+real (câmera do navegador via `getUserMedia` + `barcode-detector`, com
+fallback para digitação manual, conforme `PLANOMVP.md` §3.4) deve ser
+testada isoladamente — só o corpo da função `iniciarCamera()` em
+`script.js` precisa trocar quando chegar a hora; o resto do fluxo já está
+pronto para receber um código de verdade.
 
 ## O que não está aqui (de propósito)
 
 Estoque, mínimo, fornecedor, situação, relatórios, autenticação real contra
 um backend e persistência entre sessões — tudo isso fica fora do V0, pelos
-mesmos motivos documentados na decisão de stack.
+mesmos motivos documentados em `PLANOMVP.md` §3.8.
