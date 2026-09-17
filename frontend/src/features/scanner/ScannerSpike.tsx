@@ -14,6 +14,7 @@ export function ScannerSpike() {
     firstReadMs,
     torchSupported,
     torchOn,
+    torchDebug,
     videoRef,
     start,
     stop,
@@ -65,6 +66,9 @@ export function ScannerSpike() {
 
         <dt>Erro</dt>
         <dd style={{ color: error ? 'crimson' : undefined }}>{error ?? '—'}</dd>
+
+        <dt>Lanterna (debug)</dt>
+        <dd style={{ wordBreak: 'break-word' }}>{torchDebug ?? '—'}</dd>
       </dl>
     </div>
   )

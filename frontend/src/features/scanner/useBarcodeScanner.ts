@@ -11,6 +11,7 @@ export interface BarcodeScannerState {
   firstReadMs: number | null
   torchSupported: boolean
   torchOn: boolean
+  torchDebug: string | null
 }
 
 export interface UseBarcodeScanner extends BarcodeScannerState {
@@ -52,6 +53,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
   const [firstReadMs, setFirstReadMs] = useState<number | null>(null)
   const [torchSupported, setTorchSupported] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
+  const [torchDebug, setTorchDebug] = useState<string | null>(null)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -80,6 +82,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     lastCodeRef.current = null
     setTorchSupported(false)
     setTorchOn(false)
+    setTorchDebug(null)
     setStatus('idle')
   }, [])
 
@@ -166,9 +169,18 @@ export function useBarcodeScanner(): UseBarcodeScanner {
         streamRef.current = stream
         const [videoTrack] = stream.getVideoTracks()
         videoTrackRef.current = videoTrack ?? null
-        const capabilities = (videoTrack?.getCapabilities?.() ??
-          {}) as TorchCapabilities
-        setTorchSupported(!!capabilities.torch)
+
+        if (!videoTrack) {
+          setTorchDebug('sem video track')
+        } else if (!videoTrack.getCapabilities) {
+          setTorchDebug('getCapabilities() não existe neste navegador')
+        } else {
+          const capabilities = videoTrack.getCapabilities() as TorchCapabilities
+          setTorchDebug(
+            `torch=${JSON.stringify(capabilities.torch)} | chaves: ${Object.keys(capabilities).join(', ')}`,
+          )
+          setTorchSupported(!!capabilities.torch)
+        }
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream
@@ -195,6 +207,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     firstReadMs,
     torchSupported,
     torchOn,
+    torchDebug,
     videoRef,
     start,
     stop,
