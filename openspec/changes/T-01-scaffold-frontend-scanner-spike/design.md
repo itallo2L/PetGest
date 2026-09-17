@@ -98,6 +98,19 @@ padrão do TypeScript, os tipos são estendidos localmente em
 A lanterna é desligada automaticamente em `stop()`, para não deixar o LED
 aceso com a câmera liberada.
 
+**Resultado do teste em campo (Android, mesmo aparelho do teste de
+motor):** `capabilities.torch` veio `undefined` — a lista de capabilities
+retornada é rica (`aspectRatio`, `exposureMode`, `focusMode`, `iso`,
+`zoom`, etc.), mas não inclui `torch`. Ou seja, **não é bug**: o código
+checou corretamente e escondeu o botão como o design previa para
+navegador/aparelho sem suporte — é esse aparelho/Chrome específico que
+não expõe a capability, apesar de suportar bastante coisa avançada de
+câmera. Suporte a `torch` via web é conhecidamente inconsistente entre
+fabricantes Android. Não há o que corrigir no código; o comportamento de
+"esconder graciosamente" é o resultado esperado aqui. Ainda não testado
+em outro Android — se aparecer em outro aparelho, a expectativa é que o
+botão funcione sem mudança de código.
+
 ## Risks / Trade-offs
 
 - [Nativo do Android lê pior que o WASM em código amassado/pouca luz, ou vice-versa] → `?engine=wasm` permite comparar no mesmo aparelho; o resultado decide qual motor a integração prefere.
