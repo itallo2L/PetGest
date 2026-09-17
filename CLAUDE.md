@@ -22,7 +22,7 @@ partida atual para a migração para React.
 - `main` só recebe o que já foi validado em `dev` — não commitar nem
   abrir PR direto para `main`.
 
-## Documento de decisão (ler antes de propor mudanças de arquitetura)
+## Documentos de decisão (ler antes de propor mudanças de arquitetura)
 
 - `PLANOMVP.md` — plano único de stack e entregáveis, com duas fases:
   - **Seção 3 (V0, ativa agora):** Supabase + Vercel — schema SQL
@@ -30,6 +30,10 @@ partida atual para a migração para React.
   - **Seção 4 (futura, pós-V0):** ASP.NET Core + Identity/JWT + Azure App
     Service — reservada para quando o produto justificar uma API própria
     (ver gatilhos na seção 4.5). Não seguir essa stack agora.
+- `ROADMAPV0.md` — roadmap do V0 quebrado em tarefas numeradas (`T-01`,
+  `T-02`, ...). Cada change em `openspec/changes/` deve prefixar a pasta
+  com o número da tarefa correspondente (`T-0X-<slug>`) para rastrear
+  proposta/design/specs/tasks de cada etapa.
 
 ## Stack alvo do V0 (ver `PLANOMVP.md` §2 e §3 para o detalhe completo)
 
