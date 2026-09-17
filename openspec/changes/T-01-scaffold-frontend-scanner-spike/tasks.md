@@ -1,13 +1,13 @@
 ## 1. Scaffold do frontend
 
-- [ ] 1.1 Confirmar que a branch atual é `dev` (`git branch --show-current`) e criar `.gitignore` na raiz com `node_modules/`, `dist/`, `.env*`, `.vercel/`; verificar com `git status` que nada desses padrões aparece como untracked
-- [ ] 1.2 Criar `frontend/` com `npm create vite@latest frontend -- --template react-ts` e rodar `npm install` dentro dela; verificar que `npm run build` conclui sem erro e gera `frontend/dist/`
-- [ ] 1.3 Remover os arquivos de exemplo do template (`App.css`, `assets/react.svg`, `public/vite.svg`, conteúdo do contador em `App.tsx`) e reduzir `index.css` a um reset mínimo; ajustar `<title>` e `lang="pt-BR"` em `index.html`; verificar que `npm run build` e `npm run lint` continuam passando
-- [ ] 1.4 Instalar `barcode-detector` (`npm i barcode-detector`) e verificar que `import { BarcodeDetector } from "barcode-detector/ponyfill"` compila com `npx tsc --noEmit -p tsconfig.app.json`
+- [x] 1.1 Confirmar que a branch atual é `dev` (`git branch --show-current`) e criar `.gitignore` na raiz com `node_modules/`, `dist/`, `.env*`, `.vercel/`; verificar com `git status` que nada desses padrões aparece como untracked
+- [x] 1.2 Criar `frontend/` com `npm create vite@latest frontend -- --template react-ts` e rodar `npm install` dentro dela; verificar que `npm run build` conclui sem erro e gera `frontend/dist/`
+- [x] 1.3 Remover os arquivos de exemplo do template (`App.css`, `assets/react.svg`, `public/vite.svg`, conteúdo do contador em `App.tsx`) e reduzir `index.css` a um reset mínimo; ajustar `<title>` e `lang="pt-BR"` em `index.html`; verificar que `npm run build` e `npm run lint` continuam passando
+- [x] 1.4 Instalar `barcode-detector` (`npm i barcode-detector`) e verificar que `import { BarcodeDetector } from "barcode-detector/ponyfill"` compila com `npx tsc --noEmit -p tsconfig.app.json`
 
 ## 2. Módulo de detecção (design D2)
 
-- [ ] 2.1 Criar `src/features/scanner/createDetector.ts` exportando `createDetector(): Promise<{ detector, engine: "native" | "wasm" }>` que usa o `BarcodeDetector` nativo somente se `getSupportedFormats()` incluir `ean_13`, senão o ponyfill; ambos criados com `formats: ["ean_13"]`; verificar que compila sem `any` e sem erro de tipo para o global nativo
+- [x] 2.1 Criar `src/features/scanner/createDetector.ts` exportando `createDetector(): Promise<{ detector, engine: "native" | "wasm" }>` que usa o `BarcodeDetector` nativo somente se `getSupportedFormats()` incluir `ean_13`, senão o ponyfill; ambos criados com `formats: ["ean_13"]`; verificar que compila sem `any` e sem erro de tipo para o global nativo
 - [ ] 2.2 Suportar o override `?engine=wasm` na URL (força o ponyfill) e verificar em desktop, no console, que `engine` muda conforme o parâmetro
 
 ## 3. Hook de câmera + loop (design D3–D5)
@@ -19,8 +19,8 @@
 
 ## 4. Tela do spike (design D7)
 
-- [ ] 4.1 Criar `src/features/scanner/ScannerSpike.tsx` com botão "Iniciar câmera"/"Parar", o `<video playsInline muted autoplay>` ocupando a largura da tela, e um painel de diagnóstico mostrando motor (`nativo`/`wasm`), status, código lido, `firstReadMs` e a mensagem de erro; renderizar em `App.tsx`; verificar que a página funciona em largura de celular (DevTools, 390px) sem rolagem horizontal
-- [ ] 4.2 Adicionar `frontend/vercel.json` com o rewrite SPA `/(.*)` → `/index.html`; verificar que `npm run build` ignora o arquivo sem erro e que ele é JSON válido
+- [x] 4.1 Criar `src/features/scanner/ScannerSpike.tsx` com botão "Iniciar câmera"/"Parar", o `<video playsInline muted autoplay>` ocupando a largura da tela, e um painel de diagnóstico mostrando motor (`nativo`/`wasm`), status, código lido, `firstReadMs` e a mensagem de erro; renderizar em `App.tsx`; verificar que a página funciona em largura de celular (DevTools, 390px) sem rolagem horizontal
+- [x] 4.2 Adicionar `frontend/vercel.json` com o rewrite SPA `/(.*)` → `/index.html`; verificar que `npm run build` ignora o arquivo sem erro e que ele é JSON válido
 
 ## 5. Deploy e validação em campo
 
