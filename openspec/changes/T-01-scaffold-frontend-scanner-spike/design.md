@@ -78,6 +78,26 @@ frontend/
 ### D8. Deploy pela Vercel com Root Directory = `frontend`
 O projeto na Vercel é criado pelo usuário no painel apontando para o repositório, com Root Directory `frontend` e preset Vite (detectado). Essa configuração vive no projeto Vercel, não no repositório — `vercel.json` só carrega o rewrite de SPA. Cada push em `dev` gera uma prévia HTTPS; é ela que se abre no celular. Alternativa descartada: `@vitejs/plugin-basic-ssl` para testar via Wi-Fi local — economiza um push por iteração, mas adiciona dependência e certificado autoassinado que o iOS reclama; não compensa para uma tela.
 
+### D9. Botão de lanterna (torch), condicional ao suporte do navegador
+
+Adicionado depois do teste de campo em Android (ver "Resultado do teste de
+campo" acima): iluminação foi o fator que mais afetou a leitura, mais que
+o motor em si. `MediaStreamTrack.getCapabilities()` (Chrome/Android) pode
+expor `torch: true` quando o hardware suporta; nesse caso,
+`track.applyConstraints({ advanced: [{ torch: true }] })` liga a lanterna
+da câmera traseira. **O Safari/iOS não implementa essa extensão** — a
+propriedade não existe em `getCapabilities()` nesse navegador, então o
+botão só aparece quando `torch` estiver presente nas capabilities da
+track ativa; no iPhone ele fica ausente, sem quebrar nada.
+
+Como `torch` não faz parte do `MediaTrackCapabilities`/`MediaTrackConstraintSet`
+padrão do TypeScript, os tipos são estendidos localmente em
+`useBarcodeScanner.ts` (mesmo padrão usado em `createDetector.ts` para o
+`BarcodeDetector` nativo — ambiente tipado sem `any`).
+
+A lanterna é desligada automaticamente em `stop()`, para não deixar o LED
+aceso com a câmera liberada.
+
 ## Risks / Trade-offs
 
 - [Nativo do Android lê pior que o WASM em código amassado/pouca luz, ou vice-versa] → `?engine=wasm` permite comparar no mesmo aparelho; o resultado decide qual motor a integração prefere.
@@ -95,3 +115,30 @@ Greenfield — nada a migrar. O protótipo na raiz não é tocado. Rollback = re
 ## Open Questions
 
 - Servir o `.wasm` localmente (D6) e pré-carregar o módulo ao abrir o app: decidir com os números de `firstReadMs` do teste em campo. Não altera specs nem tarefas desta etapa.
+
+### Resultado do teste de campo (Android, Chrome — 2026-09-17)
+
+- **Motor nativo:** desempenho bom. Errou a leitura algumas vezes em
+  determinados produtos (provavelmente por foco/ângulo/distância), mas
+  sempre acertou depois de reposicionar. `firstReadMs` registrado: 55020ms
+  num dos testes — alto porque `firstReadMs` mede o tempo até a *primeira*
+  detecção bem-sucedida (mesmo que o valor esteja errado), não até o
+  código correto; o app tentou várias vezes antes de conseguir focar.
+- **Motor `?engine=wasm`:** desempenho ruim no mesmo aparelho — só um
+  código foi lido corretamente entre várias tentativas, os demais não
+  passaram. Reforça a expectativa de que o WASM é significativamente mais
+  fraco que o nativo em condições reais (não só mais lento no download
+  inicial, como a decisão D6 assumia).
+- **Fator determinante observado pelo usuário:** iluminação e qualidade da
+  câmera influenciam muito mais o resultado do que o motor em si — mesmo
+  o nativo errou em produtos com menos luz ou reflexo na embalagem.
+- **Implicação para a decisão D6:** como o motor nativo (Android) já
+  entrega resultado bom, e o WASM (fallback Safari/iOS/Firefox) mostrou-se
+  frágil mesmo em boas condições, servir o `.wasm` localmente não parece
+  o problema prioritário — o gargalo é iluminação, não latência de
+  download. Ainda falta testar o WASM real no iPhone (tarefa 5.4) antes de
+  fechar essa decisão, já que lá ele não é fallback por escolha, é o único
+  caminho possível.
+- **Ideia levantada pelo usuário:** adicionar um botão de lanterna
+  (torch) para compensar pouca luz. Ver avaliação técnica na conversa —
+  registrado aqui como candidato a nova tarefa, não decidido ainda.

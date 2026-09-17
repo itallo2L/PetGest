@@ -6,8 +6,19 @@ const engineLabel: Record<string, string> = {
 }
 
 export function ScannerSpike() {
-  const { status, engine, code, error, firstReadMs, videoRef, start, stop } =
-    useBarcodeScanner()
+  const {
+    status,
+    engine,
+    code,
+    error,
+    firstReadMs,
+    torchSupported,
+    torchOn,
+    videoRef,
+    start,
+    stop,
+    toggleTorch,
+  } = useBarcodeScanner()
 
   const isScanning = status === 'asking' || status === 'scanning'
 
@@ -20,6 +31,16 @@ export function ScannerSpike() {
       >
         {isScanning ? 'Parar' : 'Iniciar câmera'}
       </button>
+
+      {isScanning && torchSupported && (
+        <button
+          type="button"
+          onClick={toggleTorch}
+          style={{ width: '100%', padding: 12, fontSize: 16, marginTop: 8 }}
+        >
+          {torchOn ? 'Desligar lanterna' : 'Ligar lanterna'}
+        </button>
+      )}
 
       <video
         ref={videoRef}

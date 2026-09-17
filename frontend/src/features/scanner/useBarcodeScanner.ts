@@ -9,12 +9,24 @@ export interface BarcodeScannerState {
   code: string | null
   error: string | null
   firstReadMs: number | null
+  torchSupported: boolean
+  torchOn: boolean
 }
 
 export interface UseBarcodeScanner extends BarcodeScannerState {
   videoRef: React.RefObject<HTMLVideoElement | null>
   start: () => void
   stop: () => void
+  toggleTorch: () => void
+}
+
+/** `torch` não faz parte do `MediaTrackCapabilities`/`MediaTrackConstraintSet`
+ * padrão do TypeScript — é uma extensão do Chrome/Android, ausente no Safari. */
+interface TorchCapabilities extends MediaTrackCapabilities {
+  torch?: boolean
+}
+interface TorchConstraintSet extends MediaTrackConstraintSet {
+  torch?: boolean
 }
 
 function mapGetUserMediaError(err: unknown): string {
@@ -38,9 +50,12 @@ export function useBarcodeScanner(): UseBarcodeScanner {
   const [code, setCode] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [firstReadMs, setFirstReadMs] = useState<number | null>(null)
+  const [torchSupported, setTorchSupported] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const videoTrackRef = useRef<MediaStreamTrack | null>(null)
   const detectorRef = useRef<ScannerDetector | null>(null)
   const rafRef = useRef<number | null>(null)
   const inFlightRef = useRef(false)
@@ -55,6 +70,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     }
     streamRef.current?.getTracks().forEach((track) => track.stop())
     streamRef.current = null
+    videoTrackRef.current = null
     if (videoRef.current) {
       videoRef.current.srcObject = null
     }
@@ -62,8 +78,22 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     startedAtRef.current = null
     firstReadDoneRef.current = false
     lastCodeRef.current = null
+    setTorchSupported(false)
+    setTorchOn(false)
     setStatus('idle')
   }, [])
+
+  const toggleTorch = useCallback(() => {
+    const track = videoTrackRef.current
+    if (!track) return
+    const next = !torchOn
+    track
+      .applyConstraints({ advanced: [{ torch: next } as TorchConstraintSet] })
+      .then(() => setTorchOn(next))
+      .catch(() => {
+        // hardware recusou o toggle — mantém o estado anterior
+      })
+  }, [torchOn])
 
   const tickRef = useRef<() => void>(() => {})
 
@@ -134,6 +164,12 @@ export function useBarcodeScanner(): UseBarcodeScanner {
         })
 
         streamRef.current = stream
+        const [videoTrack] = stream.getVideoTracks()
+        videoTrackRef.current = videoTrack ?? null
+        const capabilities = (videoTrack?.getCapabilities?.() ??
+          {}) as TorchCapabilities
+        setTorchSupported(!!capabilities.torch)
+
         if (videoRef.current) {
           videoRef.current.srcObject = stream
           await videoRef.current.play()
@@ -151,5 +187,17 @@ export function useBarcodeScanner(): UseBarcodeScanner {
 
   useEffect(() => stop, [stop])
 
-  return { status, engine, code, error, firstReadMs, videoRef, start, stop }
+  return {
+    status,
+    engine,
+    code,
+    error,
+    firstReadMs,
+    torchSupported,
+    torchOn,
+    videoRef,
+    start,
+    stop,
+    toggleTorch,
+  }
 }
