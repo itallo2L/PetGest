@@ -11,4 +11,4 @@
 - [x] 2.1 (Usuário) Criar o projeto no Supabase (tier gratuito, região São Paulo `sa-east-1`; Security: "Enable Data API" ligado, "Automatically expose new tables" desligado, "Enable automatic RLS" desligado — design D8); guardar `Project URL` e `anon key` (Project Settings > API) — **não** copiar a `service_role key` para lugar nenhum do frontend
 - [x] 2.2 (Usuário) SQL Editor > colar `supabase/schema.sql` > Run; verificar em Table Editor que as três tabelas aparecem com o selo "RLS enabled"
 - [x] 2.3 (Usuário) SQL Editor > colar `supabase/tests/rls_test.sql` > Run; verificar que o resultado é "RLS OK: todos os testes passaram" e que Authentication > Users continua vazio (rollback)
-- [ ] 2.4 Commitar em `dev` e fazer push
+- [x] 2.4 Commitar em `dev` e fazer push
