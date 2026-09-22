@@ -133,6 +133,15 @@ hospedar um servidor.
 
 ### 3.2 Modelagem de dados (Supabase / Postgres)
 
+> **Fonte da verdade: `supabase/schema.sql`** (T-02). O SQL abaixo é o
+> esboço original e ficou só como referência. A versão versionada corrige
+> uma falha de isolamento — a política de UPDATE em `profiles` deixava o
+> usuário trocar o próprio `petshop_id` e acessar outro petshop — e
+> acrescenta `current_petshop_id()`, default de `petshop_id` em
+> `products`, trigger de `updated_at` e `signup_petshop` endurecida. Ver
+> `openspec/changes/T-02-supabase-schema-rls/design.md`. O teste de
+> isolamento fica em `supabase/tests/rls_test.sql`.
+
 ```sql
 -- petshops: um por conta (dono/funcionário único, como já decidido)
 create table petshops (

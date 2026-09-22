@@ -20,7 +20,7 @@ T-01 ──> T-02 ──> T-03 ──┬──> T-05 ──> T-06 ──> T-07 �
                           └──> T-04 ─────────────────────┴──> T-08 ──> T-09 ──> T-10
 ```
 
-- T-01 é a única tarefa já iniciada (change existente em `openspec/`).
+- T-01 (spike do scanner) e T-02 (schema) já têm change em `openspec/`.
 - T-02 e T-03 (Supabase) podem começar em paralelo com T-04 (design
   system), mas nada de T-05 em diante avança sem T-01+T-02+T-03 prontos.
 - T-09 (deploy) e T-10 (teste de campo) fecham o V0.
@@ -44,6 +44,11 @@ vem antes de auth, banco e telas.
   celular real, motor (nativo/WASM) e `firstReadMs` registrados.
 
 ## T-02 — Setup do Supabase (schema, RLS, signup_petshop)
+
+**Status:** concluída no Supabase (2026-09-22) — projeto criado em São
+Paulo, `supabase/schema.sql` aplicado e `supabase/tests/rls_test.sql`
+retornando "RLS OK". Change: `openspec/changes/T-02-supabase-schema-rls/`
+(falta só o commit/push, tarefa 2.4).
 
 Cria o projeto no Supabase e aplica a base de dados que sustenta o V0
 inteiro.
