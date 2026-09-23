@@ -1,0 +1,95 @@
+/* ==========================================================================
+   PetGest — Tokens do design system
+   Copiados do bloco :root do style.css do protótipo, sem alterar nomes nem
+   valores. Para trocar a identidade visual, altere apenas este arquivo.
+   ========================================================================== */
+
+:root {
+  /* --- Marca / primária --- */
+  --primary: #108B91;
+  --primary-hover: #0C6F74;
+  --primary-active: #0A5B5F;
+  --primary-soft: #E4F2F3;
+  --primary-soft-strong: #C9E5E7;
+  --primary-contrast: #FFFFFF;
+
+  /* --- Superfícies e fundo --- */
+  --background: #F4F7F7;
+  --surface: #FFFFFF;
+  --surface-secondary: #F8FAFA;
+  --surface-hover: #F2F6F6;
+  --sidebar-bg: #FFFFFF;
+
+  /* --- Texto --- */
+  --text: #16272B;
+  --text-secondary: #55666C;
+  --text-muted: #8B9AA0;
+  --text-inverse: #FFFFFF;
+
+  /* --- Bordas --- */
+  --border: #E5EAEB;
+  --border-strong: #D2DADC;
+
+  /* --- Cores semânticas de status --- */
+  --success: #22CC5E;
+  --success-strong: #167F3B;
+  --success-soft: #E7F9EE;
+
+  --warning: #F5A524;
+  --warning-strong: #A35C07;
+  --warning-soft: #FEF4E2;
+
+  --danger: #EF4444;
+  --danger-strong: #B42318;
+  --danger-soft: #FEECEB;
+
+  --info: #3B82F6;
+  --info-soft: #EAF2FE;
+
+  /* --- Tipografia --- */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --fs-xs: 0.6875rem;   /* 11px */
+  --fs-sm: 0.75rem;     /* 12px */
+  --fs-base: 0.8125rem; /* 13px */
+  --fs-md: 0.875rem;    /* 14px */
+  --fs-lg: 1rem;        /* 16px */
+  --fs-xl: 1.25rem;     /* 20px */
+  --fs-2xl: 1.75rem;    /* 28px */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* --- Espaçamentos --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+
+  /* --- Raios --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* --- Sombras (bem suaves) --- */
+  --shadow-xs: 0 1px 2px rgba(22, 39, 43, 0.04);
+  --shadow-sm: 0 1px 3px rgba(22, 39, 43, 0.06), 0 1px 2px rgba(22, 39, 43, 0.04);
+  --shadow-md: 0 4px 16px rgba(22, 39, 43, 0.07);
+  --shadow-lg: 0 18px 48px rgba(22, 39, 43, 0.16);
+
+  /* --- Dimensões --- */
+  --sidebar-width: 244px;
+  --topbar-height: 76px;
+  --content-max: 1240px;
+
+  /* --- Transições --- */
+  --transition-fast: 120ms ease;
+  --transition: 160ms ease;
+}

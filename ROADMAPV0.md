@@ -88,6 +88,16 @@ T-05 vai consumir.
 
 ## T-04 — Porte do design system e estrutura de features
 
+**Status:** implementada (2026-09-23), falta conferir no celular após o
+deploy — tokens do protótipo em `frontend/src/shared/ui/tokens.css`,
+reset/base em `frontend/src/index.css`, Inter empacotada
+(`@fontsource/inter`), sprite com os 22 ícones do V0 em
+`shared/ui/icons.svg` + componente `<Icon>`, e pastas
+`features/{auth,products,petshop}/`. Regra adotada: o CSS de componentes
+(botões, campos, cards, modal) **não** foi portado agora — entra em
+`shared/ui/` junto da tela que o usa (T-05, T-06, T-08). Change:
+`openspec/changes/T-04-design-system-feature-structure/`.
+
 Porta o visual do protótipo (`style.css`) para dentro do `frontend/` já
 criado em T-01, e organiza as pastas por feature antes de portar telas.
 
