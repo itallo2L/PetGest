@@ -72,7 +72,9 @@ inteiro.
 contra o projeto real: cadastro devolve sessão na hora, e-mail repetido e
 senha errada recusados, conta sem petshop não vê dados. A persistência da
 sessão após recarregar a página fica para verificar em T-05, quando houver
-tela de login. Change: `openspec/changes/T-03-supabase-auth-client/`.
+tela de login. Change arquivada em
+`openspec/changes/archive/2026-09-23-T-03-supabase-auth-client/`; spec
+principal em `openspec/specs/auth/`.
 
 Prepara o provedor de auth para os fluxos reais de login/cadastro que
 T-05 vai consumir.
