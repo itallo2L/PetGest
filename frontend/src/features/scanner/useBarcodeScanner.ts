@@ -1,13 +1,33 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createDetector, type DetectorEngine, type ScannerDetector } from './createDetector'
+import { createDetector, type BarcodeFormat, type DetectorEngine, type ScannerDetector } from './createDetector'
 
 export type ScannerStatus = 'idle' | 'asking' | 'scanning' | 'error'
+
+/** Para a tela escolher o aviso: permissão negada, sem câmera/HTTPS ou outro. */
+export type ScannerErrorKind = 'denied' | 'unavailable' | 'error'
+
+/**
+ * Opções do leitor do app (T-07). Sem opções, o hook se comporta como no
+ * spike da T-01: só EAN-13, publica cada código novo e segue lendo.
+ */
+export interface BarcodeScannerOptions {
+  formats?: BarcodeFormat[]
+  /** Descarta leituras que não passam (ex.: dígito verificador). */
+  accept?: (code: string) => boolean
+  /** Quantas detecções idênticas seguidas antes de publicar o código. */
+  requiredMatches?: number
+  /** Para o loop depois do primeiro código publicado (a câmera segue ligada). */
+  stopOnAccept?: boolean
+  /** Desliga a câmera quando a aba fica oculta. */
+  stopWhenHidden?: boolean
+}
 
 export interface BarcodeScannerState {
   status: ScannerStatus
   engine: DetectorEngine | null
   code: string | null
   error: string | null
+  errorKind: ScannerErrorKind | null
   firstReadMs: number | null
   torchSupported: boolean
   torchOn: boolean
@@ -30,6 +50,13 @@ interface TorchConstraintSet extends MediaTrackConstraintSet {
   torch?: boolean
 }
 
+function errorKindOf(err: unknown): ScannerErrorKind {
+  if (!(err instanceof DOMException)) return 'error'
+  if (err.name === 'NotAllowedError') return 'denied'
+  if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') return 'unavailable'
+  return 'error'
+}
+
 function mapGetUserMediaError(err: unknown): string {
   if (!(err instanceof DOMException)) {
     return `Erro ao acessar a câmera (${err instanceof Error ? err.message : String(err)}).`
@@ -45,11 +72,17 @@ function mapGetUserMediaError(err: unknown): string {
   }
 }
 
-export function useBarcodeScanner(): UseBarcodeScanner {
+export function useBarcodeScanner(options: BarcodeScannerOptions = {}): UseBarcodeScanner {
+  const optionsRef = useRef(options)
+  useEffect(() => {
+    optionsRef.current = options
+  })
+
   const [status, setStatus] = useState<ScannerStatus>('idle')
   const [engine, setEngine] = useState<DetectorEngine | null>(null)
   const [code, setCode] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [errorKind, setErrorKind] = useState<ScannerErrorKind | null>(null)
   const [firstReadMs, setFirstReadMs] = useState<number | null>(null)
   const [torchSupported, setTorchSupported] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
@@ -64,6 +97,8 @@ export function useBarcodeScanner(): UseBarcodeScanner {
   const startedAtRef = useRef<number | null>(null)
   const firstReadDoneRef = useRef(false)
   const lastCodeRef = useRef<string | null>(null)
+  const candidateRef = useRef<{ value: string; count: number } | null>(null)
+  const acceptedRef = useRef(false)
 
   const stop = useCallback(() => {
     if (rafRef.current !== null) {
@@ -80,6 +115,8 @@ export function useBarcodeScanner(): UseBarcodeScanner {
     startedAtRef.current = null
     firstReadDoneRef.current = false
     lastCodeRef.current = null
+    candidateRef.current = null
+    acceptedRef.current = false
     setTorchSupported(false)
     setTorchOn(false)
     setTorchDebug(null)
@@ -103,7 +140,7 @@ export function useBarcodeScanner(): UseBarcodeScanner {
   const tick = useCallback(() => {
     const video = videoRef.current
     const detector = detectorRef.current
-    if (!video || !detector) return
+    if (!video || !detector || acceptedRef.current) return
 
     if (
       !inFlightRef.current &&
@@ -113,9 +150,22 @@ export function useBarcodeScanner(): UseBarcodeScanner {
       detector
         .detect(video)
         .then((results) => {
-          const value = results[0]?.rawValue
-          if (value && value !== lastCodeRef.current) {
+          if (acceptedRef.current) return
+          const { accept, requiredMatches = 1, stopOnAccept = false } = optionsRef.current
+          const raw = results[0]?.rawValue
+          const value = raw && (!accept || accept(raw)) ? raw : undefined
+          if (!value) {
+            // Leitura inválida ou nenhuma: a próxima detecção recomeça a contagem.
+            if (raw) candidateRef.current = null
+            return
+          }
+          const candidate = candidateRef.current
+          candidateRef.current =
+            candidate?.value === value ? { value, count: candidate.count + 1 } : { value, count: 1 }
+          if (candidateRef.current.count < requiredMatches) return
+          if (value !== lastCodeRef.current) {
             lastCodeRef.current = value
+            if (stopOnAccept) acceptedRef.current = true
             setCode(value)
             if (!firstReadDoneRef.current && startedAtRef.current !== null) {
               firstReadDoneRef.current = true
@@ -140,19 +190,23 @@ export function useBarcodeScanner(): UseBarcodeScanner {
 
   const start = useCallback(() => {
     setError(null)
+    setErrorKind(null)
     setCode(null)
     setFirstReadMs(null)
     lastCodeRef.current = null
+    candidateRef.current = null
+    acceptedRef.current = false
     firstReadDoneRef.current = false
     setStatus('asking')
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setError('Câmera não disponível neste contexto (precisa de HTTPS).')
+      setErrorKind('unavailable')
       setStatus('error')
       return
     }
 
-    createDetector()
+    createDetector(optionsRef.current.formats)
       .then(async ({ detector, engine: detectorEngine }) => {
         detectorRef.current = detector
         setEngine(detectorEngine)
@@ -193,17 +247,28 @@ export function useBarcodeScanner(): UseBarcodeScanner {
       })
       .catch((err: unknown) => {
         setError(mapGetUserMediaError(err))
+        setErrorKind(errorKindOf(err))
         setStatus('error')
       })
   }, [tickRef])
 
   useEffect(() => stop, [stop])
 
+  // Câmera não fica ligada com a aba em segundo plano (T-07 D7).
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden && optionsRef.current.stopWhenHidden && streamRef.current) stop()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [stop])
+
   return {
     status,
     engine,
     code,
     error,
+    errorKind,
     firstReadMs,
     torchSupported,
     torchOn,

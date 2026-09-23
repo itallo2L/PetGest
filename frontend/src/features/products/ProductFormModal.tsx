@@ -1,13 +1,14 @@
 import { useId, useState, type FormEvent } from 'react'
 import { toFormMessage, type FormMessage } from '../auth/authErrors'
 import { FormError } from '../auth/FormError'
+import { ScannerModal } from '../scanner/ScannerModal'
 import { ConfirmDialog } from '../../shared/ui/ConfirmDialog'
 import { Icon } from '../../shared/ui/Icon'
 import { Modal } from '../../shared/ui/Modal'
 import { useToast } from '../../shared/ui/toastContext'
 import { categoryOptions, CATEGORIES } from './categories'
-import { isValidBarcode, normalizeBarcode, parsePrice, priceToInput } from './productFormat'
-import { createProduct, deleteProduct, updateProduct } from './productsApi'
+import { formatPrice, isValidBarcode, normalizeBarcode, parsePrice, priceToInput } from './productFormat'
+import { createProduct, deleteProduct, findProductByEan, updateProduct } from './productsApi'
 import type { Product, ProductInput } from './types'
 
 interface ProductFormModalProps {
@@ -15,19 +16,40 @@ interface ProductFormModalProps {
   product: Product | null
   /** Produto da loja que já usa este código (para a mensagem de duplicidade). */
   findByEan: (ean: string) => Product | undefined
+  /** Cadastro aberto pelo leitor da barra: código já preenchido. */
+  initialEan?: string
+  /** O `initialEan` veio da câmera (define `source` — T-07 D6). */
+  initialScanned?: boolean
+  /** Produto achado pelo leitor no banco (entra na lista se faltar). */
+  onFound: (product: Product) => void
+  /** "Abrir produto": troca o formulário para outro produto da loja. */
+  onOpenProduct: (product: Product) => void
   onSaved: (product: Product, created: boolean) => void
   onDeleted: (product: Product) => void
   onClose: () => void
 }
 
 /** Um único formulário atende cadastro e edição (script.js §6). */
-export function ProductFormModal({ product, findByEan, onSaved, onDeleted, onClose }: ProductFormModalProps) {
+export function ProductFormModal({
+  product,
+  findByEan,
+  initialEan,
+  initialScanned,
+  onFound,
+  onOpenProduct,
+  onSaved,
+  onDeleted,
+  onClose,
+}: ProductFormModalProps) {
   const isCreate = product === null
   const formId = useId()
   const showToast = useToast()
   const [name, setName] = useState(product?.name ?? '')
   const [category, setCategory] = useState<string>(product?.category ?? CATEGORIES[0])
-  const [ean, setEan] = useState(product?.ean ?? '')
+  const [ean, setEan] = useState(product?.ean ?? initialEan ?? '')
+  /** Último código aceito pela câmera neste formulário. */
+  const [scannedEan, setScannedEan] = useState<string | null>(initialScanned && initialEan ? initialEan : null)
+  const [scanning, setScanning] = useState(false)
   const [price, setPrice] = useState(product ? priceToInput(product.price) : '')
   const [error, setError] = useState<FormMessage | null>(null)
   const [saving, setSaving] = useState(false)
@@ -54,7 +76,9 @@ export function ProductFormModal({ product, findByEan, onSaved, onDeleted, onClo
     setError(null)
     setSaving(true)
     try {
-      const saved = isCreate ? await createProduct(input) : await updateProduct(product.id, input)
+      // `barcode` só se o código salvo é o que a câmera leu; a edição não muda `source`.
+      const source = input.ean && input.ean === scannedEan ? 'barcode' : 'manual'
+      const saved = isCreate ? await createProduct(input, source) : await updateProduct(product.id, input)
       showToast({ type: 'success', title: isCreate ? 'Produto cadastrado' : 'Produto atualizado', text: saved.name })
       onSaved(saved, isCreate)
     } catch (err) {
@@ -86,6 +110,14 @@ export function ProductFormModal({ product, findByEan, onSaved, onDeleted, onClo
       setConfirmingDelete(false)
       setError(toFormMessage(err))
     }
+  }
+
+  /** Leitor aberto pelo campo de código: o próprio produto em edição conta como "novo". */
+  async function lookupFromForm(code: string) {
+    const found = await findProductByEan(code)
+    if (!found || found.id === product?.id) return { kind: 'new' as const }
+    onFound(found)
+    return { kind: 'existing' as const, item: found, summary: `${found.name} · ${formatPrice(found.price)}` }
   }
 
   const busy = saving || deleting
@@ -163,16 +195,28 @@ export function ProductFormModal({ product, findByEan, onSaved, onDeleted, onClo
             <label className="field__label" htmlFor={`${formId}-ean`}>
               Código de barras <span className="field__optional">(opcional)</span>
             </label>
-            <input
-              className="input"
-              id={`${formId}-ean`}
-              inputMode="numeric"
-              autoComplete="off"
-              placeholder="Ex.: 7891000315507"
-              value={ean}
-              onChange={(event) => setEan(event.target.value)}
-            />
-            <p className="field__hint">Digite o código que aparece abaixo das barras (8 a 14 dígitos).</p>
+            <div className="field-with-action">
+              <input
+                className="input"
+                id={`${formId}-ean`}
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="Ex.: 7891000315507"
+                value={ean}
+                onChange={(event) => setEan(event.target.value)}
+              />
+              <button
+                type="button"
+                className="btn btn--outline field-with-action__btn"
+                data-action="scan-barcode"
+                onClick={() => setScanning(true)}
+                disabled={busy}
+              >
+                <Icon name="barcode" size="sm" />
+                Escanear
+              </button>
+            </div>
+            <p className="field__hint">Escaneie com a câmera do celular ou digite o código.</p>
           </div>
 
           <div className="field">
@@ -193,6 +237,23 @@ export function ProductFormModal({ product, findByEan, onSaved, onDeleted, onClo
           <FormError message={error} />
         </form>
       </Modal>
+
+      {scanning && (
+        <ScannerModal<Product>
+          onCode={lookupFromForm}
+          onNewCode={(code) => {
+            setEan(code)
+            setScannedEan(code)
+            setScanning(false)
+          }}
+          existingActionLabel="Abrir produto"
+          onExistingAction={(other) => {
+            setScanning(false)
+            onOpenProduct(other)
+          }}
+          onClose={() => setScanning(false)}
+        />
+      )}
 
       {confirmingDelete && product && (
         <ConfirmDialog

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toFormMessage } from '../auth/authErrors'
 import { EmptyState } from '../../shared/ui/EmptyState'
 import { Icon } from '../../shared/ui/Icon'
+import { ScannerModal } from '../scanner/ScannerModal'
 import { CATEGORIES } from './categories'
 import { ProductFormModal } from './ProductFormModal'
 import { ProductList } from './ProductList'
@@ -9,23 +10,31 @@ import {
   activeFilterCount,
   FILTER_DEFAULTS,
   filterProducts,
+  formatPrice,
   type ProductFilters,
   type SortKey,
 } from './productFormat'
-import { listProducts } from './productsApi'
+import { findProductByEan, listProducts } from './productsApi'
 import type { Product } from './types'
 import './products.css'
 
 type LoadState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; products: Product[] }
 
-/** Formulário aberto: `null` fechado, `'new'` cadastro, ou o produto em edição. */
-type FormTarget = null | 'new' | Product
+/** Formulário aberto: `null` fechado, cadastro (com código vindo do leitor, se
+ * houver) ou o produto em edição. */
+type NewTarget = { mode: 'new'; ean?: string; scanned?: boolean }
+type FormTarget = null | NewTarget | Product
+
+function isNewTarget(target: FormTarget): target is NewTarget {
+  return target !== null && 'mode' in target
+}
 
 export function ProductsPage() {
   const [load, setLoad] = useState<LoadState>({ status: 'loading' })
   const [filters, setFilters] = useState<ProductFilters>(FILTER_DEFAULTS)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [form, setForm] = useState<FormTarget>(null)
+  const [scanning, setScanning] = useState(false)
 
   const [attempt, setAttempt] = useState(0)
 
@@ -82,9 +91,55 @@ export function ProductsPage() {
 
   const findByEan = (ean: string) => products.find((p) => p.ean === ean)
 
+  /** Produto achado no banco pelo leitor que a lista ainda não tem (outro aparelho). */
+  function mergeFound(found: Product) {
+    setLoad((current) =>
+      current.status !== 'ready' || current.products.some((p) => p.id === found.id)
+        ? current
+        : { status: 'ready', products: [...current.products, found] },
+    )
+  }
+
+  /** Leitor da barra: já cadastrado → editar; novo → cadastro com o código (T-07 D5). */
+  async function lookupFromToolbar(code: string) {
+    const found = await findProductByEan(code)
+    if (!found) return { kind: 'new' as const }
+    mergeFound(found)
+    return { kind: 'existing' as const, item: found, summary: `${found.name} · ${formatPrice(found.price)}` }
+  }
+
+  const scannerModal = scanning && (
+    <ScannerModal<Product>
+      onCode={lookupFromToolbar}
+      onNewCode={(code) => {
+        setScanning(false)
+        setForm({ mode: 'new', ean: code, scanned: true })
+      }}
+      existingActionLabel="Editar produto"
+      onExistingAction={(product) => {
+        setScanning(false)
+        setForm(product)
+      }}
+      onClose={() => setScanning(false)}
+    />
+  )
+
+  const scanButton = (
+    <button type="button" className="btn btn--outline" data-action="scan" onClick={() => setScanning(true)}>
+      <Icon name="barcode" size="sm" />
+      Escanear
+    </button>
+  )
+
   const formModal = form !== null && (
     <ProductFormModal
-      product={form === 'new' ? null : form}
+      // Nova key a cada alvo: "Abrir produto" troca o formulário sem reaproveitar os campos.
+      key={isNewTarget(form) ? `new-${form.ean ?? ''}` : form.id}
+      product={isNewTarget(form) ? null : form}
+      initialEan={isNewTarget(form) ? form.ean : undefined}
+      initialScanned={isNewTarget(form) ? form.scanned : undefined}
+      onFound={mergeFound}
+      onOpenProduct={(product) => setForm(product)}
       findByEan={findByEan}
       onSaved={handleSaved}
       onDeleted={handleDeleted}
@@ -120,13 +175,17 @@ export function ProductsPage() {
           title="Nenhum produto cadastrado"
           text="Cadastre o primeiro produto da loja. Depois ele aparece aqui para buscar e editar."
           action={
-            <button type="button" className="btn btn--primary" data-action="new-product" onClick={() => setForm('new')}>
+            <div className="toolbar">
+              {scanButton}
+              <button type="button" className="btn btn--primary" data-action="new-product" onClick={() => setForm({ mode: 'new' })}>
               <Icon name="plus" size="sm" />
               Cadastrar produto
             </button>
+            </div>
           }
         />
         {formModal}
+        {scannerModal}
       </>
     )
   }
@@ -180,7 +239,9 @@ export function ProductsPage() {
           </span>
         </button>
 
-        <button type="button" className="btn btn--primary" data-action="new-product" onClick={() => setForm('new')}>
+        {scanButton}
+
+        <button type="button" className="btn btn--primary" data-action="new-product" onClick={() => setForm({ mode: 'new' })}>
           <Icon name="plus" size="sm" />
           Cadastrar produto
         </button>
@@ -234,6 +295,7 @@ export function ProductsPage() {
       />
 
       {formModal}
+      {scannerModal}
     </>
   )
 }

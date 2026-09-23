@@ -26,11 +26,20 @@ export async function listProducts(): Promise<Product[]> {
   }
 }
 
-/** `petshop_id` vem do default da coluna; `source` é sempre manual nesta tela. */
-export async function createProduct(input: ProductInput): Promise<Product> {
+/** Produto da loja com este código, ou `null` — o RLS limita à loja logada e
+ * o índice único (petshop_id, ean) garante no máximo um (T-07 D3). */
+export async function findProductByEan(ean: string): Promise<Product | null> {
+  const { data, error } = await supabase.from('products').select(COLUMNS).eq('ean', ean).maybeSingle()
+  if (error) throw error
+  return data ? toProduct(data as Product) : null
+}
+
+/** `petshop_id` vem do default da coluna; `source` diz se o código veio da
+ * câmera (`barcode`) ou foi digitado/ausente (`manual`) — T-07 D6. */
+export async function createProduct(input: ProductInput, source: Product['source'] = 'manual'): Promise<Product> {
   const { data, error } = await supabase
     .from('products')
-    .insert({ ...input, source: 'manual' })
+    .insert({ ...input, source })
     .select(COLUMNS)
     .single()
   if (error) throw error

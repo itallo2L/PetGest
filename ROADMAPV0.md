@@ -159,6 +159,16 @@ Supabase.
 
 ## T-07 — Scanner real integrado ao cadastro de produto
 
+**Status:** implementada (2026-09-23), falta teste em celular real com
+embalagens (Android e iPhone — este junto com a tarefa 5.4 da T-01).
+"Escanear" na barra de Produtos e no campo de código do formulário;
+desfechos "já cadastrado → editar" e "novo → cadastro com o código";
+leitura aceita só com dígito verificador válido e 2 leituras iguais;
+EAN-13 e EAN-8; lanterna quando o aparelho permite; produto cadastrado
+pela câmera grava `source: 'barcode'`. O `/spike` continua até a T-01
+registrar o teste do iPhone. Change:
+`openspec/changes/T-07-scanner-product-integration/`.
+
 Junta o resultado validado em T-01 (câmera + `barcode-detector`) com a
 tela de Produtos de T-06.
 

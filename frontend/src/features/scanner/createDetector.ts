@@ -6,6 +6,8 @@ import {
 
 const EAN_13_FORMATS: BarcodeFormat[] = ['ean_13']
 
+export type { BarcodeFormat }
+
 export type DetectorEngine = 'native' | 'wasm'
 
 export interface ScannerDetector {
@@ -41,8 +43,13 @@ function isForcedWasm(): boolean {
  *
  * `?engine=wasm` na URL força o ponyfill mesmo havendo suporte nativo,
  * para comparar os dois motores no mesmo aparelho em campo.
+ *
+ * `formats` padrão = só EAN-13 (spike da T-01); o leitor do app pede também
+ * EAN-8 (T-07).
  */
-export async function createDetector(): Promise<CreateDetectorResult> {
+export async function createDetector(
+  formats: BarcodeFormat[] = EAN_13_FORMATS,
+): Promise<CreateDetectorResult> {
   const NativeBarcodeDetector = isForcedWasm()
     ? undefined
     : getNativeBarcodeDetector()
@@ -51,14 +58,15 @@ export async function createDetector(): Promise<CreateDetectorResult> {
     const supported = await NativeBarcodeDetector.getSupportedFormats()
     if (supported.includes('ean_13')) {
       return {
-        detector: new NativeBarcodeDetector({ formats: EAN_13_FORMATS }),
+        // Só os formatos pedidos que o nativo declara (EAN-8 pode faltar).
+        detector: new NativeBarcodeDetector({ formats: formats.filter((f) => supported.includes(f)) }),
         engine: 'native',
       }
     }
   }
 
   return {
-    detector: new PonyfillBarcodeDetector({ formats: EAN_13_FORMATS }),
+    detector: new PonyfillBarcodeDetector({ formats }),
     engine: 'wasm',
   }
 }
