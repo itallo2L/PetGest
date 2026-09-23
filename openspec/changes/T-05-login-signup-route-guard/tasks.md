@@ -20,7 +20,7 @@
 ## 4. Verificação e fechamento
 
 - [x] 4.1 Conferir sessão persistida (requisito de T-03): logado, recarregar e fechar/reabrir a aba mantêm o usuário em `/produtos`; e conferir que nenhum arquivo de `features/scanner/` mudou (`git diff --stat`)
-- [ ] 4.2 (Usuário) Vercel > projeto > Settings > Environment Variables: adicionar `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (mesmos valores do `.env.local`, chave pública) em Preview e Production **antes do push** (design D8); verificar que nenhuma `service_role`/`sb_secret_` foi cadastrada
+- [x] 4.2 (Usuário) Vercel > projeto > Settings > Environment Variables: adicionar `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (mesmos valores do `.env.local`, chave pública) em Preview e Production **antes do push** (design D8); verificar que nenhuma `service_role`/`sb_secret_` foi cadastrada
 - [x] 4.3 Atualizar `ROADMAPV0.md` com o status de T-05 e a nova URL do spike (`/spike`) na seção de T-01; verificar que os dois trechos apontam para esta change
 - [ ] 4.4 (Usuário) Commitar em `dev`, fazer push e, no deploy, testar em **Android (Chrome) e iPhone (Safari)**: criar conta, sair, entrar, senha errada, recarregar logado, gaveta de navegação e `/spike` sem login
 - [ ] 4.5 (Usuário) Authentication > Users: apagar as contas `t05-teste-...` criadas nas verificações; verificar que a lista não tem mais contas de teste
