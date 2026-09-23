@@ -47,8 +47,9 @@ vem antes de auth, banco e telas.
 
 **Status:** concluída no Supabase (2026-09-22) — projeto criado em São
 Paulo, `supabase/schema.sql` aplicado e `supabase/tests/rls_test.sql`
-retornando "RLS OK". Change: `openspec/changes/T-02-supabase-schema-rls/`
-(falta só o commit/push, tarefa 2.4).
+retornando "RLS OK". Change arquivada em
+`openspec/changes/archive/2026-09-22-T-02-supabase-schema-rls/`; spec
+principal em `openspec/specs/tenant-data/`.
 
 Cria o projeto no Supabase e aplica a base de dados que sustenta o V0
 inteiro.
@@ -63,6 +64,15 @@ inteiro.
 - Ref: `PLANOMVP.md` §3.1, §3.2, §3.7 passos 1–2.
 
 ## T-03 — Configuração de autenticação (Supabase Auth)
+
+**Status:** concluída (2026-09-23) — provedor e-mail/senha ativo com
+"Confirm email" desligado, `@supabase/supabase-js` instalado e
+`frontend/src/shared/supabaseClient.ts` criado (variáveis em
+`frontend/.env.local`, modelo em `frontend/.env.example`). Verificado
+contra o projeto real: cadastro devolve sessão na hora, e-mail repetido e
+senha errada recusados, conta sem petshop não vê dados. A persistência da
+sessão após recarregar a página fica para verificar em T-05, quando houver
+tela de login. Change: `openspec/changes/T-03-supabase-auth-client/`.
 
 Prepara o provedor de auth para os fluxos reais de login/cadastro que
 T-05 vai consumir.
