@@ -30,7 +30,9 @@ T-01 ──> T-02 ──> T-03 ──┬──> T-05 ──> T-06 ──> T-07 �
 ## T-01 — Scaffold frontend com scanner spike
 
 **Status:** em andamento — já existe a change
-`openspec/changes/T-01-scaffold-frontend-scanner-spike/`.
+`openspec/changes/T-01-scaffold-frontend-scanner-spike/`. Desde T-05 o
+spike fica em **`/spike`** (público, sem login) — usar `<url>/spike` nos
+testes de campo que faltam.
 
 Cria a pasta `frontend/` definitiva (React + TS + Vite) e valida, isolado
 de tudo o mais, se o `barcode-detector` lê um EAN-13 de forma confiável em
@@ -110,6 +112,13 @@ criado em T-01, e organiza as pastas por feature antes de portar telas.
 - Ref: `PLANOMVP.md` §3.5, §3.8 (tokens visuais a reaproveitar).
 
 ## T-05 — Login, cadastro de petshop e proteção de rota
+
+**Status:** implementada (2026-09-23), falta teste em celular real
+(Android e iPhone) após configurar as variáveis na Vercel e fazer o
+deploy. Telas Entrar, Criar conta (conta + loja) e Concluir cadastro;
+proteção de rota; shell do protótipo com Produtos e Configurações "em
+construção"; spike movido para `/spike`. Change:
+`openspec/changes/T-05-login-signup-route-guard/`.
 
 Primeira tela real conectada ao Supabase — substitui a simulação do
 protótipo.

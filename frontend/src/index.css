@@ -1,4 +1,8 @@
 @import './shared/ui/tokens.css';
+@import './shared/ui/buttons.css';
+@import './shared/ui/forms.css';
+@import './shared/ui/empty-state.css';
+@import './shared/ui/layout.css';
 
 /* ==========================================================================
    RESET / BASE (portado do style.css do protótipo)
