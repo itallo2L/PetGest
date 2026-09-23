@@ -135,6 +135,14 @@ protótipo.
 
 ## T-06 — Tela de Produtos (CRUD real)
 
+**Status:** implementada (2026-09-23), falta teste em celular real
+(Android e iPhone). Listagem (tabela no desktop, cards no celular), busca
+sem acento por nome/código, filtro por categoria e ordenação; cadastro e
+edição no modal do protótipo com as 7 categorias fixas; **exclusão com
+confirmação — acréscimo ao roadmap**, decidido na proposta da T-06.
+Botão "Escanear" fica para T-07. Change:
+`openspec/changes/T-06-products-crud/`.
+
 Troca o array de produtos em memória do protótipo por operações reais no
 Supabase.
 

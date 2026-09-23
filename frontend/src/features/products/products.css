@@ -1,0 +1,100 @@
+/* ==========================================================================
+   PRODUTOS — barra de ferramentas (busca, filtro, cadastro) e painel de
+   filtros, portados do style.css do protótipo (BARRA DE FERRAMENTAS,
+   RESPONSIVO e REFINAMENTO MOBILE). Fora: page-actions e chips de status.
+   @keyframes fade-in vem de shared/ui/modal.css.
+   ========================================================================== */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: 460px;
+}
+
+.search__icon {
+  position: absolute;
+  top: 50%;
+  left: var(--space-3);
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Especificidade maior que .input, que é declarada depois neste arquivo. */
+.search .search__input { padding-left: 38px; padding-right: 38px; }
+
+.search__clear {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.search__clear:hover { background: var(--surface-secondary); color: var(--text); }
+.search__clear[hidden] { display: none; }
+
+.filter-panel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  animation: fade-in 160ms ease;
+}
+.filter-panel[hidden] { display: none; }
+
+/* Novo (T-06): no React o card do produto é um <button>, para abrir pelo
+   teclado; zera o estilo nativo do botão. */
+button.record { width: 100%; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+
+@media (max-width: 1024px) {
+  .filter-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .toolbar { flex-wrap: wrap; }
+  .search { flex: 1 1 100%; max-width: none; order: -1; }
+  .toolbar .btn { flex: 1; }
+  .filter-panel { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* O botão de cadastro cresce só até onde ainda parece um botão. */
+@media (min-width: 560px) and (max-width: 768px) {
+  .toolbar [data-action="new-product"] { max-width: 280px; }
+}
+
+@media (max-width: 768px) {
+  /* Cadastrar é a ação principal e leva o espaço restante da linha. */
+  .toolbar #filterToggle { flex: 0 0 auto; }
+  .toolbar [data-action="new-product"] { flex: 1; }
+
+  .filter-panel { padding: var(--space-4); gap: var(--space-3); }
+  .filter-panel [data-action="clear-filters"] { min-height: 44px; justify-content: center; }
+}
+
+@media (max-width: 400px) {
+  .toolbar { gap: var(--space-2); }
+  .toolbar .btn { padding-inline: var(--space-3); }
+}

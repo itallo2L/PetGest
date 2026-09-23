@@ -3,6 +3,10 @@
 @import './shared/ui/forms.css';
 @import './shared/ui/empty-state.css';
 @import './shared/ui/layout.css';
+@import './shared/ui/card.css';
+@import './shared/ui/table.css';
+@import './shared/ui/modal.css';
+@import './shared/ui/toast.css';
 
 /* ==========================================================================
    RESET / BASE (portado do style.css do protótipo)

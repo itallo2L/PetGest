@@ -1,6 +1,6 @@
 /* ==========================================================================
    BOTÕES — portado do style.css do protótipo (BOTÕES + alvos de toque do
-   REFINAMENTO MOBILE). Fora: .btn__badge, sem uso no V0 ainda.
+   REFINAMENTO MOBILE). .btn--danger e .btn--danger-ghost são novos (T-06).
    ========================================================================== */
 
 .btn {
@@ -59,6 +59,30 @@
   border-radius: var(--radius-sm);
 }
 .btn--link:hover { background: var(--primary-soft); }
+
+.btn__badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--primary-contrast);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.btn__badge[hidden] { display: none; }
+
+/* Não existe no protótipo (T-06: excluir produto) — mesmos tokens de perigo. */
+.btn--danger {
+  background: var(--danger-strong);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-xs);
+}
+.btn--danger:hover:not(:disabled) { background: var(--danger); }
+.btn--danger-ghost { color: var(--danger-strong); }
+.btn--danger-ghost:hover { background: var(--danger-soft); }
 
 @media (max-width: 768px) {
   .btn { min-height: 42px; padding-inline: var(--space-4); }

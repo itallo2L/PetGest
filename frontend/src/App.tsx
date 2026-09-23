@@ -9,6 +9,7 @@ import { ProductsPage } from './features/products/ProductsPage'
 import { ScannerSpike } from './features/scanner/ScannerSpike'
 import { AppShell } from './shared/ui/AppShell'
 import { Icon } from './shared/ui/Icon'
+import { ToastProvider } from './shared/ui/ToastProvider'
 
 /** Spike de T-01, público até T-07 integrar o scanner ao cadastro. */
 function SpikePage() {
@@ -27,27 +28,29 @@ function App() {
   return (
     <BrowserRouter>
       <SessionProvider>
-        <Routes>
-          <Route path="/spike" element={<SpikePage />} />
+        <ToastProvider>
+          <Routes>
+            <Route path="/spike" element={<SpikePage />} />
 
-          <Route element={<PublicOnly />}>
-            <Route path="/entrar" element={<LoginPage />} />
-            <Route path="/criar-conta" element={<SignupPage />} />
-          </Route>
-
-          <Route element={<RequireNoPetshop />}>
-            <Route path="/concluir-cadastro" element={<CompleteSignupPage />} />
-          </Route>
-
-          <Route element={<RequireReady />}>
-            <Route element={<AppShell />}>
-              <Route path="/produtos" element={<ProductsPage />} />
-              <Route path="/configuracoes" element={<SettingsPage />} />
+            <Route element={<PublicOnly />}>
+              <Route path="/entrar" element={<LoginPage />} />
+              <Route path="/criar-conta" element={<SignupPage />} />
             </Route>
-          </Route>
 
-          <Route path="*" element={<Navigate to="/produtos" replace />} />
-        </Routes>
+            <Route element={<RequireNoPetshop />}>
+              <Route path="/concluir-cadastro" element={<CompleteSignupPage />} />
+            </Route>
+
+            <Route element={<RequireReady />}>
+              <Route element={<AppShell />}>
+                <Route path="/produtos" element={<ProductsPage />} />
+                <Route path="/configuracoes" element={<SettingsPage />} />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<Navigate to="/produtos" replace />} />
+          </Routes>
+        </ToastProvider>
       </SessionProvider>
     </BrowserRouter>
   )
