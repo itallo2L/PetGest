@@ -202,6 +202,15 @@ e-mail de acesso. Change: `openspec/changes/T-08-store-settings/`.
 
 ## T-09 — Deploy do app completo (Vercel + Supabase)
 
+**Status:** em andamento (2026-09-24). Produção: **https://pet-gest.vercel.app**
+(branch `main`, ainda sem deploy — o merge de 17/09 falhou e a `main` só
+recebe o app depois do teste no iPhone). Prévia da `dev`:
+https://pet-gest-git-dev-itallo2ls-projects.vercel.app — verificada:
+endereços diretos carregam o app e o JavaScript publicado só tem a chave
+pública. **Atenção:** o Supabase gratuito pausa o projeto após ~7 dias sem
+uso; reativar no painel se o app parar de carregar dados. Change:
+`openspec/changes/T-09-production-deploy/`.
+
 - Conectar o repositório na Vercel (build Vite, root `frontend/`).
 - Configurar variáveis de ambiente `VITE_SUPABASE_URL` e
   `VITE_SUPABASE_ANON_KEY`.
