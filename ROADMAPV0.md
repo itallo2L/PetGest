@@ -187,6 +187,12 @@ tela de Produtos de T-06.
 
 ## T-08 — Tela de Configurações (dados da loja)
 
+**Status:** implementada (2026-09-23), falta teste em celular real
+(Android e iPhone). Formulário "Dados da loja" (nome, e-mail de contato,
+telefone opcional) lendo e gravando `petshops`; salvar atualiza nome e
+iniciais na barra lateral na hora; trocar o e-mail da loja não muda o
+e-mail de acesso. Change: `openspec/changes/T-08-store-settings/`.
+
 - Formulário de "Dados da loja" (nome, e-mail, telefone) lendo/gravando
   `petshops` via Supabase, restrito ao petshop do usuário logado (RLS).
 - Sem estoque mínimo, multiplicador de sugestão de compra ou alertas —

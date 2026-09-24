@@ -1,0 +1,22 @@
+/* ==========================================================================
+   CONFIGURAÇÕES — portado do style.css do protótipo (CONFIGURAÇÕES e
+   RESPONSIVO). Fora: .settings-note, sem uso no V0.
+   ========================================================================== */
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.settings-grid__wide { grid-column: 1 / -1; }
+
+.form__actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-1);
+}
+
+@media (max-width: 1024px) {
+  .settings-grid { grid-template-columns: minmax(0, 1fr); }
+}

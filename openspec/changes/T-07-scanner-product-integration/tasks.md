@@ -21,7 +21,7 @@
 ## 4. Campo e fechamento
 
 - [x] 4.1 Atualizar `ROADMAPV0.md` com o status de T-07; verificar que aponta para esta change
-- [ ] 4.2 (Usuário) Commitar em `dev`, fazer push e testar no deploy em **Android (Chrome)** com embalagens reais: ler pela barra (produto existente e novo), ler pelo formulário, EAN-8 se houver, pouca luz, negar e liberar a câmera, confirmar que a câmera apaga ao fechar
+- [x] 4.2 (Usuário) Commitar em `dev`, fazer push e testar no deploy em **Android (Chrome)** com embalagens reais: ler pela barra (produto existente e novo), ler pelo formulário, EAN-8 se houver, pouca luz, negar e liberar a câmera, confirmar que a câmera apaga ao fechar
 - [ ] 4.3 (Usuário) Mesmo teste no **iPhone (Safari)**, junto com a tarefa 5.4 da T-01 (motor WASM); registrar na T-01 o resultado
 - [ ] 4.4 Depois do registro da T-01: remover `/spike`, `ScannerSpike.tsx` e o requisito "Spike do scanner público" de `app-shell` (design D9); verificar que `/spike` cai em `/produtos` e que o build passa
 - [ ] 4.5 (Usuário) Apagar as contas/lojas de teste criadas nas verificações
