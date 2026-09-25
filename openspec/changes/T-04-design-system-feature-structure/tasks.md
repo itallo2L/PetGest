@@ -19,4 +19,4 @@
 - [x] 4.1 Conferir o spike sem regressão: build ok, página abre no dev server sem erros no console, botão "Iniciar câmera" visível e estilizado como antes (estilo inline), nenhum arquivo em `features/scanner/` alterado (`git diff --stat`)
 - [ ] 4.2 (Usuário) Após o deploy na Vercel, abrir a URL do spike no iPhone (Safari) e no Android (Chrome) e confirmar que o ícone da pata aparece no título e o texto está em Inter
 - [x] 4.3 Atualizar `ROADMAPV0.md` com o status de T-04 apontando para esta change; verificar que o texto cita a regra do design D2 (CSS de componente vem com a tela)
-- [ ] 4.4 (Usuário) Commitar em `dev` e fazer push
+- [x] 4.4 (Usuário) Commitar em `dev` e fazer push

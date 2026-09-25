@@ -24,6 +24,7 @@ Motivação em `proposal.md`. Requisitos em `specs/deployment/spec.md`.
 Sem configuração nova além de conferir **Production Branch = `main`** e as variáveis em Production. A prévia de `dev` continua sendo o ambiente de teste. Alternativa (promover um deploy de prévia manualmente) descartada: quebraria a regra "`main` = validado" e deixaria produção sem ligação com um commit da `main`.
 
 ### D2. Merge `dev` → `main` por PR, depois do iPhone
+**Atualizado na proposta da T-10 (2026-09-24):** sem iPhone disponível, o usuário decidiu mesclar na `main` depois da validação no Android e no desktop, para o teste de campo rodar na produção. O iPhone continua obrigatório para **fechar** o V0 (T-10). Texto original:
 A T-09 termina com o PR `dev` → `main` aberto pelo usuário **depois** que o teste no iPhone (T-04 a T-08 e T-01 5.4) estiver registrado. As tarefas de verificação desta change rodam na **prévia de `dev`**, que usa a mesma configuração; depois do merge, só um teste de fumaça curto na URL de produção.
 
 ### D3. Site URL e Redirect URLs agora, confirmação de e-mail depois
