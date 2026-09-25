@@ -18,4 +18,4 @@
 
 - [x] 4.1 (Usuário) Abrir o PR `dev` → `main` no GitHub e mesclar — antecipado para antes do iPhone, ver design D2 e T-10 (tarefa 1.3); verificar que o deploy de produção da `main` fica **Ready** na Vercel
 - [x] 4.2 Teste de fumaça na URL de produção: repetir 2.1 e 2.2 contra produção; verificar que passam
-- [ ] 4.3 (Usuário) Apagar a conta/loja de teste criada em 2.3
+- [x] 4.3 (Usuário) Apagar a conta/loja de teste criada em 2.3
