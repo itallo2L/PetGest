@@ -1,9 +1,9 @@
 ## 1. Preparação
 
 - [x] 1.1 Escrever `roteiro.md` (seções: preparação, autenticação, navegação, produtos, scanner com erros, configurações, medições) e o modelo de `relatorio.md` (design D2, D5); verificar que cada passo tem ação, resultado esperado e o requisito de spec que cobre, e que todos os itens do `ROADMAPV0.md` T-10 aparecem no roteiro
-- [ ] 1.2 (Usuário) Limpar dados de teste: apagar as contas de teste em Authentication > Users e rodar o SQL de limpeza de lojas sem usuário; conferir que o projeto Supabase não está pausado (design D3); verificar que Users e `petshops` não têm mais dados de teste
-- [ ] 1.3 (Usuário) Abrir o PR `dev` → `main` e mesclar (design D1); verificar que o deploy de produção da `main` fica **Ready** na Vercel
-- [ ] 1.4 Rodar o teste de fumaça da T-09 (tarefa 4.2) contra `https://pet-gest.vercel.app` e marcá-la na T-09; verificar endereços diretos com 200 e JavaScript publicado só com a chave pública
+- [x] 1.2 (Usuário) Limpar dados de teste: apagar as contas de teste em Authentication > Users e rodar o SQL de limpeza de lojas sem usuário; conferir que o projeto Supabase não está pausado (design D3); verificar que Users e `petshops` não têm mais dados de teste
+- [x] 1.3 (Usuário) Abrir o PR `dev` → `main` e mesclar (design D1); verificar que o deploy de produção da `main` fica **Ready** na Vercel
+- [x] 1.4 Rodar o teste de fumaça da T-09 (tarefa 4.2) contra `https://pet-gest.vercel.app` e marcá-la na T-09; verificar endereços diretos com 200 e JavaScript publicado só com a chave pública
 
 ## 2. Teste de campo no Android
 
