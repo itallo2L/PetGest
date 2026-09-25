@@ -1,0 +1,32 @@
+/* ==========================================================================
+   EMPTY STATES — portado do style.css do protótipo.
+   ========================================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-6);
+}
+
+.empty-state__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  background: var(--primary-soft);
+  color: var(--primary);
+  margin-bottom: var(--space-1);
+}
+.empty-state__icon .icon { width: 26px; height: 26px; }
+
+.empty-state__title { font-size: var(--fs-lg); font-weight: var(--fw-semibold); }
+.empty-state__text {
+  max-width: 44ch;
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}

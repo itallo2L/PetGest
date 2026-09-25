@@ -1,0 +1,200 @@
+/* ==========================================================================
+   LEITOR DE CÓDIGO DE BARRAS — portado do style.css do protótipo
+   --------------------------------------------------------------------------
+   Um único atributo data-state no container decide o que aparece, para que
+   os seis estados nunca se sobreponham:
+   asking | scanning | found | denied | unsupported | error
+   ========================================================================== */
+
+.scanner { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* Por padrão tudo escondido; cada estado liga o que lhe cabe. */
+.scanner__stage,
+.scanner__hint,
+.scanner__notice,
+.scanner__result { display: none; }
+
+.scanner[data-state="scanning"] .scanner__stage,
+.scanner[data-state="scanning"] .scanner__hint { display: block; }
+
+.scanner[data-state="asking"] .scanner__notice,
+.scanner[data-state="denied"] .scanner__notice,
+.scanner[data-state="unsupported"] .scanner__notice,
+.scanner[data-state="error"] .scanner__notice { display: block; }
+
+.scanner[data-state="found"] .scanner__result { display: block; }
+.scanner[data-state="found"] .scanner__manual { display: none; }
+
+/* --- Palco da câmera --- */
+
+.scanner__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #101a1c;
+}
+
+.scanner__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mira: escurece a volta e deixa a faixa central limpa. */
+.scanner__frame {
+  position: absolute;
+  inset: 0;
+  border: 40px solid rgba(16, 26, 28, 0.45);
+  border-width: 22% 12%;
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.scanner__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--danger);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+  animation: scanner-sweep 2s ease-in-out infinite;
+}
+
+@keyframes scanner-sweep {
+  0%, 100% { transform: translateY(-38px); }
+  50% { transform: translateY(38px); }
+}
+
+.scanner__torch {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgba(16, 26, 28, 0.72);
+  color: #FFFFFF;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+.scanner__torch[hidden] { display: none; }
+.scanner__torch[aria-pressed="true"] { background: var(--warning); color: var(--warning-strong); }
+
+.scanner__hint {
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* --- Aviso (pedindo permissão, negada, sem suporte, erro) --- */
+
+.scanner__notice {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+}
+
+.scanner__notice-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto var(--space-3);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.scanner__notice-icon .icon { width: 26px; height: 26px; }
+
+.scanner[data-state="denied"] .scanner__notice-icon,
+.scanner[data-state="error"] .scanner__notice-icon {
+  background: var(--danger-soft);
+  color: var(--danger-strong);
+}
+.scanner[data-state="unsupported"] .scanner__notice-icon {
+  background: var(--warning-soft);
+  color: var(--warning-strong);
+}
+
+.scanner__notice-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-1);
+}
+.scanner__notice-text {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+  max-width: 42ch;
+  margin: 0 auto;
+}
+
+/* --- Resultado --- */
+
+.scanner__result {
+  text-align: center;
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--success-soft);
+  border-radius: var(--radius-md);
+  background: var(--success-soft);
+}
+.scanner__result--info { border-color: var(--warning-soft); background: var(--warning-soft); }
+
+.scanner__result-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-3);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--success-strong);
+}
+.scanner__result--info .scanner__result-icon { color: var(--warning-strong); }
+
+.scanner__result-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--success-strong);
+}
+.scanner__result--info .scanner__result-title { color: var(--warning-strong); }
+
+.scanner__code {
+  margin: var(--space-2) 0;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.scanner__result-text { font-size: var(--fs-md); color: var(--text-secondary); }
+
+.scanner__manual { display: flex; flex-direction: column; gap: 6px; }
+
+/* --- Acréscimos da T-07 (não existem no protótipo) --- */
+
+/* Consultando o código no banco: mesmo aviso dos estados de câmera. */
+.scanner[data-state="lookup"] .scanner__notice { display: block; }
+
+/* Sem câmera/HTTPS: mesmo visual de "sem suporte" do protótipo. */
+.scanner[data-state="unavailable"] .scanner__notice { display: block; }
+.scanner[data-state="unavailable"] .scanner__notice-icon {
+  background: var(--warning-soft);
+  color: var(--warning-strong);
+}
+
+/* O <video> já recebe o stream enquanto a câmera abre: mantê-lo visível
+   evita que o Safari/iOS recuse tocar um vídeo oculto (display: none). */
+.scanner[data-state="asking"] .scanner__stage { display: block; }

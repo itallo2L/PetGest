@@ -1,0 +1,91 @@
+/* ==========================================================================
+   BOTÕES — portado do style.css do protótipo (BOTÕES + alvos de toque do
+   REFINAMENTO MOBILE). .btn--danger e .btn--danger-ghost são novos (T-06).
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 9px var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/* .btn usa display:inline-flex, que vence o [hidden] do navegador. */
+.btn[hidden] { display: none; }
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  box-shadow: var(--shadow-xs);
+}
+.btn--primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn--primary:active:not(:disabled) { background: var(--primary-active); }
+
+.btn--outline {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.btn--outline:hover { background: var(--surface-hover); border-color: var(--text-muted); }
+
+.btn--ghost { color: var(--text-secondary); }
+.btn--ghost:hover { background: var(--surface-hover); color: var(--text); }
+
+.btn--sm { padding: 6px var(--space-3); font-size: var(--fs-base); }
+.btn--block { width: 100%; }
+
+.btn--link {
+  padding: 4px 6px;
+  color: var(--primary);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-sm);
+}
+.btn--link:hover { background: var(--primary-soft); }
+
+.btn__badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--primary);
+  color: var(--primary-contrast);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+.btn__badge[hidden] { display: none; }
+
+/* Não existe no protótipo (T-06: excluir produto) — mesmos tokens de perigo. */
+.btn--danger {
+  background: var(--danger-strong);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-xs);
+}
+.btn--danger:hover:not(:disabled) { background: var(--danger); }
+.btn--danger-ghost { color: var(--danger-strong); }
+.btn--danger-ghost:hover { background: var(--danger-soft); }
+
+@media (max-width: 768px) {
+  .btn { min-height: 42px; padding-inline: var(--space-4); }
+  .btn--sm { min-height: 36px; }
+  .btn--link { min-height: 36px; padding: 8px 10px; }
+}

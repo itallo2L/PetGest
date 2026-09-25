@@ -1,0 +1,115 @@
+/* ==========================================================================
+   MODAIS — portado do style.css do protótipo (MODAIS + modais centralizados
+   do REFINAMENTO MOBILE). body.is-locked já vem de layout.css.
+   ========================================================================== */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+.modal[hidden] { display: none; }
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 34, 38, 0.45);
+  animation: fade-in 140ms ease;
+}
+
+.modal__dialog {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - var(--space-8));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* O diálogo recebe foco ao abrir apenas para levar o leitor de tela até ele. */
+.modal__dialog:focus,
+.modal__dialog:focus-visible { outline: none; }
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+
+.modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.modal__subtitle { margin-top: 2px; font-size: var(--fs-base); color: var(--text-secondary); }
+
+.modal__body { padding: var(--space-5); overflow-y: auto; }
+
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border);
+  background: var(--surface-secondary);
+  flex-wrap: wrap;
+}
+.modal__footer--end { justify-content: flex-end; }
+.modal__footer-right { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+
+/* --- Modais centralizados na tela --- */
+
+@media (max-width: 768px) {
+  .modal {
+    padding: var(--space-4) var(--space-3);
+    align-items: center;          /* nunca ancorado no rodapé */
+    justify-content: center;
+  }
+
+  .modal__dialog {
+    max-height: calc(100vh - var(--space-7));
+    max-height: calc(100dvh - var(--space-7));
+    border-radius: var(--radius-lg);
+  }
+
+  .modal__header { padding: var(--space-4); }
+  .modal__body { padding: var(--space-4); }
+  .modal__footer { padding: var(--space-3) var(--space-4); }
+
+  /* Rodapés com mais de dois botões empilham; os dois botões de um
+     formulário simples continuam lado a lado, que cabe bem. */
+  .modal__footer:not(.modal__footer--end) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .modal__footer:not(.modal__footer--end) .modal__footer-right {
+    flex-direction: column;
+    width: 100%;
+  }
+  .modal__footer .btn { min-height: 44px; }
+  .modal__footer--end .btn { flex: 1; }
+}

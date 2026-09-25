@@ -20,7 +20,7 @@ T-01 ──> T-02 ──> T-03 ──┬──> T-05 ──> T-06 ──> T-07 �
                           └──> T-04 ─────────────────────┴──> T-08 ──> T-09 ──> T-10
 ```
 
-- T-01 é a única tarefa já iniciada (change existente em `openspec/`).
+- T-01 (spike do scanner) e T-02 (schema) já têm change em `openspec/`.
 - T-02 e T-03 (Supabase) podem começar em paralelo com T-04 (design
   system), mas nada de T-05 em diante avança sem T-01+T-02+T-03 prontos.
 - T-09 (deploy) e T-10 (teste de campo) fecham o V0.
@@ -30,7 +30,9 @@ T-01 ──> T-02 ──> T-03 ──┬──> T-05 ──> T-06 ──> T-07 �
 ## T-01 — Scaffold frontend com scanner spike
 
 **Status:** em andamento — já existe a change
-`openspec/changes/T-01-scaffold-frontend-scanner-spike/`.
+`openspec/changes/T-01-scaffold-frontend-scanner-spike/`. Desde T-05 o
+spike fica em **`/spike`** (público, sem login) — usar `<url>/spike` nos
+testes de campo que faltam.
 
 Cria a pasta `frontend/` definitiva (React + TS + Vite) e valida, isolado
 de tudo o mais, se o `barcode-detector` lê um EAN-13 de forma confiável em
@@ -44,6 +46,12 @@ vem antes de auth, banco e telas.
   celular real, motor (nativo/WASM) e `firstReadMs` registrados.
 
 ## T-02 — Setup do Supabase (schema, RLS, signup_petshop)
+
+**Status:** concluída no Supabase (2026-09-22) — projeto criado em São
+Paulo, `supabase/schema.sql` aplicado e `supabase/tests/rls_test.sql`
+retornando "RLS OK". Change arquivada em
+`openspec/changes/archive/2026-09-22-T-02-supabase-schema-rls/`; spec
+principal em `openspec/specs/tenant-data/`.
 
 Cria o projeto no Supabase e aplica a base de dados que sustenta o V0
 inteiro.
@@ -59,6 +67,17 @@ inteiro.
 
 ## T-03 — Configuração de autenticação (Supabase Auth)
 
+**Status:** concluída (2026-09-23) — provedor e-mail/senha ativo com
+"Confirm email" desligado, `@supabase/supabase-js` instalado e
+`frontend/src/shared/supabaseClient.ts` criado (variáveis em
+`frontend/.env.local`, modelo em `frontend/.env.example`). Verificado
+contra o projeto real: cadastro devolve sessão na hora, e-mail repetido e
+senha errada recusados, conta sem petshop não vê dados. A persistência da
+sessão após recarregar a página fica para verificar em T-05, quando houver
+tela de login. Change arquivada em
+`openspec/changes/archive/2026-09-23-T-03-supabase-auth-client/`; spec
+principal em `openspec/specs/auth/`.
+
 Prepara o provedor de auth para os fluxos reais de login/cadastro que
 T-05 vai consumir.
 
@@ -70,6 +89,16 @@ T-05 vai consumir.
 - Ref: `PLANOMVP.md` §3.3, §3.7 passo 3.
 
 ## T-04 — Porte do design system e estrutura de features
+
+**Status:** implementada (2026-09-23), falta conferir no celular após o
+deploy — tokens do protótipo em `frontend/src/shared/ui/tokens.css`,
+reset/base em `frontend/src/index.css`, Inter empacotada
+(`@fontsource/inter`), sprite com os 22 ícones do V0 em
+`shared/ui/icons.svg` + componente `<Icon>`, e pastas
+`features/{auth,products,petshop}/`. Regra adotada: o CSS de componentes
+(botões, campos, cards, modal) **não** foi portado agora — entra em
+`shared/ui/` junto da tela que o usa (T-05, T-06, T-08). Change:
+`openspec/changes/T-04-design-system-feature-structure/`.
 
 Porta o visual do protótipo (`style.css`) para dentro do `frontend/` já
 criado em T-01, e organiza as pastas por feature antes de portar telas.
@@ -83,6 +112,13 @@ criado em T-01, e organiza as pastas por feature antes de portar telas.
 - Ref: `PLANOMVP.md` §3.5, §3.8 (tokens visuais a reaproveitar).
 
 ## T-05 — Login, cadastro de petshop e proteção de rota
+
+**Status:** implementada (2026-09-23), falta teste em celular real
+(Android e iPhone) após configurar as variáveis na Vercel e fazer o
+deploy. Telas Entrar, Criar conta (conta + loja) e Concluir cadastro;
+proteção de rota; shell do protótipo com Produtos e Configurações "em
+construção"; spike movido para `/spike`. Change:
+`openspec/changes/T-05-login-signup-route-guard/`.
 
 Primeira tela real conectada ao Supabase — substitui a simulação do
 protótipo.
@@ -99,6 +135,14 @@ protótipo.
 
 ## T-06 — Tela de Produtos (CRUD real)
 
+**Status:** implementada (2026-09-23), falta teste em celular real
+(Android e iPhone). Listagem (tabela no desktop, cards no celular), busca
+sem acento por nome/código, filtro por categoria e ordenação; cadastro e
+edição no modal do protótipo com as 7 categorias fixas; **exclusão com
+confirmação — acréscimo ao roadmap**, decidido na proposta da T-06.
+Botão "Escanear" fica para T-07. Change:
+`openspec/changes/T-06-products-crud/`.
+
 Troca o array de produtos em memória do protótipo por operações reais no
 Supabase.
 
@@ -114,6 +158,16 @@ Supabase.
   remover da tela do protótipo).
 
 ## T-07 — Scanner real integrado ao cadastro de produto
+
+**Status:** implementada (2026-09-23), falta teste em celular real com
+embalagens (Android e iPhone — este junto com a tarefa 5.4 da T-01).
+"Escanear" na barra de Produtos e no campo de código do formulário;
+desfechos "já cadastrado → editar" e "novo → cadastro com o código";
+leitura aceita só com dígito verificador válido e 2 leituras iguais;
+EAN-13 e EAN-8; lanterna quando o aparelho permite; produto cadastrado
+pela câmera grava `source: 'barcode'`. O `/spike` continua até a T-01
+registrar o teste do iPhone. Change:
+`openspec/changes/T-07-scanner-product-integration/`.
 
 Junta o resultado validado em T-01 (câmera + `barcode-detector`) com a
 tela de Produtos de T-06.
@@ -133,6 +187,12 @@ tela de Produtos de T-06.
 
 ## T-08 — Tela de Configurações (dados da loja)
 
+**Status:** implementada (2026-09-23), falta teste em celular real
+(Android e iPhone). Formulário "Dados da loja" (nome, e-mail de contato,
+telefone opcional) lendo e gravando `petshops`; salvar atualiza nome e
+iniciais na barra lateral na hora; trocar o e-mail da loja não muda o
+e-mail de acesso. Change: `openspec/changes/T-08-store-settings/`.
+
 - Formulário de "Dados da loja" (nome, e-mail, telefone) lendo/gravando
   `petshops` via Supabase, restrito ao petshop do usuário logado (RLS).
 - Sem estoque mínimo, multiplicador de sugestão de compra ou alertas —
@@ -141,6 +201,15 @@ tela de Produtos de T-06.
 - Ref: `PLANOMVP.md` §3.8 (o que manter em Configurações).
 
 ## T-09 — Deploy do app completo (Vercel + Supabase)
+
+**Status:** em andamento (2026-09-24). Produção: **https://pet-gest.vercel.app**
+(branch `main`, ainda sem deploy — o merge de 17/09 falhou e a `main` só
+recebe o app depois do teste no iPhone). Prévia da `dev`:
+https://pet-gest-git-dev-itallo2ls-projects.vercel.app — verificada:
+endereços diretos carregam o app e o JavaScript publicado só tem a chave
+pública. **Atenção:** o Supabase gratuito pausa o projeto após ~7 dias sem
+uso; reativar no painel se o app parar de carregar dados. Change:
+`openspec/changes/T-09-production-deploy/`.
 
 - Conectar o repositório na Vercel (build Vite, root `frontend/`).
 - Configurar variáveis de ambiente `VITE_SUPABASE_URL` e

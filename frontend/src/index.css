@@ -1,15 +1,58 @@
-* {
-  box-sizing: border-box;
-}
+@import './shared/ui/tokens.css';
+@import './shared/ui/buttons.css';
+@import './shared/ui/forms.css';
+@import './shared/ui/empty-state.css';
+@import './shared/ui/layout.css';
+@import './shared/ui/card.css';
+@import './shared/ui/table.css';
+@import './shared/ui/modal.css';
+@import './shared/ui/toast.css';
 
-html,
-body,
-#root {
-  margin: 0;
-  min-height: 100svh;
-}
+/* ==========================================================================
+   RESET / BASE (portado do style.css do protótipo)
+   CSS de componentes entra em shared/ui/ junto da tela que o usa.
+   ========================================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
 
 body {
-  font: 16px/1.4 system-ui, 'Segoe UI', Roboto, sans-serif;
-  color-scheme: light dark;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, p, ul, figure { margin: 0; }
+ul { padding: 0; list-style: none; }
+
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: currentColor;
+}
+.icon--sm { width: 16px; height: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

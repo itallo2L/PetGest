@@ -1,0 +1,273 @@
+/* ==========================================================================
+   LAYOUT DO APP — sidebar, topbar, gaveta e botão de sair
+   Portado do style.css do protótipo (LAYOUT, SIDEBAR, TOPBAR, BOTÃO DE SAIR,
+   RESPONSIVO e REFINAMENTO MOBILE). Fora: rótulos de seção e badges da
+   navegação, user-chip e ponto de notificação — sem uso no V0.
+   ========================================================================== */
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-7) var(--space-8);
+}
+
+body.is-locked { overflow: hidden; }
+
+/* --- Sidebar --- */
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5) var(--space-3) var(--space-4);
+  z-index: 60;
+  transition: transform var(--transition);
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-3) var(--space-6);
+}
+
+.brand__mark {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-contrast);
+}
+.brand__mark .icon { width: 22px; height: 22px; }
+
+.brand__text { display: flex; flex-direction: column; min-width: 0; }
+
+.brand__name {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.brand__tagline {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.sidebar__nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+.nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 9px var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+/* No protótipo era <button>; no React é link (NavLink) e o navegador o
+   sublinharia. */
+a.nav__item { text-decoration: none; }
+.nav__item > span:first-of-type { flex: 1; }
+.nav__item .icon { color: var(--text-muted); transition: color var(--transition-fast); }
+
+.nav__item:hover { background: var(--surface-hover); color: var(--text); }
+.nav__item:hover .icon { color: var(--text-secondary); }
+
+.nav__item.is-active {
+  background: var(--primary-soft);
+  color: var(--primary-active);
+  font-weight: var(--fw-semibold);
+}
+.nav__item.is-active .icon { color: var(--primary); }
+
+.sidebar__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.store-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+}
+
+.store-chip__avatar {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft-strong);
+  color: var(--primary-active);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+}
+
+.store-chip__info { display: flex; flex-direction: column; min-width: 0; }
+.store-chip__info strong {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.store-chip__info small { font-size: var(--fs-xs); color: var(--text-muted); }
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 39, 43, 0.4);
+  z-index: 50;
+  border: 0;
+}
+
+.sidebar__logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 8px var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.sidebar__logout:hover { background: var(--danger-soft); color: var(--danger-strong); }
+
+/* --- Topbar --- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  min-height: var(--topbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-7);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar__left { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.topbar__titles { min-width: 0; }
+
+.topbar__title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.topbar__subtitle {
+  font-size: var(--fs-md);
+  color: var(--text-secondary);
+}
+
+.icon-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+.icon-btn:hover { background: var(--surface-hover); color: var(--text); border-color: var(--border-strong); }
+
+/* Declarado depois de .icon-btn para vencer o display: grid dele. */
+.topbar__menu { display: none; }
+
+/* --- Gaveta de navegação --- */
+
+.sidebar__close { display: none; }
+
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+  .sidebar.is-open { transform: none; }
+  .main { margin-left: 0; }
+  .topbar__menu { display: grid; }
+  .topbar, .content { padding-left: var(--space-5); padding-right: var(--space-5); }
+}
+
+@media (max-width: 768px) {
+  .topbar { min-height: auto; flex-wrap: wrap; }
+  .topbar__subtitle { display: none; }
+  .icon-btn { width: 42px; height: 42px; }
+}
+
+@media (max-width: 520px) {
+  .content { padding: var(--space-4) var(--space-4) var(--space-7); }
+  .topbar { padding: var(--space-3) var(--space-4); }
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: min(288px, 84vw);
+    padding: var(--space-4) var(--space-3) var(--space-5);
+  }
+
+  .sidebar__brand { padding-right: 0; align-items: center; }
+  .sidebar__close { display: grid; margin-left: auto; flex: none; }
+
+  /* Itens com altura de toque de app, sem inflar o desktop. */
+  .nav__item { padding: 11px var(--space-3); min-height: 46px; font-size: var(--fs-lg); }
+  .nav__item .icon { width: 22px; height: 22px; }
+  .sidebar__nav { gap: 4px; }
+  .store-chip { padding: var(--space-3); }
+}
+
+@media (max-width: 400px) {
+  .content { padding: var(--space-3) var(--space-3) var(--space-7); }
+  .topbar { padding: var(--space-3); }
+}
