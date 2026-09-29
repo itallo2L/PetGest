@@ -108,6 +108,14 @@ no início da T-19 (D6).
 Cria a pasta `backend/` definitiva, sem regra de negócio, e prova o
 caminho de build e deploy antes de qualquer tela depender dela.
 
+**Status:** implementada em 2026-09-29 (`openspec/changes/T-12-backend-scaffold/`).
+`backend/Api/` (.NET 10, minimal APIs) com `GET /health` checando o banco,
+CORS por configuração (produção, prévias `pet-gest-…-itallo2ls-projects.vercel.app`
+e `localhost:5183`), OpenAPI + Swagger UI só em Development e `AppDbContext`
+vazio; Postgres 17 local via Docker Compose (porta 5450); 18 testes em
+`backend/Api.Tests/`; GitHub Actions com build + testes, sem deploy — o
+deploy no Azure fica todo na T-17.
+
 - `backend/Api/` com um único projeto ASP.NET Core Web API, pastas
   `Endpoints/` (ou `Controllers/`), `Services/`, `Data/`, `Models/`
   (§4.3).

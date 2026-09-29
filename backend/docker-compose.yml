@@ -1,0 +1,23 @@
+# Postgres de desenvolvimento da API (design D5 da T-12).
+# Porta 5450 no host para não disputar a 5432 com um Postgres instalado na máquina.
+name: petgest
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: petgest
+      POSTGRES_PASSWORD: petgest_dev
+      POSTGRES_DB: petgest
+    ports:
+      - "5450:5432"
+    volumes:
+      - petgest-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U petgest -d petgest"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  petgest-pg:

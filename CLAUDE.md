@@ -19,7 +19,12 @@ barras + dados da loja. Projeto solo, sem equipe.
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
   `frontend/`; não é mais onde o desenvolvimento acontece.
-- Sem pasta `backend/` ainda — ela nasce na T-12 (`ROADMAPV1.md`).
+- `backend/` — API do **V1** (ASP.NET Core, .NET 10), criada na T-12:
+  por enquanto só o esqueleto (`/health`, CORS, OpenAPI, EF Core com
+  `DbContext` vazio), Postgres 17 local via Docker Compose e testes em
+  `Api.Tests/`, rodados pelo GitHub Actions
+  (`.github/workflows/backend.yml`). Não é publicada nem toca a
+  produção. Instruções em `backend/README.md`.
 
 ## Fase atual: V1 em desenvolvimento, produção no V0
 
@@ -86,10 +91,15 @@ frontend/
 supabase/
   schema.sql      (tabelas + RLS + função signup_petshop, versionado)
   tests/          (rls_test.sql — roteiro de teste das políticas)
+backend/          (V1 — deploy independente do frontend, PLANOMVP.md §4.3)
+  Api/            (projeto único ASP.NET Core, minimal APIs)
+    Endpoints/    (um arquivo por área: MapXxxEndpoints())
+    Services/     (regras de negócio, a partir da T-13)
+    Data/         (AppDbContext, entidades e migrations EF)
+    Models/       (DTOs de request/response)
+  Api.Tests/      (xUnit + WebApplicationFactory, contra Postgres real)
+  docker-compose.yml  (Postgres 17 de desenvolvimento, porta 5450)
 ```
-
-No V1, `backend/` entra ao lado de `frontend/` a partir da T-12
-(`ROADMAPV1.md`, `PLANOMVP.md` §4.3).
 
 ## Modelo de dados (Supabase/Postgres)
 

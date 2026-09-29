@@ -1,0 +1,49 @@
+# Build e testes da API do V1 (T-12, design D9). Sem deploy — Azure entra na T-17.
+name: backend
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    branches: [dev, main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    # Mesmo Postgres e mesma porta do docker-compose.yml, para a string de conexão
+    # de desenvolvimento servir aqui também.
+    services:
+      db:
+        image: postgres:17
+        env:
+          POSTGRES_USER: petgest
+          POSTGRES_PASSWORD: petgest_dev
+          POSTGRES_DB: petgest
+        ports:
+          - 5450:5432
+        options: >-
+          --health-cmd "pg_isready -U petgest -d petgest"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+
+      - run: dotnet restore PetGest.slnx
+      - run: dotnet build PetGest.slnx --no-restore -c Release
+      - run: dotnet test PetGest.slnx --no-build -c Release
