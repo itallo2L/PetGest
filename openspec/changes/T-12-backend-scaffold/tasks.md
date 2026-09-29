@@ -20,8 +20,8 @@
 
 ## 4. CI
 
-- [ ] 4.1 Criar `.github/workflows/backend.yml` (push/PR em `dev` e `main`, `paths` em `backend/**` e no próprio workflow, `setup-dotnet` com `backend/global.json`, serviço `postgres:17` em `5450:5432`, restore → build Release → test) (design D9); verificar com `git push` na `dev` que o workflow roda e fica verde no GitHub Actions
-- [ ] 4.2 Verificar que um commit que só mexe em `frontend/` não dispara o workflow do backend e que o deploy de prévia da Vercel da `dev` continua **Ready** (Root Directory `frontend` intocado)
+- [x] 4.1 Criar `.github/workflows/backend.yml` (push/PR em `dev` e `main`, `paths` em `backend/**` e no próprio workflow, `setup-dotnet` com `backend/global.json`, serviço `postgres:17` em `5450:5432`, restore → build Release → test) (design D9); verificar com `git push` na `dev` que o workflow roda e fica verde no GitHub Actions
+- [ ] 4.2 Verificar que um commit que só mexe em `frontend/` não dispara o workflow do backend e que o deploy de prévia da Vercel da `dev` continua **Ready** (Root Directory `frontend` intocado) — _prévias `pet-gest` e `pet-gest-8fd8` Ready no commit 13f6c30 (2026-09-29); falta ver um commit só de `frontend/` sem disparar o workflow_
 
 ## 5. Documentação
 
