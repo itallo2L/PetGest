@@ -5,15 +5,21 @@ barras + dados da loja. Projeto solo, sem equipe.
 
 ## Estado atual do repositório
 
-O que existe hoje em `index.html` / `script.js` / `style.css` é um
-**protótipo navegável, sem backend** — login não valida credenciais de
-verdade, o scanner sorteia um de três resultados fake (não liga a câmera),
-produtos vivem num array em memória. Ver `README.md` para o detalhe de
-cada tela.
-
-O corte das telas para o escopo do V0 (Login, Produtos, Configurações)
-já foi commitado e enviado ao repositório remoto — esse é o ponto de
-partida atual para a migração para React.
+- `frontend/` — o app do V0 (React + TypeScript + Vite), em produção em
+  `pet-gest.vercel.app`: login/cadastro reais no Supabase Auth, scanner
+  com câmera (`barcode-detector`), produtos e dados da loja persistidos
+  no Supabase. Instruções de execução e variáveis de ambiente em
+  `frontend/README.md`.
+- `supabase/` — `schema.sql` (tabelas, RLS, `signup_petshop`) e
+  `tests/` (testes das políticas de RLS).
+- `openspec/` — specs vigentes em `openspec/specs/` e uma change por
+  tarefa dos roadmaps. Arquivadas até agora: T-02, T-03 e T-11; as changes
+  T-01 e T-04 a T-10 ainda estão abertas em `openspec/changes/`.
+- `index.html` / `script.js` / `style.css` na raiz — o **protótipo
+  navegável original**, sem backend (login fake, scanner que sorteia
+  resultados, produtos em memória). Serviu de referência visual para o
+  `frontend/`; não é mais onde o desenvolvimento acontece.
+- Sem pasta `backend/` ainda — ela nasce na T-12 (`ROADMAPV1.md`).
 
 ## Fase atual: V1 em desenvolvimento, produção no V0
 
@@ -64,7 +70,7 @@ partida atual para a migração para React.
   em produção) — é a stack do V1, em desenvolvimento desde a T-11
   (`PLANOMVP.md` §4, `ROADMAPV1.md`).
 
-## Estrutura de pastas alvo (ainda não migrada)
+## Estrutura de pastas
 
 ```
 frontend/
@@ -76,9 +82,14 @@ frontend/
       petshop/    (dados da loja)
     shared/
       supabaseClient.ts   (único client Supabase do app — sempre usar este)
+      ui/                 (componentes e CSS compartilhados: shell, modal, toast, tokens)
 supabase/
   schema.sql      (tabelas + RLS + função signup_petshop, versionado)
+  tests/          (rls_test.sql — roteiro de teste das políticas)
 ```
+
+No V1, `backend/` entra ao lado de `frontend/` a partir da T-12
+(`ROADMAPV1.md`, `PLANOMVP.md` §4.3).
 
 ## Modelo de dados (Supabase/Postgres)
 

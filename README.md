@@ -1,66 +1,38 @@
-# PetGest V0 — Protótipo
+# PetGest
 
-Protótipo navegável (HTML/CSS/JS vanilla, sem backend) só com as telas que
-fazem parte do V0 do PetGest: login, cadastro de produto via código de
-barras e dados da loja — ver a seção "Escopo de telas do V0" (§3.8) em
-`PLANOMVP.md`.
+SaaS de gestão para petshops. O V0 cobre login e cadastro de petshop,
+cadastro de produto pelo leitor de código de barras (ou digitação manual)
+e os dados da loja.
 
-## Como abrir
+- **Produção:** https://pet-gest.vercel.app (V0)
+- **Em desenvolvimento:** V1 — API própria em ASP.NET Core + Identity/JWT
+  sobre o Postgres do Supabase, para o cadastro por foto e voz com IA.
 
-Abra `index.html` no navegador. Sem instalação, build ou servidor.
+## Estrutura
 
-## Telas
+| Pasta / arquivo | O que é |
+|---|---|
+| [`frontend/`](frontend/) | App do V0 (React + TypeScript + Vite), publicado na Vercel. Como rodar, variáveis de ambiente e deploy em [`frontend/README.md`](frontend/README.md). |
+| [`supabase/`](supabase/) | `schema.sql` (tabelas, RLS, função `signup_petshop`) e `tests/rls_test.sql`. |
+| [`openspec/`](openspec/) | Specs vigentes e uma change por tarefa dos roadmaps (`T-XX-<slug>`). |
+| `index.html`, `script.js`, `style.css` | Protótipo navegável original — ver abaixo. |
 
-1. **Login** — e-mail e senha, exibida antes do app.
-2. **Produtos** — busca, filtro por categoria/ordenação, cadastro, lista
-   (Produto, Categoria, Código de barras, Preço, Ações).
-3. **Configurações** — só "Dados da loja" (nome, e-mail, telefone).
+Ainda não existe `backend/`: ele entra na T-12 do `ROADMAPV1.md`.
 
-## Login — visual, não funcional
+## Documentos de decisão
 
-Assim como o leitor de código de barras, esta é só a experiência de tela:
-não há verificação de credenciais nem sessão de verdade. Qualquer e-mail em
-formato válido e qualquer senha preenchida entram — o botão "Entrar" só
-simula uma pequena espera (como uma chamada de rede de verdade) antes de
-liberar o app.
+- [`PLANOMVP.md`](PLANOMVP.md) — stack e entregáveis: §3 é o V0 (Supabase +
+  Vercel), §4 é o V1 (ASP.NET Core + Azure App Service).
+- [`ROADMAPV0.md`](ROADMAPV0.md) — tarefas T-01 a T-10 do V0.
+- [`ROADMAPV1.md`](ROADMAPV1.md) — tarefas T-11 a T-21 do V1.
 
-- O campo de senha tem o botão de mostrar/ocultar.
-- "Esqueci minha senha" mostra um aviso de que o recurso está fora do
-  escopo deste protótipo.
-- O botão "Sair", no rodapé da barra lateral, volta para a tela de login
-  (sem apagar nenhum dado — é só a experiência de logout).
+## Protótipo original (raiz do repositório)
 
-A implementação real (autenticação contra o Supabase Auth, conforme
-decidido em `PLANOMVP.md` §3.3) troca o corpo de `submitLogin()` em
-`script.js`; o restante do fluxo (tela, validação de campos, loading,
-logout) já está pronto para receber isso.
+`index.html` / `script.js` / `style.css` são o protótipo em HTML/CSS/JS
+puro que serviu de referência visual para o `frontend/`. Abre direto no
+navegador, sem instalação. **Não tem backend:** o login aceita qualquer
+e-mail e senha, o leitor de código de barras não liga a câmera (sorteia
+resultados de demonstração) e os produtos vivem só em memória.
 
-## Leitor de código de barras — visual, não funcional
-
-Este protótipo **não liga a câmera de verdade**. O modal do leitor mostra a
-experiência visual de apontar a câmera para um código de barras — a mesma
-moldura de mira e linha de varredura do protótipo original, agora sobre uma
-etiqueta de produto com um código de barras desenhado em CSS — e, depois de
-um instante, "detecta" um código de demonstração sozinho. Cada abertura do
-leitor alterna entre os três desfechos possíveis, só para passear pela
-demonstração:
-
-1. um código já cadastrado no catálogo (mostra "produto já cadastrado");
-2. um código da base de referência (preenche nome e categoria sozinho);
-3. um código desconhecido (só preenche o código, para completar manualmente).
-
-A entrada manual do código (campo "Ou digite o código") continua funcionando
-de verdade — é só texto, não depende de câmera.
-
-Isso é intencional: é um protótipo de tela, não o app final. A implementação
-real (câmera do navegador via `getUserMedia` + `barcode-detector`, com
-fallback para digitação manual, conforme `PLANOMVP.md` §3.4) deve ser
-testada isoladamente — só o corpo da função `iniciarCamera()` em
-`script.js` precisa trocar quando chegar a hora; o resto do fluxo já está
-pronto para receber um código de verdade.
-
-## O que não está aqui (de propósito)
-
-Estoque, mínimo, fornecedor, situação, relatórios, autenticação real contra
-um backend e persistência entre sessões — tudo isso fica fora do V0, pelos
-mesmos motivos documentados em `PLANOMVP.md` §3.8.
+Não é mais onde o desenvolvimento acontece — fica no repositório só como
+referência.
