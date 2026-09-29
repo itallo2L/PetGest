@@ -108,7 +108,7 @@ no início da T-19 (D6).
 Cria a pasta `backend/` definitiva, sem regra de negócio, e prova o
 caminho de build e deploy antes de qualquer tela depender dela.
 
-**Status:** implementada em 2026-09-29 (`openspec/changes/T-12-backend-scaffold/`).
+**Status:** concluída e arquivada em 2026-09-29 (`openspec/changes/archive/2026-09-29-T-12-backend-scaffold/`, spec `api-platform`).
 `backend/Api/` (.NET 10, minimal APIs) com `GET /health` checando o banco,
 CORS por configuração (produção, prévias `pet-gest-…-itallo2ls-projects.vercel.app`
 e `localhost:5183`), OpenAPI + Swagger UI só em Development e `AppDbContext`
