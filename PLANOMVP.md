@@ -12,9 +12,10 @@
   hospedado na Vercel. Sem API própria de longa duração.
 - **Fase futura (pós-V0, quando justificar):** migração para uma API
   própria em **ASP.NET Core Web API** com **ASP.NET Core Identity + JWT**
-  para autenticação, hospedada em **Azure App Service**, com PostgreSQL
-  gerenciado (Azure Database for PostgreSQL). Essa é a arquitetura da
-  decisão original deste projeto — ela não foi descartada, só adiada: o V0
+  para autenticação, hospedada em **Azure App Service**, sobre o
+  PostgreSQL do projeto Supabase, que passa a ser só banco (decidido na
+  T-11; o plano original previa Azure Database for PostgreSQL). Essa é a
+  arquitetura da decisão original deste projeto — ela não foi descartada, só adiada: o V0
   usa Supabase para validar o produto mais rápido e mais barato; quando
   fizer sentido ter uma API própria (features de IA mais elaboradas,
   volume, lógica de negócio que não cabe bem em RLS/RPC), a stack ASP.NET
@@ -77,8 +78,9 @@ produtos sem código de barras e falha/negação de permissão de câmera.
 
 ### 2.3 Banco de dados: PostgreSQL
 
-Tanto no V0 (Postgres gerenciado pelo Supabase) quanto na fase futura
-(Azure Database for PostgreSQL) o banco é Postgres, pelos mesmos motivos:
+Tanto no V0 quanto na fase futura o banco é o Postgres gerenciado pelo
+Supabase (na fase futura, só como banco — decidido na T-11), pelos
+mesmos motivos:
 
 1. **Hospedagem/custo para um SaaS pequeno começando:** opções gerenciadas
    baratas ou gratuitas (Supabase, Neon, Azure Database for PostgreSQL
@@ -460,8 +462,8 @@ permissões granular por enquanto.
   domínios/hosts diferentes (frontend em host estático, backend no Azure)
   — cookies same-site ficariam mais complicados nesse cenário.
 - Alternativa legítima: serviços externos de auth (Clerk, Auth0) — o
-  Supabase Auth já cumpre esse papel no V0; ao migrar, reavaliar se vale
-  a pena trocar por Identity+JWT ou manter um provedor externo.
+  Supabase Auth já cumpre esse papel no V0; reavaliado na T-11: a fase
+  futura usa Identity+JWT, com as contas do Supabase Auth importadas.
 - Nada de rate limiting elaborado ou 2FA nesta fase — HTTPS sempre, senha
   com hash forte (Identity já faz isso), rate limit simples no endpoint
   de login (middleware nativo do ASP.NET Core desde o .NET 7).
@@ -473,7 +475,7 @@ Frontend (SPA)
      ↓  HTTPS / JSON (multipart/form-data para imagem e áudio no futuro)
 Backend (API ASP.NET Core)
      ↓
-PostgreSQL (Azure Database for PostgreSQL)
+PostgreSQL (projeto Supabase, só como banco — via pooler)
 ```
 
 `frontend/` e `backend/` como pastas separadas no repositório — mantém os
@@ -513,7 +515,7 @@ migração inicial. Foto+IA e voz+IA são só um endpoint `multipart/form-data`
 ```text
 Frontend:  host estático (Vercel, Netlify ou Azure Static Web Apps) — build do Vite
 Backend:   Azure App Service (tier gratuito/básico) — HTTPS por padrão, CI/CD via GitHub
-Banco:     Azure Database for PostgreSQL (tier burstable)
+Banco:     Postgres do projeto Supabase (só banco, via pooler) — decidido na T-11
 ```
 
 Nada de Kubernetes, filas, Redis ou Elasticsearch.
@@ -551,8 +553,9 @@ desenvolvimento acontece.
 
 - API própria em ASP.NET Core Web API, com autenticação via Identity +
   JWT.
-- Banco migrado para Azure Database for PostgreSQL (ou mantido no
-  Supabase, a decidir no momento da migração).
+- Banco mantido no Postgres do Supabase, só como banco, acessado pela API
+  via EF Core/Npgsql (decidido na T-11; Azure Database for PostgreSQL
+  descartado nesta fase).
 - Suporte a cadastro de produto via foto+IA e voz+IA, usando o mesmo
   contrato `ProductDraft` já preparado desde o V0.
 - Deploy do backend em Azure App Service.

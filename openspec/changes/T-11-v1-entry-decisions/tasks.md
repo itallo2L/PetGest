@@ -1,0 +1,11 @@
+## 1. Conferência e aprovação
+
+- [x] 1.1 Conferir no painel do Supabase (somente leitura) o que D2 e D4 assumem: região do projeto, plano (gratuito/pago e regra de pausa), endereço e modos do pooler, e o formato dos hashes em `auth.users.encrypted_password` (prefixo `$2a$`/`$2b$` e custo) — rodar `select substr(encrypted_password, 1, 7), count(*) from auth.users group by 1` no SQL Editor; verificar que o resultado está anotado em D2/D4 e que nenhuma decisão foi contrariada (se foi, ajustar o design antes de 1.2)
+- [x] 1.2 (Usuário) Revisar `proposal.md` e `design.md` (D1–D7) e aprovar ou pedir ajustes; verificar que a aprovação está registrada numa linha "Aprovado em AAAA-MM-DD" no fim do `design.md`
+
+## 2. Documentos (só depois de 1.2)
+
+- [x] 2.1 Atualizar `ROADMAPV1.md`: seção "Quando começar" com a exceção de D1 (V1 em paralelo à T-10, T-18 bloqueada até o arquivamento da T-10); status da T-11; T-13 com a troca da FK de `profiles.id` e o schema `identity`; T-17 com banco = Supabase via pooler, papel `petgest_api` e região Brazil South; T-18 sem cópia de `petshops`/`products`, com importação de usuários (D4), fechamento da Data API e "desligar o Supabase Auth" no lugar de "desligar o projeto Supabase"; T-19 começando pela escolha do provedor de IA (D6); verificar com `git diff ROADMAPV1.md` que cada decisão de D1–D6 aparece na tarefa afetada e nenhuma outra tarefa mudou
+- [x] 2.2 Atualizar `PLANOMVP.md` só onde o texto contradiz as decisões: diagrama de §4.3 e linha "Banco" de §4.4 (Postgres do Supabase), §5 "Futuro" ("a decidir" → decidido, com referência à T-11); verificar com `grep -n "Azure Database" PLANOMVP.md` que as menções restantes são só histórico/alternativa descartada
+- [x] 2.3 Atualizar `CLAUDE.md`: V1 em desenvolvimento (ASP.NET Core + Identity/JWT sobre o Postgres do Supabase, deploy da API no Azure App Service), produção ainda no V0 até a T-18, T-10 aberta em paralelo; manter as regras de escopo, RLS e testes do V0 válidas enquanto a produção estiver no V0; verificar que não sobra frase dizendo que ASP.NET "não é a stack" sem a ressalva de fase
+- [x] 2.4 Verificar a change com `openspec validate T-11-v1-entry-decisions` (sem erros) e confirmar com `git status` que só mudaram `ROADMAPV1.md`, `PLANOMVP.md`, `CLAUDE.md` e os arquivos desta change — nenhuma pasta `backend/` nem dependência .NET

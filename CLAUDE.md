@@ -15,6 +15,21 @@ O corte das telas para o escopo do V0 (Login, Produtos, Configurações)
 já foi commitado e enviado ao repositório remoto — esse é o ponto de
 partida atual para a migração para React.
 
+## Fase atual: V1 em desenvolvimento, produção no V0
+
+- **Produção** (`pet-gest.vercel.app`) continua no **V0** (Supabase Auth +
+  Postgres + RLS, frontend na Vercel) até a virada da T-18. Tudo o que
+  este arquivo diz sobre o V0 (escopo, RLS, testes) segue valendo para a
+  produção enquanto ela estiver no V0.
+- **V1 em desenvolvimento** (T-11 aprovada em 2026-09-29, ver
+  `openspec/changes/T-11-v1-entry-decisions/design.md`): API própria em
+  ASP.NET Core (.NET 10) + Identity/JWT sobre o **Postgres do projeto
+  Supabase**, que passa a ser só banco; deploy da API no Azure App Service
+  (Brazil South). Gatilho: cadastro por foto/voz + IA.
+- **T-10 continua aberta em paralelo** (falta o teste no iPhone).
+  Defeitos do V0 são corrigidos no V0, e a T-18 não começa antes de a
+  T-10 ser arquivada.
+
 ## Fluxo de branches
 
 - `dev` é onde toda funcionalidade nova ou correção é desenvolvida.
@@ -27,13 +42,15 @@ partida atual para a migração para React.
 - `PLANOMVP.md` — plano único de stack e entregáveis, com duas fases:
   - **Seção 3 (V0, ativa agora):** Supabase + Vercel — schema SQL
     completo, políticas de RLS, roadmap de migração do protótipo.
-  - **Seção 4 (futura, pós-V0):** ASP.NET Core + Identity/JWT + Azure App
-    Service — reservada para quando o produto justificar uma API própria
-    (ver gatilhos na seção 4.5). Não seguir essa stack agora.
+  - **Seção 4 (V1, em desenvolvimento):** ASP.NET Core + Identity/JWT +
+    Azure App Service, sobre o Postgres do Supabase (decisões da T-11).
+    Vale para o código novo do V1; a produção só muda na T-18.
 - `ROADMAPV0.md` — roadmap do V0 quebrado em tarefas numeradas (`T-01`,
   `T-02`, ...). Cada change em `openspec/changes/` deve prefixar a pasta
   com o número da tarefa correspondente (`T-0X-<slug>`) para rastrear
   proposta/design/specs/tasks de cada etapa.
+- `ROADMAPV1.md` — roadmap do V1 (T-11 a T-21), mesma convenção de
+  pastas (`T-1X-<slug>`).
 
 ## Stack alvo do V0 (ver `PLANOMVP.md` §2 e §3 para o detalhe completo)
 
@@ -43,9 +60,9 @@ partida atual para a migração para React.
 - Scanner: pacote `barcode-detector` (API nativa no Android/Chrome,
   fallback WASM no Safari/iOS — a Apple não implementa a API nativa)
 - Deploy: Vercel (frontend), projeto Supabase (banco/auth)
-- ASP.NET Core + Identity/JWT + Azure **não** é a stack do V0 — é a
-  arquitetura da fase futura (`PLANOMVP.md` §4), reservada para quando o
-  produto justificar uma API própria.
+- ASP.NET Core + Identity/JWT + Azure **não** é a stack do V0 (que está
+  em produção) — é a stack do V1, em desenvolvimento desde a T-11
+  (`PLANOMVP.md` §4, `ROADMAPV1.md`).
 
 ## Estrutura de pastas alvo (ainda não migrada)
 

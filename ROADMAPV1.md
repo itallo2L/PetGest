@@ -13,9 +13,8 @@
 
 ## Quando começar
 
-**Ainda não.** Conforme `PLANOMVP.md` §4.5 e o `CLAUDE.md`, a stack do V0
-(Supabase + Vercel) continua sendo onde todo o desenvolvimento acontece
-até que **as duas condições** abaixo sejam verdadeiras:
+**Começou em 2026-09-29, com uma exceção registrada na T-11.** A regra
+original pedia **as duas condições** abaixo antes de qualquer tarefa do V1:
 
 1. **V0 fechado:** T-10 arquivada, com o teste no iPhone registrado e o
    `ROADMAPV0.md` marcando o V0 como concluído.
@@ -27,8 +26,16 @@ até que **as duas condições** abaixo sejam verdadeiras:
      (processamento assíncrono pesado, jobs agendados complexos);
    - volume de uso que justifique manter uma API própria.
 
-Até lá, este documento é só planejamento. Nenhuma pasta `backend/` nem
-dependência .NET entra no repositório antes da T-11 aprovada.
+A condição 2 está atendida: foto/voz + IA precisando de orquestração no
+servidor (T-11, D1). A condição 1 **não**: o teste no iPhone da T-10
+espera um aparelho disponível. Exceção consciente (T-11, D1):
+
+- o V1 começa em paralelo à T-10, que continua aberta e é a única dona
+  do fechamento do V0;
+- defeitos achados no iPhone são corrigidos no V0 (changes T-05 a T-09),
+  não no V1;
+- **a T-18 (virada da produção) não começa antes de a T-10 ser
+  arquivada** — T-12 a T-17 não tocam produção.
 
 ## Ordem e dependências
 
@@ -67,6 +74,13 @@ Decisões de `PLANOMVP.md` §2, válidas nas duas fases:
 Formaliza, numa change só de design (sem código), as escolhas que o
 `PLANOMVP.md` deixa para "o momento da migração".
 
+**Status:** aprovada em 2026-09-29 (`openspec/changes/T-11-v1-entry-decisions/`).
+Decisões: gatilho foto/voz + IA, V1 em paralelo à T-10 (D1); banco =
+Postgres do projeto Supabase, só como banco (D2); ASP.NET Core Identity +
+JWT (D3); usuários importados com o hash bcrypt e re-hash no login (D4);
+projeto único com pastas, .NET 10 (D5); provedor de IA em aberto, escolhido
+no início da T-19 (D6).
+
 - Registrar qual gatilho de §4.5 motivou o V1 e a evidência (uso real,
   pedido de petshop, limite atingido no Supabase).
 - **Banco:** Azure Database for PostgreSQL (tier burstable) ou manter o
@@ -85,7 +99,8 @@ Formaliza, numa change só de design (sem código), as escolhas que o
   SDK oficial em C# — §4.1), com estimativa de custo por cadastro.
 - Atualizar o `CLAUDE.md` (stack ativa passa a ser a do V1) só quando esta
   change for aprovada.
-- Depende de: V0 concluído.
+- Depende de: V0 concluído — dispensado pela exceção de D1 (ver "Quando
+  começar").
 - Ref: `PLANOMVP.md` §4.1, §4.2, §4.5, §5.
 
 ## T-12 — Scaffold do backend ASP.NET Core
@@ -123,6 +138,11 @@ papel do RLS por regras da API.
   equivalente ao "nunca filtrar `petshop_id` na query" do V0.
 - Testes de integração portando os casos de `supabase/tests/rls_test.sql`
   (ler/gravar em outro petshop, trocar o próprio vínculo, anônimo).
+- **Mesmo banco do V0** (T-11, D2): as tabelas `petshops`/`products`/
+  `profiles` já existem — as migrations EF mapeiam o que está lá. A FK de
+  `profiles.id` troca de `auth.users(id)` para a tabela de usuários do
+  Identity (mesmo `Guid`, D4); tabelas do Identity no schema próprio
+  `identity`, fora do schema exposto pela Data API.
 - Depende de: T-12.
 - Ref: `PLANOMVP.md` §2.3, §3.2 (invariantes), §4.3.
 
@@ -180,8 +200,15 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
 
 - Backend em **Azure App Service** (tier gratuito/básico), HTTPS padrão,
   CI/CD via GitHub Actions (§4.4).
-- Banco conforme a decisão da T-11 (Azure Database for PostgreSQL tier
-  burstable, ou o Postgres do Supabase).
+- App Service na região **Brazil South**, perto do Supabase em São Paulo
+  (`sa-east-1`) — T-11, D2.
+- Banco: o Postgres do projeto Supabase (T-11, D2), conectado pelo pooler
+  (Supavisor) em modo *session* (porta 5432, IPv4), com pool pequeno — o
+  projeto tem limite de 60 conexões. A API usa um papel dedicado
+  `petgest_api` (`grant`s só nas tabelas do app, `bypassrls`), nunca o
+  `postgres`.
+- Ambiente de teste da API: segundo projeto Supabase gratuito ou Postgres
+  em contêiner — decidir aqui.
 - Segredos (string de conexão, chave de assinatura do JWT, chave da IA)
   só nas configurações do App Service — nunca no frontend nem na Vercel.
 - Frontend continua na Vercel (§4.4 permite); prévia da `dev` apontando
@@ -192,24 +219,42 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
 
 ## T-18 — Migração dos dados e virada da produção
 
-- Script de migração do Supabase para o banco novo: `petshops`,
-  vínculos e `products` (preservando `source`, `created_at`,
-  `updated_at`).
-- Usuários conforme a decisão da T-11 (hash importado ou redefinição de
-  senha); comunicar os petshops antes da virada.
-- Janela de virada: Supabase em somente leitura → migração → conferência
-  de contagens por petshop → deploy da `main` com `VITE_API_URL` de
-  produção.
+- **Pré-requisitos:** T-10 arquivada (T-11, D1) e projeto Supabase no
+  plano Pro — no gratuito ele pausa após 7 dias sem uso, e com a API em
+  cima uma pausa derruba a produção.
+- **Sem cópia de dados entre bancos** (T-11, D2): `petshops` e `products`
+  já estão no banco que a API usa.
+- **Usuários** (T-11, D4): cada linha de `auth.users` vira um usuário do
+  Identity com o mesmo `id`, e-mail, estado de confirmação e o hash bcrypt
+  copiado; um `IPasswordHasher` compatível verifica o bcrypt e regrava em
+  PBKDF2 no primeiro login. Conferir antes, numa cópia, o prefixo
+  (`$2a$`/`$2b$`) e o custo dos hashes. Plano B, só se a conferência
+  falhar: redefinição de senha no primeiro acesso. Comunicar os petshops
+  antes da virada.
+- Janela de virada: importar usuários → trocar a FK de `profiles.id` →
+  remover `auth.uid()` das funções/políticas que deixam de ser usadas →
+  conferência de contagens por petshop → deploy da `main` com
+  `VITE_API_URL` de produção.
+- **Fechar a Data API do Supabase** (desligar o PostgREST ou revogar os
+  `grant`s de `anon`/`authenticated`) — senão as tabelas seguem
+  acessíveis pela chave anon que o V0 publicou.
 - Rollback: "Instant Rollback" na Vercel para o deploy do V0 enquanto o
-  Supabase não for desligado.
+  Supabase Auth não for desativado.
 - Teste de campo de paridade (roteiro da T-10) em Android e iPhone, em
   produção.
-- Desligar o projeto Supabase só depois de um período de observação.
+- Desligar o **Supabase Auth** só depois de um período de observação — o
+  projeto Supabase continua, agora só como banco.
 - Depende de: T-17.
 - Ref: `PLANOMVP.md` §5 "Futuro", `CLAUDE.md` §Testes.
 
 ## T-19 — Cadastro de produto por foto + IA
 
+- **Primeiro passo: escolher o provedor de IA** (T-11, D6) com o teste de
+  bancada — ~20 fotos de embalagens reais e ~10 áudios, os mesmos para
+  OpenAI, Azure OpenAI e Google; critérios na ordem: acerto dos campos em
+  PT-BR → custo por cadastro → latência do Brasil → retenção de
+  dados/LGPD → SDK. Provedor atrás de `IProductDraftExtractor`, como
+  adaptador. A escolha vale também para a T-20.
 - Frontend: botão "Foto" no cadastro de produto, captura pela câmera
   (mesma permissão e HTTPS do scanner).
 - API: endpoint `multipart/form-data` que recebe a imagem, chama o
