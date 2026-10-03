@@ -13,6 +13,7 @@ public class SchemaCompatibilityTests : IAsyncLifetime
     private const string V0Database = "petgest_v0";
     private const string EfDatabase = "petgest_v0_ef";
     private const string V0SchemaMigration = "V0Schema";
+    private const string IdentitySchemaMigration = "IdentitySchema";
 
     private static readonly string[] Tables = ["petshops", "profiles", "products"];
 
@@ -66,10 +67,13 @@ public class SchemaCompatibilityTests : IAsyncLifetime
     {
         await using var db = DatabaseFixture.Open(V0ConnectionString, new FixedTenant(null, null));
 
-        // Linha gravada pelo V0 antes da virada.
+        // Dados gravados pelo V0 antes da virada: conta no Supabase Auth, loja, vínculo, produto.
+        var userId = Guid.NewGuid();
         var petshopId = Guid.NewGuid();
         var productId = Guid.NewGuid();
+        await db.Database.ExecuteSqlAsync($"insert into auth.users (id, email) values ({userId}, 'dono@loja.invalid')");
         await db.Database.ExecuteSqlAsync($"insert into petshops (id, name, email) values ({petshopId}, 'Pet A', 'a@loja.invalid')");
+        await db.Database.ExecuteSqlAsync($"insert into profiles (id, petshop_id) values ({userId}, {petshopId})");
         await db.Database.ExecuteSqlAsync(
             $"insert into products (id, petshop_id, name, category, price, ean, source) values ({productId}, {petshopId}, 'Ração X 1kg', 'Ração', 39.90, '7891000100103', 'barcode')");
 
@@ -83,9 +87,30 @@ public class SchemaCompatibilityTests : IAsyncLifetime
         await db.Database.ExecuteSqlRawAsync(history.GetCreateIfNotExistsScript());
         await db.Database.ExecuteSqlRawAsync(history.GetInsertScript(new HistoryRow(v0SchemaId, productVersion)));
 
+        // Ordem da T-18 (design D2 da T-14): tabelas do Identity → importar as contas com os
+        // mesmos ids e o hash bcrypt → FK de profiles.id para identity.users.
+        await db.GetService<IMigrator>().MigrateAsync(IdentitySchemaMigration);
+        var bcryptHash = BCrypt.Net.BCrypt.HashPassword("senha-do-v0");
+        await db.Database.ExecuteSqlAsync($"""
+            insert into identity.users
+              (id, user_name, normalized_user_name, email, normalized_email, email_confirmed, password_hash,
+               security_stamp, phone_number_confirmed, two_factor_enabled, lockout_enabled, access_failed_count)
+            select id, email, upper(email), email, upper(email), false, {bcryptHash},
+                   gen_random_uuid()::text, false, false, false, 0
+            from auth.users where id = {userId}
+            """);
+
         await db.Database.MigrateAsync();
 
         Assert.Empty(await db.Database.GetPendingMigrationsAsync());
+        var fkTarget = await db.Database
+            .SqlQuery<string>($"select confrelid::regclass::text as \"Value\" from pg_constraint where conname = 'profiles_id_fkey'")
+            .SingleAsync();
+        Assert.Equal("identity.users", fkTarget);
+        var linkedPetshop = await db.Database
+            .SqlQuery<Guid>($"select petshop_id as \"Value\" from profiles where id = {userId}")
+            .SingleAsync();
+        Assert.Equal(petshopId, linkedPetshop);
         var source = await db.Database
             .SqlQuery<string>($"select source as \"Value\" from products where id = {productId}")
             .SingleAsync();

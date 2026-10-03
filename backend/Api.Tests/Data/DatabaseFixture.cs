@@ -46,11 +46,30 @@ public class DatabaseFixture : IAsyncLifetime
         db.Petshops.Add(petshop);
         await db.SaveChangesAsync();
 
-        var userId = Guid.NewGuid();
+        var userId = await AddUserAsync(db);
         db.Profiles.Add(new Profile { Id = userId, PetshopId = petshop.Id });
         await db.SaveChangesAsync();
 
         return new TestTenant(userId, petshop.Id);
+    }
+
+    // Conta mínima em identity.users (profiles.id tem FK para ela desde a T-14).
+    public static async Task<Guid> AddUserAsync(AppDbContext db, string? passwordHash = null)
+    {
+        var email = $"{Guid.NewGuid():N}@teste.invalid";
+        var user = new AppUser
+        {
+            Id = Guid.NewGuid(),
+            UserName = email,
+            NormalizedUserName = email.ToUpperInvariant(),
+            Email = email,
+            NormalizedEmail = email.ToUpperInvariant(),
+            SecurityStamp = Guid.NewGuid().ToString(),
+            PasswordHash = passwordHash,
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+        return user.Id;
     }
 
     public async Task<Product> AddProductAsync(TestTenant tenant, string name, string? ean = null)

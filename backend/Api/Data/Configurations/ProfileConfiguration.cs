@@ -4,8 +4,9 @@ using PetGest.Api.Data.Entities;
 
 namespace PetGest.Api.Data.Configurations;
 
-// Sem FK de `id` para uma tabela de usuários: auth.users não existe fora do Supabase e
-// as tabelas do Identity só chegam na T-14, que adiciona a FK (design D6).
+// `id` é o id da conta do Identity (mesmo Guid de auth.users no V0 — T-11 D4). A FK
+// para identity.users fica na migration ProfilesUserFk, separada das tabelas do
+// Identity para a T-18 importar as contas entre as duas (design D2 da T-14).
 public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
 {
     public void Configure(EntityTypeBuilder<Profile> builder)
@@ -20,6 +21,12 @@ public class ProfileConfiguration : IEntityTypeConfiguration<Profile>
             .WithMany()
             .HasForeignKey(p => p.PetshopId)
             .HasConstraintName("profiles_petshop_id_fkey")
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<AppUser>()
+            .WithOne()
+            .HasForeignKey<Profile>(p => p.Id)
+            .HasConstraintName("profiles_id_fkey")
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(p => p.PetshopId).HasDatabaseName("profiles_petshop_id_idx");

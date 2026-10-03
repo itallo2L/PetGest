@@ -3,6 +3,7 @@ using System;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PetGest.Api.Data;
@@ -12,9 +13,11 @@ using PetGest.Api.Data;
 namespace PetGest.Api.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003221054_IdentitySchema")]
+    partial class IdentitySchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,13 +426,6 @@ namespace PetGest.Api.Data.Migrations
 
             modelBuilder.Entity("PetGest.Api.Data.Entities.Profile", b =>
                 {
-                    b.HasOne("PetGest.Api.Data.Entities.AppUser", null)
-                        .WithOne()
-                        .HasForeignKey("PetGest.Api.Data.Entities.Profile", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("profiles_id_fkey");
-
                     b.HasOne("PetGest.Api.Data.Entities.Petshop", null)
                         .WithMany()
                         .HasForeignKey("PetshopId")

@@ -14,7 +14,7 @@ barras + dados da loja. Projeto solo, sem equipe.
   `tests/` (testes das políticas de RLS).
 - `openspec/` — specs vigentes em `openspec/specs/` e uma change por
   tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11, T-12 e T-13; as changes
-  T-01 e T-04 a T-10 ainda estão abertas em `openspec/changes/`.
+  T-01, T-04 a T-10 e T-14 ainda estão abertas em `openspec/changes/`.
 - `index.html` / `script.js` / `style.css` na raiz — o **protótipo
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
@@ -23,8 +23,9 @@ barras + dados da loja. Projeto solo, sem equipe.
   `/health`, CORS, OpenAPI e, desde a T-13, o modelo de dados do V0 em
   EF Core (migrations `V0Schema` e `ProductSourceAi`) com isolamento por
   petshop feito pela API (claims `sub`/`petshop_id`, filtros globais e
-  `TenantWriteGuard`). Ainda sem login (T-14) nem endpoints de dados
-  (T-15). Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
+  `TenantWriteGuard`) e, desde a T-14, contas do Identity com sessão por
+  JWT + refresh token (`/auth/*`), todo endpoint protegido por padrão.
+  Ainda sem endpoints de dados (T-15). Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
   rodados pelo GitHub Actions (`.github/workflows/backend.yml`). Não é
   publicada nem toca a produção. Instruções em `backend/README.md`.
 
@@ -62,8 +63,8 @@ barras + dados da loja. Projeto solo, sem equipe.
   `T-02`, ...). Cada change em `openspec/changes/` deve prefixar a pasta
   com o número da tarefa correspondente (`T-0X-<slug>`) para rastrear
   proposta/design/specs/tasks de cada etapa.
-- `ROADMAPV1.md` — roadmap do V1 (T-11 a T-21), mesma convenção de
-  pastas (`T-1X-<slug>`).
+- `ROADMAPV1.md` — roadmap do V1 (T-11 a T-22; a T-22 saiu da T-14 e vem
+  antes da T-18), mesma convenção de pastas (`T-1X-<slug>`).
 
 ## Stack alvo do V0 (ver `PLANOMVP.md` §2 e §3 para o detalhe completo)
 

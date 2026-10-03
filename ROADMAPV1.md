@@ -40,14 +40,18 @@ espera um aparelho disponível. Exceção consciente (T-11, D1):
 ## Ordem e dependências
 
 ```
-T-11 ──> T-12 ──> T-13 ──> T-14 ──> T-15 ──> T-16 ──> T-17 ──> T-18 ──┬──> T-19 ──┐
-                                                                        └──> T-20 ──┴──> T-21
+T-11 ──> T-12 ──> T-13 ──> T-14 ──> T-15 ──> T-16 ──┬──> T-17 ──┬──> T-18 ──┬──> T-19 ──┐
+                                                    └──> T-22 ──┘           └──> T-20 ──┴──> T-21
 ```
 
 - **Paridade antes de novidade:** T-12 a T-18 trocam o backend sem mudar
   o que o usuário vê — o app faz exatamente o que o V0 faz, agora sobre a
   API própria. Só depois disso entram foto+IA (T-19) e voz+IA (T-20).
 - T-19 e T-20 são independentes entre si e podem correr em paralelo.
+- A **T-22** (e-mail transacional e recuperação de senha) saiu da T-14 em
+  2026-10-03, por decisão do usuário: o número é o próximo livre, não a
+  ordem — ela vem depois da T-16, em paralelo à T-17, e é pré-requisito da
+  T-18.
 - T-18 (virada da produção) e T-21 (teste de campo) têm o mesmo papel que
   T-09/T-10 no V0: nenhuma mudança fica "pronta" sem celular real.
 
@@ -166,6 +170,18 @@ petshop e usuário lidos das claims `petshop_id`/`sub`, filtros globais no
 Substitui o Supabase Auth, mantendo o comportamento que as specs `auth` e
 `tenant-data` do V0 exigem.
 
+**Status:** implementada em 2026-10-03 (`openspec/changes/T-14-identity-jwt/`, spec `api-auth`).
+Identity (`Guid`, sem papéis) no schema `identity`; `/auth/signup` (conta +
+petshop + vínculo numa transação), `/login`, `/refresh` (rotação com
+detecção de reuso), `/logout`, `/confirm-email` e `/auth/me`; JWT HS256 de
+15 minutos com `sub`/`email`/`petshop_id` e refresh token opaco de 30 dias
+guardado como hash; todo endpoint protegido por padrão; rate limit em
+cadastro/login/confirmação; hasher compatível com o bcrypt do Supabase;
+migrations `IdentitySchema` e `ProfilesUserFk`. Confirmação de e-mail com
+envio de desenvolvimento (só log) e exigência desligada
+(`Auth:RequireConfirmedEmail`) até a T-18. Recuperação de senha e e-mail
+real foram para a T-22.
+
 - Cadastro atômico de usuário + petshop numa transação — sucessor da
   função `signup_petshop` (§3.1: "detalhe de implementação, não mudança
   de arquitetura").
@@ -176,9 +192,10 @@ Substitui o Supabase Auth, mantendo o comportamento que as specs `auth` e
   (`ClaimsTenantContext`).
 - Login devolvendo JWT (e refresh token), logout, papel único (§4.2).
 - Rate limit simples no login com o middleware nativo (§4.2).
-- Recuperação de senha e **confirmação de e-mail** — pendência herdada do
-  V0 (`PLANOMVP.md` §3.3, §3.9), agora pelo Identity e com envio de
-  e-mail real.
+- **Confirmação de e-mail** — pendência herdada do V0 (`PLANOMVP.md` §3.3,
+  §3.9): link gerado no cadastro e endpoint de confirmação, com envio só
+  para o log e a exigência desligada até a T-18. Envio real e recuperação
+  de senha: T-22.
 - Sem 2FA nem rate limiting elaborado nesta fase (§4.2).
 - Depende de: T-13.
 - Ref: `PLANOMVP.md` §4.2, `openspec/specs/auth/`, `openspec/specs/tenant-data/`.
@@ -212,6 +229,13 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
   `VITE_SUPABASE_ANON_KEY`.
 - Todas as specs do V0 continuam valendo — reexecutar o `roteiro.md` da
   T-10 contra a API local como critério de paridade.
+- Sessão (design da T-14): token de acesso em memória e refresh token no
+  `localStorage`; **renovação em voo único** (uma promessa compartilhada
+  entre chamadas que recebem `401`) e sincronização entre abas pelo evento
+  `storage` — duas renovações simultâneas com o mesmo token contam como
+  reuso e derrubam a sessão. Cadastro passa a ser uma chamada só
+  (`/auth/signup`); mapear os `code` dos erros da API para as mensagens que
+  `authErrors.ts` já tem.
 - Depende de: T-15.
 - Ref: `PLANOMVP.md` §4.3, `roteiro.md` da T-10 (em
   `openspec/changes/archive/` depois do fechamento do V0).
@@ -234,13 +258,17 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
 - Frontend continua na Vercel (§4.4 permite); prévia da `dev` apontando
   para um ambiente de teste da API.
 - Nada de Kubernetes, filas, Redis ou Elasticsearch (§4.4).
+- Da T-14: persistir as chaves do Data Protection (senão os links de
+  confirmação deixam de valer a cada reinício) e configurar
+  `ForwardedHeaders`, para o rate limit enxergar o IP do cliente e não o
+  do proxy do App Service; `Jwt__SigningKey` aleatória por ambiente.
 - Depende de: T-16.
 - Ref: `PLANOMVP.md` §4.4.
 
 ## T-18 — Migração dos dados e virada da produção
 
-- **Pré-requisitos:** T-10 arquivada (T-11, D1) e projeto Supabase no
-  plano Pro — no gratuito ele pausa após 7 dias sem uso, e com a API em
+- **Pré-requisitos:** T-10 e T-22 arquivadas (T-11, D1) e projeto Supabase
+  no plano Pro — no gratuito ele pausa após 7 dias sem uso, e com a API em
   cima uma pausa derruba a produção.
 - **Sem cópia de dados entre bancos** (T-11, D2): `petshops` e `products`
   já estão no banco que a API usa.
@@ -251,9 +279,11 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
   (`$2a$`/`$2b$`) e o custo dos hashes. Plano B, só se a conferência
   falhar: redefinição de senha no primeiro acesso. Comunicar os petshops
   antes da virada.
-- Schema: registrar a migration `V0Schema` como aplicada no banco de
-  produção (baseline, ensaiado pelo `SchemaCompatibilityTests` da T-13) e
-  aplicar `ProductSourceAi` e as migrations da T-14.
+- Schema (ensaiado pelo `SchemaCompatibilityTests`): registrar a migration
+  `V0Schema` como aplicada no banco de produção (baseline) → aplicar
+  `ProductSourceAi` e `IdentitySchema` → importar `auth.users` para
+  `identity.users` → aplicar `ProfilesUserFk` (troca a FK de `profiles.id`).
+- Ligar `Auth:RequireConfirmedEmail` no App Service.
 - Janela de virada: importar usuários → trocar a FK de `profiles.id` →
   remover `auth.uid()` das funções/políticas que deixam de ser usadas →
   conferência de contagens por petshop → deploy da `main` com
@@ -267,7 +297,7 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
   produção.
 - Desligar o **Supabase Auth** só depois de um período de observação — o
   projeto Supabase continua, agora só como banco.
-- Depende de: T-17.
+- Depende de: T-17 e T-22.
 - Ref: `PLANOMVP.md` §5 "Futuro", `CLAUDE.md` §Testes.
 
 ## T-19 — Cadastro de produto por foto + IA
@@ -313,6 +343,26 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
   concluído aqui.
 - Depende de: T-19 e T-20.
 - Ref: `CLAUDE.md` §Testes.
+
+## T-22 — E-mail transacional, recuperação de senha e telas de link
+
+Saiu da T-14 (decisão do usuário, 2026-10-03). Vem depois da T-16 e é
+pré-requisito da T-18 — a virada liga a exigência de e-mail confirmado, e
+sem envio real ninguém consegue confirmar.
+
+- **Escolher o provedor de e-mail** (em aberto desde a T-11: ex.: Azure
+  Communication Services, Resend) e implementar o adaptador de
+  `IEmailSender` no lugar do `LogEmailSender`; remetente e domínio
+  verificados (SPF/DKIM).
+- Recuperação de senha: pedir (`/auth/forgot-password`, resposta igual
+  exista ou não a conta) e redefinir (`/auth/reset-password`), com rate
+  limit; redefinir encerra as sessões abertas.
+- Reenvio do e-mail de confirmação.
+- Texto definitivo dos e-mails (PT-BR).
+- Frontend: telas que abrem os links (`/confirmar-email`,
+  `/redefinir-senha`) e o "esqueci minha senha" no login.
+- Depende de: T-16 (as telas usam o cliente da API).
+- Ref: `openspec/changes/T-14-identity-jwt/design.md` (D6), `PLANOMVP.md` §4.2.
 
 ---
 
