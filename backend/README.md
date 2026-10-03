@@ -63,7 +63,7 @@ trigger `products_set_updated_at`).
 
 A API conecta com um papel que ignora o RLS do V0, então quem isola os dados de
 cada petshop é ela (design da T-13 em
-`openspec/changes/T-13-api-data-model/design.md`, D4–D5):
+`openspec/changes/archive/2026-10-03-T-13-api-data-model/design.md`, D4–D5):
 
 - **De onde vem o petshop:** só das claims do token — `sub` (usuário) e
   `petshop_id` (`ClaimsTenantContext`). Nunca do corpo, rota ou query.

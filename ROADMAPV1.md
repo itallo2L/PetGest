@@ -133,7 +133,7 @@ deploy no Azure fica todo na T-17.
 Reproduz em EF Core o que `supabase/schema.sql` garante hoje, trocando o
 papel do RLS por regras da API.
 
-**Status:** implementada em 2026-10-03 (`openspec/changes/T-13-api-data-model/`, spec `api-tenant-data`).
+**Status:** concluída e arquivada em 2026-10-03 (`openspec/changes/archive/2026-10-03-T-13-api-data-model/`, spec `api-tenant-data`).
 Entidades `Petshop`/`Profile`/`Product` com os mesmos nomes de tabelas,
 colunas, índices e constraints do V0; migrations `V0Schema` (o schema do V0)
 e `ProductSourceAi` (`photo_ai`/`voice_ai` e `ai_raw_response jsonb`);
