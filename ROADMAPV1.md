@@ -133,6 +133,15 @@ deploy no Azure fica todo na T-17.
 Reproduz em EF Core o que `supabase/schema.sql` garante hoje, trocando o
 papel do RLS por regras da API.
 
+**Status:** implementada em 2026-10-03 (`openspec/changes/T-13-api-data-model/`, spec `api-tenant-data`).
+Entidades `Petshop`/`Profile`/`Product` com os mesmos nomes de tabelas,
+colunas, índices e constraints do V0; migrations `V0Schema` (o schema do V0)
+e `ProductSourceAi` (`photo_ai`/`voice_ai` e `ai_raw_response jsonb`);
+petshop e usuário lidos das claims `petshop_id`/`sub`, filtros globais no
+`AppDbContext` e `TenantWriteGuard` na gravação; testes portando o
+`rls_test.sql` e um ensaio automático da T-18 (`schema.sql` → baseline de
+`V0Schema` → migrations seguintes).
+
 - Entidades `Petshop` e `Product` e o vínculo usuário → petshop (o que
   hoje é `profiles`), com migrations EF versionadas.
 - Mesmas invariantes do V0: índice único `(PetshopId, Ean)` filtrado
@@ -147,10 +156,8 @@ papel do RLS por regras da API.
 - Testes de integração portando os casos de `supabase/tests/rls_test.sql`
   (ler/gravar em outro petshop, trocar o próprio vínculo, anônimo).
 - **Mesmo banco do V0** (T-11, D2): as tabelas `petshops`/`products`/
-  `profiles` já existem — as migrations EF mapeiam o que está lá. A FK de
-  `profiles.id` troca de `auth.users(id)` para a tabela de usuários do
-  Identity (mesmo `Guid`, D4); tabelas do Identity no schema próprio
-  `identity`, fora do schema exposto pela Data API.
+  `profiles` já existem — as migrations EF mapeiam o que está lá.
+  `profiles.id` fica sem FK para usuários até a T-14 (design D6 da T-13).
 - Depende de: T-12.
 - Ref: `PLANOMVP.md` §2.3, §3.2 (invariantes), §4.3.
 
@@ -162,6 +169,11 @@ Substitui o Supabase Auth, mantendo o comportamento que as specs `auth` e
 - Cadastro atômico de usuário + petshop numa transação — sucessor da
   função `signup_petshop` (§3.1: "detalhe de implementação, não mudança
   de arquitetura").
+- Tabelas do Identity no schema próprio `identity`, fora do schema exposto
+  pela Data API, e migration com a FK de `profiles.id` para a tabela de
+  usuários do Identity (mesmo `Guid`, T-11 D4) — veio da T-13 (design D6).
+- O JWT traz as claims `sub` e `petshop_id`, que o isolamento da T-13 lê
+  (`ClaimsTenantContext`).
 - Login devolvendo JWT (e refresh token), logout, papel único (§4.2).
 - Rate limit simples no login com o middleware nativo (§4.2).
 - Recuperação de senha e **confirmação de e-mail** — pendência herdada do
@@ -239,6 +251,9 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
   (`$2a$`/`$2b$`) e o custo dos hashes. Plano B, só se a conferência
   falhar: redefinição de senha no primeiro acesso. Comunicar os petshops
   antes da virada.
+- Schema: registrar a migration `V0Schema` como aplicada no banco de
+  produção (baseline, ensaiado pelo `SchemaCompatibilityTests` da T-13) e
+  aplicar `ProductSourceAi` e as migrations da T-14.
 - Janela de virada: importar usuários → trocar a FK de `profiles.id` →
   remover `auth.uid()` das funções/políticas que deixam de ser usadas →
   conferência de contagens por petshop → deploy da `main` com

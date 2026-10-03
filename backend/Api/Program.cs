@@ -5,8 +5,13 @@ using PetGest.Api.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Usuário e petshop de cada requisição vêm das claims do token (design D4 da T-13).
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITenantContext, ClaimsTenantContext>();
+
 // A string de conexão é lida da configuração final (depois do Build), para que
-// variáveis de ambiente e os testes possam sobrescrevê-la.
+// variáveis de ambiente e os testes possam sobrescrevê-la. Convenção de nomes e
+// TenantWriteGuard ficam no próprio AppDbContext (OnConfiguring).
 builder.Services.AddDbContext<AppDbContext>((services, options) =>
     options.UseNpgsql(services.GetRequiredService<IConfiguration>().GetConnectionString("Default")));
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();

@@ -14,17 +14,19 @@ barras + dados da loja. Projeto solo, sem equipe.
   `tests/` (testes das políticas de RLS).
 - `openspec/` — specs vigentes em `openspec/specs/` e uma change por
   tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11 e T-12; as changes
-  T-01 e T-04 a T-10 ainda estão abertas em `openspec/changes/`.
+  T-01, T-04 a T-10 e T-13 ainda estão abertas em `openspec/changes/`.
 - `index.html` / `script.js` / `style.css` na raiz — o **protótipo
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
   `frontend/`; não é mais onde o desenvolvimento acontece.
 - `backend/` — API do **V1** (ASP.NET Core, .NET 10), criada na T-12:
-  por enquanto só o esqueleto (`/health`, CORS, OpenAPI, EF Core com
-  `DbContext` vazio), Postgres 17 local via Docker Compose e testes em
-  `Api.Tests/`, rodados pelo GitHub Actions
-  (`.github/workflows/backend.yml`). Não é publicada nem toca a
-  produção. Instruções em `backend/README.md`.
+  `/health`, CORS, OpenAPI e, desde a T-13, o modelo de dados do V0 em
+  EF Core (migrations `V0Schema` e `ProductSourceAi`) com isolamento por
+  petshop feito pela API (claims `sub`/`petshop_id`, filtros globais e
+  `TenantWriteGuard`). Ainda sem login (T-14) nem endpoints de dados
+  (T-15). Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
+  rodados pelo GitHub Actions (`.github/workflows/backend.yml`). Não é
+  publicada nem toca a produção. Instruções em `backend/README.md`.
 
 ## Fase atual: V1 em desenvolvimento, produção no V0
 
@@ -94,10 +96,12 @@ supabase/
 backend/          (V1 — deploy independente do frontend, PLANOMVP.md §4.3)
   Api/            (projeto único ASP.NET Core, minimal APIs)
     Endpoints/    (um arquivo por área: MapXxxEndpoints())
-    Services/     (regras de negócio, a partir da T-13)
-    Data/         (AppDbContext, entidades e migrations EF)
+    Services/     (regras de negócio)
+    Data/         (AppDbContext, isolamento por petshop, Entities/,
+                   Configurations/ com os nomes do schema do V0, Migrations/)
     Models/       (DTOs de request/response)
-  Api.Tests/      (xUnit + WebApplicationFactory, contra Postgres real)
+  Api.Tests/      (xUnit + WebApplicationFactory, contra Postgres real;
+                   Data/ com isolamento, invariantes e compatibilidade com o V0)
   docker-compose.yml  (Postgres 17 de desenvolvimento, porta 5450)
 ```
 
