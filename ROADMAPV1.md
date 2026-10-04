@@ -204,6 +204,14 @@ real foram para a T-22.
 
 Expõe na API tudo o que o frontend do V0 faz hoje direto no Supabase.
 
+**Status:** implementada em 2026-10-04 (`openspec/changes/T-15-products-store-api/`, specs `api-products` e `api-store`).
+`/products` (listar, consultar, buscar por EAN, cadastrar, editar, excluir)
+com `409 ean_taken` trazendo o produto dono do código; `/petshop` (consultar,
+salvar e — paridade com a tela de concluir cadastro do V0 — criar a loja de
+uma conta sem loja); contrato `ProductDraft` aceitando por enquanto só
+`barcode`/`manual`; recurso de outra loja → `404`, `TenantViolationException`
+→ `403`. Busca, filtro e paginação continuam no cliente.
+
 - Produtos: listar, criar, editar, excluir e buscar por EAN (desfechos do
   scanner: já cadastrado / não encontrado, sem base externa — §3.4).
 - Código repetido na loja devolve conflito dizendo a qual produto
@@ -236,6 +244,14 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
   reuso e derrubam a sessão. Cadastro passa a ser uma chamada só
   (`/auth/signup`); mapear os `code` dos erros da API para as mensagens que
   `authErrors.ts` já tem.
+- Mapa das chamadas (T-15): `listProducts` → `GET /products` (sem paginação
+  no cliente); `findProductByEan` → `GET /products/by-ean/{ean}` (`404` = não
+  encontrado); `createProduct` → `POST /products` com `source`;
+  `updateProduct` → `PUT /products/{id}`; `deleteProduct` →
+  `DELETE /products/{id}`; `getStore`/`updateStore` → `GET`/`PUT /petshop`;
+  `signup_petshop` da `CompleteSignupPage` → `POST /petshop` seguido de
+  `/auth/refresh`. Código repetido: montar a mensagem com `product.name` do
+  `409 ean_taken`. Campos em camelCase (`updatedAt`, não `updated_at`).
 - Depende de: T-15.
 - Ref: `PLANOMVP.md` §4.3, `roteiro.md` da T-10 (em
   `openspec/changes/archive/` depois do fechamento do V0).

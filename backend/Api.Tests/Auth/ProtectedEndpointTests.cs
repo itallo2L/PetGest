@@ -122,11 +122,20 @@ public class ProtectedEndpointTests(DatabaseFixture fixture) : IDisposable
         var routes = factory.Services.GetRequiredService<EndpointDataSource>().Endpoints
             .OfType<RouteEndpoint>()
             .SelectMany(e => (e.Metadata.GetMetadata<HttpMethodMetadata>()?.HttpMethods ?? ["*"])
-                .Select(method => (Route: $"{method} /{e.RoutePattern.RawText!.TrimStart('/')}", e.Metadata)))
+                .Select(method => (Route: $"{method} /{e.RoutePattern.RawText!.Trim('/')}", e.Metadata)))
             .ToList();
 
         var anonymous = routes.Where(r => r.Metadata.GetMetadata<IAllowAnonymous>() is not null).Select(r => r.Route).ToHashSet();
         Assert.Subset(PublicRoutes, anonymous);
-        Assert.Contains("GET /auth/me", routes.Select(r => r.Route));
+        // Rotas protegidas conhecidas — existem e não estão entre as públicas.
+        string[] protectedRoutes =
+        [
+            "GET /auth/me",
+            "GET /products", "GET /products/{id:guid}", "GET /products/by-ean/{ean}",
+            "POST /products", "PUT /products/{id:guid}", "DELETE /products/{id:guid}",
+            "GET /petshop", "PUT /petshop", "POST /petshop",
+        ];
+        Assert.Subset(routes.Select(r => r.Route).ToHashSet(), protectedRoutes.ToHashSet());
+        Assert.Empty(protectedRoutes.Intersect(anonymous));
     }
 }

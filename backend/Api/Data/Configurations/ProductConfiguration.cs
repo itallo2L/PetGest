@@ -34,7 +34,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Ean).HasColumnType("text");
         builder.Property(p => p.Source)
             .HasColumnType("text")
-            .HasConversion(s => ToDatabase(s), s => FromDatabase(s))
+            .HasConversion(s => s.ToWire(), s => ProductSourceExtensions.FromWire(s))
             .HasDefaultValue(ProductSource.Manual);
         builder.Property(p => p.AiRawResponse).HasColumnType("jsonb");
         builder.Property(p => p.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
@@ -52,22 +52,4 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasFilter("ean IS NOT NULL")
             .HasDatabaseName("products_petshop_ean_key");
     }
-
-    private static string ToDatabase(ProductSource source) => source switch
-    {
-        ProductSource.Manual => "manual",
-        ProductSource.Barcode => "barcode",
-        ProductSource.PhotoAI => "photo_ai",
-        ProductSource.VoiceAI => "voice_ai",
-        _ => throw new ArgumentOutOfRangeException(nameof(source), source, "Origem de produto desconhecida."),
-    };
-
-    private static ProductSource FromDatabase(string value) => value switch
-    {
-        "manual" => ProductSource.Manual,
-        "barcode" => ProductSource.Barcode,
-        "photo_ai" => ProductSource.PhotoAI,
-        "voice_ai" => ProductSource.VoiceAI,
-        _ => throw new InvalidOperationException($"Origem de produto desconhecida no banco: '{value}'."),
-    };
 }

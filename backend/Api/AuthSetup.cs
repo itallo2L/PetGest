@@ -52,6 +52,8 @@ public static class AuthSetup
 
         services.AddScoped<SessionService>();
         services.AddScoped<AuthService>();
+        services.AddScoped<ProductService>();
+        services.AddScoped<PetshopService>();
         // Envio de desenvolvimento (só log); a T-22 troca pelo provedor real.
         services.TryAddSingleton<IEmailSender, LogEmailSender>();
 

@@ -49,7 +49,15 @@ public class LoginTests(DatabaseFixture fixture) : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, wrongPassword.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, unknownEmail.StatusCode);
         Assert.Equal("invalid_credentials", await AuthApi.ReadCodeAsync(wrongPassword));
-        Assert.Equal(await wrongPassword.Content.ReadAsStringAsync(), await unknownEmail.Content.ReadAsStringAsync());
+        // Mesmo corpo, a não ser o traceId (um por requisição).
+        Assert.Equal(await WithoutTraceIdAsync(wrongPassword), await WithoutTraceIdAsync(unknownEmail));
+    }
+
+    private static async Task<string> WithoutTraceIdAsync(HttpResponseMessage response)
+    {
+        var body = System.Text.Json.Nodes.JsonNode.Parse(await response.Content.ReadAsStringAsync())!.AsObject();
+        body.Remove("traceId");
+        return body.ToJsonString();
     }
 
     [Fact]

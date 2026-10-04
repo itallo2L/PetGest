@@ -134,6 +134,44 @@ Sessão devolvida por cadastro, login e renovação:
 Para testar pelo Swagger: `POST /auth/signup` (ou `/login`), copie o
 `accessToken`, clique em *Authorize*, cole o token e chame `GET /auth/me`.
 
+## Produtos e loja
+
+Tudo exige token, e a loja é sempre a do token (`petshop_id`) — nenhum
+endpoint recebe petshop do cliente (design da T-15 em
+`openspec/changes/T-15-products-store-api/design.md`). Recurso de outra loja
+responde `404`, igual a um que não existe.
+
+| Endpoint | O que faz |
+|---|---|
+| `GET /products` | Todos os produtos da loja, ordenados por nome (busca, filtro e ordenação por categoria ficam no cliente, como no V0) |
+| `GET /products/{id}` | Um produto da loja (`404 product_not_found`) |
+| `GET /products/by-ean/{ean}` | Busca do scanner: `200` com o produto da loja ou `404`; código fora de 8–14 dígitos → `400` |
+| `POST /products` | Cadastra (`201`); corpo `ProductDraft`: `name`, `category`, `price`, `ean?`, `source?` (`barcode`/`manual`) |
+| `PUT /products/{id}` | Substitui nome, categoria, preço e código; a origem não muda |
+| `DELETE /products/{id}` | Exclui (`204`) |
+| `GET /petshop` | Dados da loja: `id`, `name`, `email`, `phone` |
+| `PUT /petshop` | Salva nome, e-mail de contato e telefone (vazio → sem telefone) |
+| `POST /petshop` | Cria a loja de uma conta que ainda não tem (`201`, `sessionRenewalRequired: true`) |
+
+Produto devolvido:
+
+```json
+{ "id": "…", "name": "Ração X 1kg", "category": "Ração", "price": 39.9,
+  "ean": "7891000100103", "source": "barcode", "updatedAt": "…" }
+```
+
+- **Código repetido na loja:** `409` com `code: ean_taken` e o produto que já
+  tem o código em `product: { id, name }`. O mesmo código em outra loja é
+  aceito.
+- **Validação:** nome (até 200) e categoria (até 100, texto livre) não vazios,
+  preço de 0 a 99.999.999,99 com no máximo duas casas, código com 8 a 14
+  dígitos — `400` indicando o campo.
+- **Conta sem loja:** `GET`/`PUT /petshop` → `404 petshop_not_found`;
+  `POST /products` → `403 petshop_required`. Depois do `POST /petshop`, renove a
+  sessão (`/auth/refresh`) para o token passar a trazer a loja.
+- **Outros `code`:** `product_not_found`, `petshop_exists`, `invalid_request`
+  e `tenant_violation` (`403`, rede de segurança do isolamento).
+
 ## Testes
 
 ```bash
@@ -147,7 +185,7 @@ próprios (recriados a cada execução):
 | Banco | Para quê |
 |---|---|
 | `petgest` | o de desenvolvimento — só os testes de `/health` se conectam nele, sem gravar |
-| `petgest_tests` | testes de isolamento, invariantes (`Api.Tests/Data/`) e autenticação pela API (`Api.Tests/Auth/`) |
+| `petgest_tests` | isolamento e invariantes (`Api.Tests/Data/`), autenticação (`Api.Tests/Auth/`) e produtos/loja pela API (`Api.Tests/Catalog/`) |
 | `petgest_v0` | `supabase/schema.sql` aplicado sobre um stub do Supabase (`Api.Tests/Sql/`) — ensaio da T-18 |
 | `petgest_v0_ef` | só a migration `V0Schema`, comparada com `petgest_v0` pelo catálogo |
 
@@ -162,14 +200,14 @@ para `dev` e `main` quando algo em `backend/` muda. Não há deploy ainda (T-17)
 ```text
 backend/
   Api/                  projeto único ASP.NET Core (minimal APIs)
-    Endpoints/          um arquivo por área, com MapXxxEndpoints()
-    Services/           regras de negócio (AuthService, SessionService, IEmailSender, CompatPasswordHasher)
+    Endpoints/          um arquivo por área, com MapXxxEndpoints() (Health, Auth, Product, Petshop)
+    Services/           regras de negócio (Auth, Session, Product, Petshop; ApiError para os erros com `code`)
     Data/               AppDbContext, isolamento por petshop (ClaimsTenantContext, TenantWriteGuard)
       Entities/         Petshop, Profile, Product, AppUser, RefreshToken
       Configurations/   mapeamento EF com os nomes do schema do V0
       Migrations/       V0Schema, ProductSourceAi, IdentitySchema, ProfilesUserFk
     Models/             DTOs de request/response
-  Api.Tests/            xUnit + WebApplicationFactory; Data/ (banco) e Auth/ (autenticação)
+  Api.Tests/            xUnit + WebApplicationFactory; Data/ (banco), Auth/ (autenticação) e Catalog/ (produtos e loja)
   .config/              dotnet-tools.json (dotnet-ef)
   docker-compose.yml    Postgres 17 de desenvolvimento
 ```

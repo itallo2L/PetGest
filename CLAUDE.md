@@ -14,7 +14,7 @@ barras + dados da loja. Projeto solo, sem equipe.
   `tests/` (testes das políticas de RLS).
 - `openspec/` — specs vigentes em `openspec/specs/` e uma change por
   tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11, T-12, T-13 e T-14; as changes
-  T-01 e T-04 a T-10 ainda estão abertas em `openspec/changes/`.
+  T-01, T-04 a T-10 e T-15 ainda estão abertas em `openspec/changes/`.
 - `index.html` / `script.js` / `style.css` na raiz — o **protótipo
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
@@ -24,8 +24,9 @@ barras + dados da loja. Projeto solo, sem equipe.
   EF Core (migrations `V0Schema` e `ProductSourceAi`) com isolamento por
   petshop feito pela API (claims `sub`/`petshop_id`, filtros globais e
   `TenantWriteGuard`) e, desde a T-14, contas do Identity com sessão por
-  JWT + refresh token (`/auth/*`), todo endpoint protegido por padrão.
-  Ainda sem endpoints de dados (T-15). Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
+  JWT + refresh token (`/auth/*`), todo endpoint protegido por padrão, e,
+  desde a T-15, produtos e loja (`/products`, `/petshop`). O frontend ainda
+  fala com o Supabase até a T-16. Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
   rodados pelo GitHub Actions (`.github/workflows/backend.yml`). Não é
   publicada nem toca a produção. Instruções em `backend/README.md`.
 

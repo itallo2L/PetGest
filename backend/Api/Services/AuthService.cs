@@ -27,7 +27,7 @@ public class AuthService(
     private AuthSettings Settings => authOptions.Value;
 
     // Conta + petshop + vínculo + sessão numa transação, sucessor de signup_petshop (D5).
-    public async Task<AuthResult<Session>> SignupAsync(SignupRequest request, CancellationToken ct)
+    public async Task<ApiResult<Session>> SignupAsync(SignupRequest request, CancellationToken ct)
     {
         var email = request.Email.Trim();
         var user = new AppUser { UserName = email, Email = email };
@@ -43,7 +43,7 @@ public class AuthService(
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
             {
                 // Cadastro simultâneo com o mesmo e-mail: o índice único pegou.
-                return AuthError.EmailTaken;
+                return AuthErrors.EmailTaken;
             }
 
             if (!created.Succeeded)
@@ -75,25 +75,25 @@ public class AuthService(
         return session;
     }
 
-    public async Task<AuthResult<Session>> LoginAsync(LoginRequest request, CancellationToken ct)
+    public async Task<ApiResult<Session>> LoginAsync(LoginRequest request, CancellationToken ct)
     {
         var user = await users.FindByEmailAsync(request.Email.Trim());
         if (user is null)
         {
             new PasswordHasher<AppUser>().VerifyHashedPassword(new AppUser(), DummyHash.Value, request.Password);
-            return AuthError.InvalidCredentials;
+            return AuthErrors.InvalidCredentials;
         }
 
         // CheckPasswordAsync regrava o hash quando o hasher pede (bcrypt importado — D7).
         if (!await users.CheckPasswordAsync(user, request.Password))
         {
-            return AuthError.InvalidCredentials;
+            return AuthErrors.InvalidCredentials;
         }
 
         // Conferido só depois da senha, para não revelar o estado da confirmação (D6).
         if (Settings.RequireConfirmedEmail && !user.EmailConfirmed)
         {
-            return AuthError.EmailNotConfirmed;
+            return AuthErrors.EmailNotConfirmed;
         }
 
         var session = await sessions.StartAsync(user, ct);
@@ -103,7 +103,7 @@ public class AuthService(
 
     // Rotação com detecção de reuso (D4): o token usado é revogado e substituído; um
     // token já revogado que volta derruba a família inteira.
-    public async Task<AuthResult<Session>> RefreshAsync(RefreshRequest request, CancellationToken ct)
+    public async Task<ApiResult<Session>> RefreshAsync(RefreshRequest request, CancellationToken ct)
     {
         var hash = SessionService.HashRefreshToken(request.RefreshToken);
         var now = sessions.Now;
@@ -113,7 +113,7 @@ public class AuthService(
         var stored = await db.RefreshTokens.SingleOrDefaultAsync(t => t.TokenHash == hash, ct);
         if (stored is null || stored.ExpiresAt <= now)
         {
-            return AuthError.InvalidRefreshToken;
+            return AuthErrors.InvalidRefreshToken;
         }
 
         // Reivindica o token de forma atômica: entre duas renovações simultâneas com o
@@ -126,19 +126,19 @@ public class AuthService(
             await RevokeFamilyAsync(stored.FamilyId, now, ct);
             await transaction.CommitAsync(ct);
             logger.LogWarning("Reuso de refresh token detectado; família {FamilyId} revogada.", stored.FamilyId);
-            return AuthError.InvalidRefreshToken;
+            return AuthErrors.InvalidRefreshToken;
         }
 
         var user = await users.FindByIdAsync(stored.UserId.ToString());
         if (user is null)
         {
-            return AuthError.InvalidRefreshToken;
+            return AuthErrors.InvalidRefreshToken;
         }
         if (Settings.RequireConfirmedEmail && !user.EmailConfirmed)
         {
             await RevokeFamilyAsync(stored.FamilyId, now, ct);
             await transaction.CommitAsync(ct);
-            return AuthError.EmailNotConfirmed;
+            return AuthErrors.EmailNotConfirmed;
         }
 
         // ExecuteUpdate já gravou revoked_at; o tracker ainda tem o valor antigo.
@@ -163,12 +163,12 @@ public class AuthService(
         }
     }
 
-    public async Task<AuthError?> ConfirmEmailAsync(ConfirmEmailRequest request, CancellationToken ct)
+    public async Task<ApiError?> ConfirmEmailAsync(ConfirmEmailRequest request, CancellationToken ct)
     {
         var user = await users.FindByIdAsync(request.UserId.ToString());
         if (user is null)
         {
-            return AuthError.InvalidConfirmation;
+            return AuthErrors.InvalidConfirmation;
         }
 
         string token;
@@ -178,11 +178,11 @@ public class AuthService(
         }
         catch (FormatException)
         {
-            return AuthError.InvalidConfirmation;
+            return AuthErrors.InvalidConfirmation;
         }
 
         var result = await users.ConfirmEmailAsync(user, token);
-        return result.Succeeded ? null : AuthError.InvalidConfirmation;
+        return result.Succeeded ? null : AuthErrors.InvalidConfirmation;
     }
 
     public async Task<MeResponse?> GetMeAsync(Guid userId, Guid? petshopId)
@@ -214,23 +214,23 @@ public class AuthService(
         }
     }
 
-    private static AuthError ToSignupError(IdentityResult result)
+    private static ApiError ToSignupError(IdentityResult result)
     {
         var codes = result.Errors.Select(e => e.Code).ToHashSet();
         if (codes.Contains(nameof(IdentityErrorDescriber.DuplicateEmail)) || codes.Contains(nameof(IdentityErrorDescriber.DuplicateUserName)))
         {
-            return AuthError.EmailTaken;
+            return AuthErrors.EmailTaken;
         }
 
         var passwordErrors = result.Errors.Where(e => e.Code.StartsWith("Password", StringComparison.Ordinal)).ToArray();
         if (passwordErrors.Length > 0)
         {
-            return new AuthError(StatusCodes.Status400BadRequest, AuthErrorCodes.WeakPassword,
+            return new ApiError(StatusCodes.Status400BadRequest, AuthErrorCodes.WeakPassword,
                 "A senha precisa ter pelo menos 6 caracteres.",
                 new Dictionary<string, string[]> { ["password"] = passwordErrors.Select(e => e.Description).ToArray() });
         }
 
-        return new AuthError(StatusCodes.Status400BadRequest, AuthErrorCodes.InvalidRequest, "Dados de cadastro inválidos.",
+        return new ApiError(StatusCodes.Status400BadRequest, AuthErrorCodes.InvalidRequest, "Dados de cadastro inválidos.",
             new Dictionary<string, string[]> { ["email"] = result.Errors.Select(e => e.Description).ToArray() });
     }
 }

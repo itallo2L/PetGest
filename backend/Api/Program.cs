@@ -21,6 +21,9 @@ builder.Services.AddFrontendCors(builder.Configuration);
 builder.Services.AddPetGestOpenApi();
 // Validação embutida (DataAnnotations) dos DTOs de request — .NET 10.
 builder.Services.AddValidation();
+// Erros inesperados em ProblemDetails; TenantViolationException vira 403 (design D6 da T-15).
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<TenantViolationHandler>();
 
 var app = builder.Build();
 
@@ -33,6 +36,7 @@ if (string.IsNullOrWhiteSpace(app.Configuration.GetConnectionString("Default")))
 
 JwtSettings.Validate(app.Configuration);
 
+app.UseExceptionHandler();
 app.UseCors();
 
 // Swagger UI é middleware e fica antes da autenticação; o documento é endpoint e
@@ -61,6 +65,8 @@ app.UseAuthorization();
 
 app.MapHealthEndpoints();
 app.MapAuthEndpoints();
+app.MapProductEndpoints();
+app.MapPetshopEndpoints();
 
 app.Run();
 

@@ -78,6 +78,27 @@ public sealed partial class AuthApi : IDisposable
         return await Client.SendAsync(request);
     }
 
+    // Chamada autenticada com token e corpo JSON opcional (endpoints de dados, T-15).
+    public async Task<HttpResponseMessage> SendAsync(HttpMethod method, string path, string? accessToken, object? body = null)
+    {
+        using var request = new HttpRequestMessage(method, path);
+        if (accessToken is not null)
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        }
+        if (body is not null)
+        {
+            request.Content = JsonContent.Create(body);
+        }
+        return await Client.SendAsync(request);
+    }
+
+    public static async Task<T> ReadAsync<T>(HttpResponseMessage response, HttpStatusCode expected = HttpStatusCode.OK)
+    {
+        Assert.Equal(expected, response.StatusCode);
+        return (await response.Content.ReadFromJsonAsync<T>())!;
+    }
+
     public static async Task<SessionResponse> ReadSessionAsync(HttpResponseMessage response)
     {
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
