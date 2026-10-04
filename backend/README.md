@@ -138,7 +138,7 @@ Para testar pelo Swagger: `POST /auth/signup` (ou `/login`), copie o
 
 Tudo exige token, e a loja é sempre a do token (`petshop_id`) — nenhum
 endpoint recebe petshop do cliente (design da T-15 em
-`openspec/changes/T-15-products-store-api/design.md`). Recurso de outra loja
+`openspec/changes/archive/2026-10-04-T-15-products-store-api/design.md`). Recurso de outra loja
 responde `404`, igual a um que não existe.
 
 | Endpoint | O que faz |

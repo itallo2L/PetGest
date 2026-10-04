@@ -204,7 +204,7 @@ real foram para a T-22.
 
 Expõe na API tudo o que o frontend do V0 faz hoje direto no Supabase.
 
-**Status:** implementada em 2026-10-04 (`openspec/changes/T-15-products-store-api/`, specs `api-products` e `api-store`).
+**Status:** concluída e arquivada em 2026-10-04 (`openspec/changes/archive/2026-10-04-T-15-products-store-api/`, specs `api-products` e `api-store`).
 `/products` (listar, consultar, buscar por EAN, cadastrar, editar, excluir)
 com `409 ean_taken` trazendo o produto dono do código; `/petshop` (consultar,
 salvar e — paridade com a tela de concluir cadastro do V0 — criar a loja de

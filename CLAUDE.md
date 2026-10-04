@@ -13,8 +13,8 @@ barras + dados da loja. Projeto solo, sem equipe.
 - `supabase/` — `schema.sql` (tabelas, RLS, `signup_petshop`) e
   `tests/` (testes das políticas de RLS).
 - `openspec/` — specs vigentes em `openspec/specs/` e uma change por
-  tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11, T-12, T-13 e T-14; as changes
-  T-01, T-04 a T-10 e T-15 ainda estão abertas em `openspec/changes/`.
+  tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11 a T-15; as changes
+  T-01 e T-04 a T-10 ainda estão abertas em `openspec/changes/`.
 - `index.html` / `script.js` / `style.css` na raiz — o **protótipo
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
