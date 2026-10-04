@@ -170,7 +170,7 @@ petshop e usuário lidos das claims `petshop_id`/`sub`, filtros globais no
 Substitui o Supabase Auth, mantendo o comportamento que as specs `auth` e
 `tenant-data` do V0 exigem.
 
-**Status:** implementada em 2026-10-03 (`openspec/changes/T-14-identity-jwt/`, spec `api-auth`).
+**Status:** concluída e arquivada em 2026-10-04 (`openspec/changes/archive/2026-10-04-T-14-identity-jwt/`, spec `api-auth`).
 Identity (`Guid`, sem papéis) no schema `identity`; `/auth/signup` (conta +
 petshop + vínculo numa transação), `/login`, `/refresh` (rotação com
 detecção de reuso), `/logout`, `/confirm-email` e `/auth/me`; JWT HS256 de
@@ -362,7 +362,7 @@ sem envio real ninguém consegue confirmar.
 - Frontend: telas que abrem os links (`/confirmar-email`,
   `/redefinir-senha`) e o "esqueci minha senha" no login.
 - Depende de: T-16 (as telas usam o cliente da API).
-- Ref: `openspec/changes/T-14-identity-jwt/design.md` (D6), `PLANOMVP.md` §4.2.
+- Ref: `openspec/changes/archive/2026-10-04-T-14-identity-jwt/design.md` (D6), `PLANOMVP.md` §4.2.
 
 ---
 

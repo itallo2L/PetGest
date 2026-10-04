@@ -89,7 +89,7 @@ Cuidados:
 ## Autenticação
 
 Contas do ASP.NET Core Identity com sessão por JWT (design da T-14 em
-`openspec/changes/T-14-identity-jwt/design.md`). **Todo endpoint exige token**,
+`openspec/changes/archive/2026-10-04-T-14-identity-jwt/design.md`). **Todo endpoint exige token**,
 a não ser os marcados com `AllowAnonymous` — e o teste
 `ProtectedEndpointTests.So_as_rotas_publicas_da_spec_dispensam_token` lista as
 rotas públicas permitidas: rota nova sem token entra lá de propósito.

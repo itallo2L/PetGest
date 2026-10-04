@@ -21,7 +21,7 @@
 - [x] 4.2 Escrever `LoginTests` (sucesso; senha errada e e-mail desconhecido com resposta idêntica; exigência desligada aceita conta não confirmada; ligada → `403 email_not_confirmed`; ligada + senha errada → `401`) e `ConfirmEmailTests` (código válido → `204` e login liberado com a exigência ligada; código alterado ou de outra conta → `400 invalid_confirmation`; confirmar de novo → `204`); verificar que passam
 - [x] 4.3 Escrever `RefreshTests` e `LogoutAndMeTests` (rotação, reuso derruba a família, expiração em 30 dias com `FakeTimeProvider`, petshop relido na renovação, refresh token ausente do banco em texto, claims do JWT, conta sem vínculo sem `petshop_id`, logout → `204` e refresh recusado, logout com token desconhecido → `204`, `GET /auth/me` com e sem token, dois cadastros vendo cada um o próprio petshop); verificar que passam
 - [x] 4.4 Escrever `ProtectedEndpointTests` (token expirado montado com `exp` no passado, assinatura de outra chave, emissor errado → `401`; `/health` público), `RateLimitTests` (limite baixo por configuração → `429` acima dele) e o teste de API de `PasswordCompatibilityTests` (usuário gravado com hash bcrypt faz login, o hash deixa de ser bcrypt; senha errada mantém o hash); verificar que passam e que **remover a política de fallback faz o teste de endpoint protegido falhar** (conferir e desfazer)
-- [ ] 4.5 Rodar a suíte inteira e fazer push na `dev`; verificar que fica verde localmente e no workflow `backend.yml` do GitHub Actions
+- [x] 4.5 Rodar a suíte inteira e fazer push na `dev`; verificar que fica verde localmente e no workflow `backend.yml` do GitHub Actions — _verificado em 2026-10-03: 119/119 local; workflow `backend.yml` verde no commit b125351_
 
 ## 5. Documentação e roadmap
 
