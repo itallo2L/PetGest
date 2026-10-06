@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation } from 'react-router'
 import { getBackend } from '../../shared/backend'
+import { focusField } from '../../shared/ui/touch'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
@@ -24,12 +25,12 @@ export function CompleteSignupPage() {
     const trimmedEmail = email.trim()
     if (!name) {
       setError({ text: 'Informe o nome da loja.' })
-      document.getElementById('storeName')?.focus()
+      focusField('storeName')
       return
     }
     if (!EMAIL_RE.test(trimmedEmail)) {
       setError({ text: 'Informe um e-mail válido.' })
-      document.getElementById('storeEmail')?.focus()
+      focusField('storeEmail')
       return
     }
 

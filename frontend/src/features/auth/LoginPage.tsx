@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation } from 'react-router'
 import { getBackend } from '../../shared/backend'
+import { focusField, isTouchScreen } from '../../shared/ui/touch'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
@@ -19,12 +20,12 @@ export function LoginPage() {
     const trimmed = email.trim()
     if (!EMAIL_RE.test(trimmed)) {
       setError({ text: 'Informe um e-mail válido.' })
-      document.getElementById('loginEmail')?.focus()
+      focusField('loginEmail')
       return
     }
     if (!password) {
       setError({ text: 'Informe sua senha.' })
-      document.getElementById('loginPassword')?.focus()
+      focusField('loginPassword')
       return
     }
 
@@ -56,7 +57,7 @@ export function LoginPage() {
             placeholder="voce@petshop.com.br"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            autoFocus
+            autoFocus={!isTouchScreen()}
           />
         </div>
 

@@ -3,6 +3,7 @@ import { EMAIL_RE, toFormMessage, type FormMessage } from '../auth/authErrors'
 import { FormError } from '../auth/FormError'
 import { useSession } from '../auth/sessionContext'
 import { Icon } from '../../shared/ui/Icon'
+import { focusField } from '../../shared/ui/touch'
 import { useToast } from '../../shared/ui/toastContext'
 import { getBackend, type Store } from '../../shared/backend'
 import './settings.css'
@@ -71,7 +72,7 @@ function StoreForm({ store, onSaved }: { store: Store; onSaved: (store: Store) =
 
   function invalid(text: string, fieldId: string) {
     setError({ text })
-    document.getElementById(fieldId)?.focus()
+    focusField(fieldId)
   }
 
   async function handleSubmit(event: FormEvent) {

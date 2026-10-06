@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { getBackend, type BackendError } from '../../shared/backend'
+import { focusField } from '../../shared/ui/touch'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, MIN_PASSWORD_LENGTH, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
@@ -28,7 +29,7 @@ export function SignupPage() {
 
   function invalid(text: string, fieldId: string) {
     setError({ text })
-    document.getElementById(fieldId)?.focus()
+    focusField(fieldId)
   }
 
   async function handleSubmit(event: FormEvent) {

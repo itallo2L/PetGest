@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Icon } from './Icon'
+import { isTouchScreen, opensKeyboard } from './touch'
 
 /** Modais abertos, do mais antigo ao mais novo: só o do topo responde ao Esc. */
 const openStack: symbol[] = []
@@ -17,7 +18,8 @@ interface ModalProps {
 
 /**
  * Diálogo do protótipo (style.css MODAIS). Ao abrir, foca o elemento com
- * `data-autofocus` (ou o primeiro campo); ao fechar, devolve o foco a quem
+ * `data-autofocus` (ou o primeiro campo; em tela de toque, o próprio diálogo
+ * se o alvo abriria o teclado); ao fechar, devolve o foco a quem
  * abriu. Fecha em Esc e no fundo escurecido; trava a rolagem da página.
  */
 export function Modal({ title, subtitle, onClose, footer, footerAlign = 'end', children }: ModalProps) {
@@ -36,10 +38,12 @@ export function Modal({ title, subtitle, onClose, footer, footerAlign = 'end', c
     document.body.classList.add('is-locked')
 
     const dialog = dialogRef.current
-    const target =
+    const first =
       dialog?.querySelector<HTMLElement>('[data-autofocus]') ??
       dialog?.querySelector<HTMLElement>('input, select, textarea') ??
       dialog
+    // No toque, um campo de texto abriria o teclado: o foco fica no diálogo.
+    const target = first && isTouchScreen() && opensKeyboard(first) ? dialog : first
     const focusTimer = window.setTimeout(() => target?.focus(), 30)
 
     const onKeyDown = (event: KeyboardEvent) => {

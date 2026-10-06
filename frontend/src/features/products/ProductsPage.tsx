@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toFormMessage } from '../auth/authErrors'
 import { EmptyState } from '../../shared/ui/EmptyState'
 import { Icon } from '../../shared/ui/Icon'
+import { focusField } from '../../shared/ui/touch'
 import { ScannerModal } from '../scanner/ScannerModal'
 import { CATEGORIES } from './categories'
 import { ProductFormModal } from './ProductFormModal'
@@ -63,7 +64,7 @@ export function ProductsPage() {
     setFilters((current) => ({ ...current, [key]: value }))
   const clearFilters = () => {
     setFilters(FILTER_DEFAULTS)
-    document.getElementById('productSearch')?.focus()
+    focusField('productSearch')
   }
 
   function handleSaved(saved: Product, created: boolean) {
@@ -217,7 +218,7 @@ export function ProductsPage() {
             hidden={!filters.search}
             onClick={() => {
               setFilter('search', '')
-              document.getElementById('productSearch')?.focus()
+              focusField('productSearch')
             }}
           >
             <Icon name="close" size="sm" />

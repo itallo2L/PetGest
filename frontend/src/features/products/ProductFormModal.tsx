@@ -4,6 +4,7 @@ import { FormError } from '../auth/FormError'
 import { ScannerModal } from '../scanner/ScannerModal'
 import { ConfirmDialog } from '../../shared/ui/ConfirmDialog'
 import { Icon } from '../../shared/ui/Icon'
+import { focusField } from '../../shared/ui/touch'
 import { Modal } from '../../shared/ui/Modal'
 import { useToast } from '../../shared/ui/toastContext'
 import { categoryOptions, CATEGORIES } from './categories'
@@ -58,7 +59,7 @@ export function ProductFormModal({
 
   function invalid(text: string, fieldId: string) {
     setError({ text })
-    document.getElementById(fieldId)?.focus()
+    focusField(fieldId)
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -93,7 +94,7 @@ export function ProductFormModal({
             ? `O código de barras ${input.ean} já pertence a ${owner.name}.`
             : `O código de barras ${input.ean} já pertence a outro produto da loja.`,
         })
-        document.getElementById(`${formId}-ean`)?.focus()
+        focusField(`${formId}-ean`)
         return
       }
       setError(toFormMessage(err))
