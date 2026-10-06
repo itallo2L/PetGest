@@ -1,20 +1,20 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation } from 'react-router'
-import { supabase } from '../../shared/supabaseClient'
+import { getBackend } from '../../shared/backend'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
 import { useSession } from './sessionContext'
 import { StoreFields } from './StoreFields'
 
-/** Conta logada sem petshop (ex.: o `signup_petshop` falhou no cadastro). */
+/** Conta logada sem petshop (ex.: a loja não foi criada no cadastro, ou conta importada sem loja). */
 export function CompleteSignupPage() {
-  const { session, refreshPetshop } = useSession()
+  const { user, refreshPetshop } = useSession()
   const location = useLocation()
   const initialError = (location.state as { error?: FormMessage } | null)?.error ?? null
   const [storeName, setStoreName] = useState('')
   const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState(session?.user.email ?? '')
+  const [email, setEmail] = useState(user?.email ?? '')
   const [error, setError] = useState<FormMessage | null>(initialError)
   const [submitting, setSubmitting] = useState(false)
 
@@ -35,13 +35,10 @@ export function CompleteSignupPage() {
 
     setError(null)
     setSubmitting(true)
-    const { error: rpcError } = await supabase.rpc('signup_petshop', {
-      petshop_name: name,
-      petshop_email: trimmedEmail,
-      petshop_phone: phone.trim() || null,
-    })
-    if (rpcError && rpcError.code !== '23505') {
-      setError(toFormMessage(rpcError))
+    try {
+      await getBackend().auth.completeSignup({ name, email: trimmedEmail, phone: phone.trim() || null })
+    } catch (storeError) {
+      setError(toFormMessage(storeError))
       setSubmitting(false)
       return
     }
@@ -78,7 +75,7 @@ export function CompleteSignupPage() {
 
       <p className="auth-hint">
         Não é sua conta?{' '}
-        <button type="button" className="btn btn--link" onClick={() => void supabase.auth.signOut()}>
+        <button type="button" className="btn btn--link" onClick={() => void getBackend().auth.signOut()}>
           Sair
         </button>
       </p>

@@ -1,7 +1,7 @@
 import type { RefObject } from 'react'
 import { NavLink } from 'react-router'
 import { useSession } from '../../features/auth/sessionContext'
-import { supabase } from '../supabaseClient'
+import { getBackend } from '../backend'
 import { Icon, type IconName } from './Icon'
 import { storeInitials } from './storeInitials'
 
@@ -65,7 +65,7 @@ export function Sidebar({ open, onClose, closeButtonRef }: SidebarProps) {
             <strong>{storeName}</strong>
           </span>
         </div>
-        <button type="button" className="sidebar__logout" onClick={() => void supabase.auth.signOut()}>
+        <button type="button" className="sidebar__logout" onClick={() => void getBackend().auth.signOut()}>
           <Icon name="logout" size="sm" />
           Sair
         </button>

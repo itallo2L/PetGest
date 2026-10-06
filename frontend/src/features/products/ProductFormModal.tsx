@@ -8,7 +8,7 @@ import { Modal } from '../../shared/ui/Modal'
 import { useToast } from '../../shared/ui/toastContext'
 import { categoryOptions, CATEGORIES } from './categories'
 import { formatPrice, isValidBarcode, normalizeBarcode, parsePrice, priceToInput } from './productFormat'
-import { createProduct, deleteProduct, findProductByEan, updateProduct } from './productsApi'
+import { getBackend, isBackendError } from '../../shared/backend'
 import type { Product, ProductInput } from './types'
 
 interface ProductFormModalProps {
@@ -78,14 +78,16 @@ export function ProductFormModal({
     try {
       // `barcode` só se o código salvo é o que a câmera leu; a edição não muda `source`.
       const source = input.ean && input.ean === scannedEan ? 'barcode' : 'manual'
-      const saved = isCreate ? await createProduct(input, source) : await updateProduct(product.id, input)
+      const { products } = getBackend()
+      const saved = isCreate ? await products.create(input, source) : await products.update(product.id, input)
       showToast({ type: 'success', title: isCreate ? 'Produto cadastrado' : 'Produto atualizado', text: saved.name })
       onSaved(saved, isCreate)
     } catch (err) {
       setSaving(false)
-      // 23505: índice único (petshop_id, ean) — o código já é de outro produto da loja.
-      if (isRecord(err) && err.code === '23505' && input.ean) {
-        const owner = findByEan(input.ean)
+      // O código já é de outro produto da loja: a API diz qual; no Supabase, procura
+      // na lista carregada.
+      if (isBackendError(err) && err.kind === 'ean_taken' && input.ean) {
+        const owner = err.owner ?? findByEan(input.ean)
         setError({
           text: owner
             ? `O código de barras ${input.ean} já pertence a ${owner.name}.`
@@ -102,7 +104,7 @@ export function ProductFormModal({
     if (!product) return
     setDeleting(true)
     try {
-      await deleteProduct(product.id)
+      await getBackend().products.remove(product.id)
       showToast({ type: 'success', title: 'Produto excluído', text: product.name })
       onDeleted(product)
     } catch (err) {
@@ -114,7 +116,7 @@ export function ProductFormModal({
 
   /** Leitor aberto pelo campo de código: o próprio produto em edição conta como "novo". */
   async function lookupFromForm(code: string) {
-    const found = await findProductByEan(code)
+    const found = await getBackend().products.findByEan(code)
     if (!found || found.id === product?.id) return { kind: 'new' as const }
     onFound(found)
     return { kind: 'existing' as const, item: found, summary: `${found.name} · ${formatPrice(found.price)}` }
@@ -267,8 +269,4 @@ export function ProductFormModal({
       )}
     </>
   )
-}
-
-function isRecord(value: unknown): value is { code?: unknown } {
-  return typeof value === 'object' && value !== null
 }

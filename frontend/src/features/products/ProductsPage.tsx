@@ -14,7 +14,7 @@ import {
   type ProductFilters,
   type SortKey,
 } from './productFormat'
-import { findProductByEan, listProducts } from './productsApi'
+import { getBackend } from '../../shared/backend'
 import type { Product } from './types'
 import './products.css'
 
@@ -41,7 +41,7 @@ export function ProductsPage() {
   // Recarrega a cada tentativa; ignora a resposta se a tela já saiu.
   useEffect(() => {
     let active = true
-    listProducts().then(
+    getBackend().products.list().then(
       (list) => active && setLoad({ status: 'ready', products: list }),
       (err: unknown) => active && setLoad({ status: 'error', message: toFormMessage(err).text }),
     )
@@ -102,7 +102,7 @@ export function ProductsPage() {
 
   /** Leitor da barra: já cadastrado → editar; novo → cadastro com o código (T-07 D5). */
   async function lookupFromToolbar(code: string) {
-    const found = await findProductByEan(code)
+    const found = await getBackend().products.findByEan(code)
     if (!found) return { kind: 'new' as const }
     mergeFound(found)
     return { kind: 'existing' as const, item: found, summary: `${found.name} · ${formatPrice(found.price)}` }

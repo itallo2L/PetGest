@@ -1,5 +1,7 @@
-import type { Session } from '@supabase/supabase-js'
 import { createContext, useContext } from 'react'
+import type { AuthUser, Petshop } from '../../shared/backend'
+
+export type { Petshop } from '../../shared/backend'
 
 /**
  * - `loading`: verificando a sessão salva (não mostrar login nem shell)
@@ -10,19 +12,14 @@ import { createContext, useContext } from 'react'
  */
 export type SessionStatus = 'loading' | 'error' | 'signed-out' | 'no-petshop' | 'ready'
 
-export interface Petshop {
-  id: string
-  name: string
-}
-
 export interface SessionState {
   status: SessionStatus
-  session: Session | null
+  user: AuthUser | null
   petshop: Petshop | null
-  /** Recarrega o petshop da sessão atual (depois do `signup_petshop`). */
+  /** Recarrega a sessão e o petshop atuais (depois de criar a loja ou salvar seus dados). */
   refreshPetshop: () => Promise<void>
-  /** Ligado pela tela de criar conta entre o `signUp` e o `rpc`, para a
-   * guarda não mandar para "Concluir cadastro" no meio do envio. */
+  /** Ligado pela tela de criar conta durante o envio, para a guarda não mandar para
+   * "Concluir cadastro" no meio do cadastro (no Supabase, entre o `signUp` e o `rpc`). */
   setSignupInProgress: (value: boolean) => void
   isSignupInProgress: () => boolean
 }

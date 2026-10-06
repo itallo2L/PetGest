@@ -4,7 +4,7 @@ import { FormError } from '../auth/FormError'
 import { useSession } from '../auth/sessionContext'
 import { Icon } from '../../shared/ui/Icon'
 import { useToast } from '../../shared/ui/toastContext'
-import { getStore, updateStore, type Store } from './petshopApi'
+import { getBackend, type Store } from '../../shared/backend'
 import './settings.css'
 
 type LoadState = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; store: Store }
@@ -17,7 +17,7 @@ export function SettingsPage() {
   // Recarrega a cada tentativa; ignora a resposta se a tela já saiu (T-08 D4).
   useEffect(() => {
     let active = true
-    getStore().then(
+    getBackend().petshop.get().then(
       (store) => active && setLoad({ status: 'ready', store }),
       (err: unknown) => active && setLoad({ status: 'error', message: toFormMessage(err).text }),
     )
@@ -85,7 +85,7 @@ function StoreForm({ store, onSaved }: { store: Store; onSaved: (store: Store) =
     setSaving(true)
     try {
       // Telefone opcional: vazio vira null, como no cadastro (T-08 D2).
-      const saved = await updateStore(store.id, { name: trimmedName, email: trimmedEmail, phone: phone.trim() || null })
+      const saved = await getBackend().petshop.update(store.id, { name: trimmedName, email: trimmedEmail, phone: phone.trim() || null })
       await refreshPetshop() // nome e iniciais novos na barra lateral (T-08 D3)
       showToast({ type: 'success', title: 'Dados da loja salvos', text: saved.name })
       onSaved(saved)

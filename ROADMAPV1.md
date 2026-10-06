@@ -228,12 +228,24 @@ uma conta sem loja); contrato `ProductDraft` aceitando por enquanto só
 
 Troca o "backend" do frontend sem mudar nenhuma tela.
 
-- Criar `shared/apiClient.ts` (único cliente HTTP do app, no lugar de
-  `shared/supabaseClient.ts`) com o JWT anexado e renovação de sessão.
+**Status:** implementada em 2026-10-06 (`openspec/changes/T-16-frontend-api/`, spec `frontend-backend`); falta o roteiro no celular (tarefa 4.4, do usuário).
+Decisão do usuário: **chave de configuração** em vez de substituir o Supabase —
+`VITE_BACKEND=supabase|api` escolhe o backend no build, e produção e prévias
+continuam em `supabase` até a T-18 (a `dev` segue mesclável na `main`). Todas as
+telas usam `shared/backend/` (interface única, implementações `supabase/` e
+`api/`, erro comum); o cliente da API guarda o token de acesso em memória e o
+refresh token no `localStorage`, renova em voo único (inclusive entre abas, com
+Web Locks) e sincroniza a saída entre abas. Tipos gerados do OpenAPI
+(`npm run api:types`), proxy `/api` no Vite, `dev:api` e `dev:lan` (HTTPS na rede
+para o celular), primeiros testes de unidade do frontend (Vitest).
+
+- Criar o cliente HTTP da API com o JWT anexado e renovação de sessão (feito
+  em `shared/backend/api/`).
 - Tipos TypeScript gerados do OpenAPI da API (§4.1).
 - Portar `features/auth`, `products`, `petshop` e a busca do scanner para
-  o cliente novo; remover `@supabase/supabase-js`.
-- Variável `VITE_API_URL` no lugar de `VITE_SUPABASE_URL` /
+  a interface de backend. **Remover `@supabase/supabase-js` ficou para depois
+  da T-18** (é o rollback da virada).
+- Variáveis `VITE_BACKEND` e `VITE_API_URL` ao lado de `VITE_SUPABASE_URL` /
   `VITE_SUPABASE_ANON_KEY`.
 - Todas as specs do V0 continuam valendo — reexecutar o `roteiro.md` da
   T-10 contra a API local como critério de paridade.
@@ -274,6 +286,10 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
 - Frontend continua na Vercel (§4.4 permite); prévia da `dev` apontando
   para um ambiente de teste da API.
 - Nada de Kubernetes, filas, Redis ou Elasticsearch (§4.4).
+- Da T-16: resiliência da conexão com o banco — no teste local, uma conexão
+  ociosa derrubada fez a primeira consulta seguinte responder `500`; avaliar
+  `EnableRetryOnFailure` (com cuidado com as transações explícitas) e
+  `Connection Idle Lifetime`/keepalive do Npgsql com o pooler do Supabase.
 - Da T-14: persistir as chaves do Data Protection (senão os links de
   confirmação deixam de valer a cada reinício) e configurar
   `ForwardedHeaders`, para o rate limit enxergar o IP do cliente e não o
@@ -307,10 +323,16 @@ Troca o "backend" do frontend sem mudar nenhuma tela.
 - **Fechar a Data API do Supabase** (desligar o PostgREST ou revogar os
   `grant`s de `anon`/`authenticated`) — senão as tabelas seguem
   acessíveis pela chave anon que o V0 publicou.
+- Frontend (T-16): definir `VITE_BACKEND=api` e `VITE_API_URL=<URL da API>` em
+  Production na Vercel e fazer Redeploy. Rollback do frontend: remover
+  `VITE_BACKEND` e fazer Redeploy (ou Instant Rollback).
 - Rollback: "Instant Rollback" na Vercel para o deploy do V0 enquanto o
   Supabase Auth não for desativado.
 - Teste de campo de paridade (roteiro da T-10) em Android e iPhone, em
   produção.
+- Depois da observação: remover do frontend o caminho Supabase
+  (`shared/backend/supabase/`, `VITE_SUPABASE_*`) e o `@supabase/supabase-js`
+  (T-16).
 - Desligar o **Supabase Auth** só depois de um período de observação — o
   projeto Supabase continua, agora só como banco.
 - Depende de: T-17 e T-22.

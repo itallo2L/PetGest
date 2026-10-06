@@ -5,16 +5,17 @@ barras + dados da loja. Projeto solo, sem equipe.
 
 ## Estado atual do repositório
 
-- `frontend/` — o app do V0 (React + TypeScript + Vite), em produção em
-  `pet-gest.vercel.app`: login/cadastro reais no Supabase Auth, scanner
-  com câmera (`barcode-detector`), produtos e dados da loja persistidos
-  no Supabase. Instruções de execução e variáveis de ambiente em
-  `frontend/README.md`.
+- `frontend/` — o app (React + TypeScript + Vite), em produção em
+  `pet-gest.vercel.app`: login/cadastro, scanner com câmera
+  (`barcode-detector`), produtos e dados da loja. Desde a T-16 fala com um
+  de dois backends, escolhido no build por `VITE_BACKEND`: `supabase`
+  (padrão, o V0 em produção) ou `api` (a API do V1). Instruções e variáveis
+  em `frontend/README.md`.
 - `supabase/` — `schema.sql` (tabelas, RLS, `signup_petshop`) e
   `tests/` (testes das políticas de RLS).
 - `openspec/` — specs vigentes em `openspec/specs/` e uma change por
   tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11 a T-15; as changes
-  T-01 e T-04 a T-10 ainda estão abertas em `openspec/changes/`.
+  T-01, T-04 a T-10 e T-16 ainda estão abertas em `openspec/changes/`.
 - `index.html` / `script.js` / `style.css` na raiz — o **protótipo
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
@@ -25,8 +26,8 @@ barras + dados da loja. Projeto solo, sem equipe.
   petshop feito pela API (claims `sub`/`petshop_id`, filtros globais e
   `TenantWriteGuard`) e, desde a T-14, contas do Identity com sessão por
   JWT + refresh token (`/auth/*`), todo endpoint protegido por padrão, e,
-  desde a T-15, produtos e loja (`/products`, `/petshop`). O frontend ainda
-  fala com o Supabase até a T-16. Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
+  desde a T-15, produtos e loja (`/products`, `/petshop`). O frontend fala
+  com ela no modo `VITE_BACKEND=api` (T-16); produção segue no Supabase. Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
   rodados pelo GitHub Actions (`.github/workflows/backend.yml`). Não é
   publicada nem toca a produção. Instruções em `backend/README.md`.
 
@@ -90,7 +91,8 @@ frontend/
       products/   (listagem, cadastro/edição)
       petshop/    (dados da loja)
     shared/
-      supabaseClient.ts   (único client Supabase do app — sempre usar este)
+      backend/            (único acesso das telas ao backend: getBackend();
+                           supabase/ = V0, api/ = V1, escolhido por VITE_BACKEND)
       ui/                 (componentes e CSS compartilhados: shell, modal, toast, tokens)
 supabase/
   schema.sql      (tabelas + RLS + função signup_petshop, versionado)

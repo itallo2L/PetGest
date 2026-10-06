@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
-import { supabase } from '../../shared/supabaseClient'
+import { getBackend, type BackendError } from '../../shared/backend'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, MIN_PASSWORD_LENGTH, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
@@ -9,7 +9,7 @@ import { PasswordField } from './PasswordField'
 import { useSession } from './sessionContext'
 import { StoreFields } from './StoreFields'
 
-/** Conta + loja na mesma submissão: `signUp` e depois `signup_petshop`. */
+/** Conta + loja na mesma submissão (no Supabase, `signUp` e depois `signup_petshop`). */
 export function SignupPage() {
   const { refreshPetshop, setSignupInProgress } = useSession()
   const navigate = useNavigate()
@@ -44,22 +44,24 @@ export function SignupPage() {
     setError(null)
     setSubmitting(true)
     setSignupInProgress(true)
-    const { data, error: signUpError } = await supabase.auth.signUp({ email: trimmedEmail, password })
-    if (signUpError || !data.session) {
+    let storeError: BackendError | undefined
+    try {
+      ;({ storeError } = await getBackend().auth.signUp({
+        email: trimmedEmail,
+        password,
+        storeName: name,
+        storePhone: phone.trim() || null,
+      }))
+    } catch (signUpError) {
       setSignupInProgress(false) // continua nesta tela, sem sessão nova
-      setError(toFormMessage(signUpError ?? new Error('signUp sem sessão')))
+      setError(toFormMessage(signUpError))
       setSubmitting(false)
       return
     }
 
-    const { error: rpcError } = await supabase.rpc('signup_petshop', {
-      petshop_name: name,
-      petshop_email: trimmedEmail,
-      petshop_phone: phone.trim() || null,
-    })
-    // 23505 = a loja já existe (envio repetido): segue como sucesso.
-    if (rpcError && rpcError.code !== '23505') {
-      const message = toFormMessage(rpcError)
+    // Conta criada, loja não (só no Supabase, onde são duas chamadas).
+    if (storeError) {
+      const message = toFormMessage(storeError)
       // Garante o status `no-petshop` antes de navegar; senão a guarda de
       // /concluir-cadastro ainda vê a sessão anterior e descarta a mensagem.
       await refreshPetshop()

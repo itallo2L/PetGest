@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation } from 'react-router'
-import { supabase } from '../../shared/supabaseClient'
+import { getBackend } from '../../shared/backend'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
@@ -30,8 +30,9 @@ export function LoginPage() {
 
     setError(null)
     setSubmitting(true)
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email: trimmed, password })
-    if (signInError) {
+    try {
+      await getBackend().auth.signIn(trimmed, password)
+    } catch (signInError) {
       setError(toFormMessage(signInError))
       setSubmitting(false)
     }
