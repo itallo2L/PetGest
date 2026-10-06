@@ -35,7 +35,7 @@ esperado, e se repetiu ao tentar de novo.
 |---|------|--------------------|------|
 | 2.1 | Em Entrar, tocar **Criar conta**. Enviar sem o nome da loja | Mensagem pedindo o nome da loja; nada é criado | auth › Criar conta com a loja (Nome da loja vazio) |
 | 2.2 | Preencher nome da loja, telefone, seu e-mail real e senha `123` | Mensagem com o tamanho mínimo da senha; nada é criado | auth › Criar conta com a loja (Senha fraca) |
-| 2.3 | Corrigir a senha (8+ caracteres) e enviar. Observar o botão durante o envio | Botão mostra "Criando conta…" e não aceita segundo toque; entra no app em **Produtos**, com o nome da loja e as iniciais na barra lateral | auth › Criar conta com a loja (Cadastro completo); app-shell › Identificação da loja |
+| 2.3 | Corrigir a senha (6+ caracteres) e enviar. Observar o botão durante o envio | Botão mostra "Criando conta…" e não aceita segundo toque; entra no app em **Produtos**, com o nome da loja e as iniciais na barra lateral | auth › Criar conta com a loja (Cadastro completo); app-shell › Identificação da loja |
 | 2.4 | Recarregar a página | Continua logado, em Produtos | auth › Sessão persistida no navegador |
 
 ## 3. Navegação
