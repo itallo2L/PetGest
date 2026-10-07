@@ -122,6 +122,15 @@ public sealed partial class AuthApi : IDisposable
         return (Guid.Parse(match.Groups["user"].Value), match.Groups["code"].Value);
     }
 
+    // Usuário e código do link de redefinição de senha enviado para o e-mail (T-22).
+    public (Guid UserId, string Code) ResetFor(string email)
+    {
+        var message = Emails.Sent.Last(m => m.To == email && m.Body.Contains("/redefinir-senha?"));
+        var match = ResetLink().Match(message.Body);
+        Assert.True(match.Success, "Link de redefinição não encontrado: " + message.Body);
+        return (Guid.Parse(match.Groups["user"].Value), match.Groups["code"].Value);
+    }
+
     public void Dispose()
     {
         Client.Dispose();
@@ -130,6 +139,9 @@ public sealed partial class AuthApi : IDisposable
 
     [GeneratedRegex(@"/confirmar-email\?user=(?<user>[0-9a-f-]+)&code=(?<code>[A-Za-z0-9_-]+)")]
     private static partial Regex ConfirmationLink();
+
+    [GeneratedRegex(@"/redefinir-senha\?user=(?<user>[0-9a-f-]+)&code=(?<code>[A-Za-z0-9_-]+)")]
+    private static partial Regex ResetLink();
 }
 
 public class CapturingEmailSender : IEmailSender

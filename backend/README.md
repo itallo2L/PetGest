@@ -103,6 +103,9 @@ rotas públicas permitidas: rota nova sem token entra lá de propósito.
 | `POST /auth/refresh` | não | Troca o refresh token por uma sessão nova (o usado deixa de valer) |
 | `POST /auth/logout` | não | Revoga a linha de renovações do refresh token (sempre `204`) |
 | `POST /auth/confirm-email` | não | Confirma o e-mail com `userId` + `code` do link |
+| `POST /auth/resend-confirmation` | não | Reenvia o link de confirmação (`202` sempre; só envia para conta não confirmada) — T-22 |
+| `POST /auth/forgot-password` | não | Envia o link de redefinição de senha, válido por 1 hora (`202` sempre) — T-22 |
+| `POST /auth/reset-password` | não | Troca a senha com `userId` + `code` do link; confirma o e-mail e encerra as sessões — T-22 |
 | `GET /auth/me` | sim | Usuário, e-mail, confirmação e petshop da sessão |
 
 Sessão devolvida por cadastro, login e renovação:
@@ -120,13 +123,14 @@ Sessão devolvida por cadastro, login e renovação:
   linha — o frontend precisa renovar **uma vez por vez** (T-16).
 - **Erros:** `ProblemDetails` com a extensão `code` — `email_taken`,
   `weak_password`, `invalid_credentials`, `email_not_confirmed`,
-  `invalid_refresh_token`, `invalid_confirmation`. Formato inválido do corpo
+  `invalid_refresh_token`, `invalid_confirmation`, `invalid_reset`. Formato inválido do corpo
   volta como `400` de validação.
-- **Confirmação de e-mail:** o cadastro gera o link e o entrega ao
-  `IEmailSender`. Em desenvolvimento é o `LogEmailSender`: o link aparece **no
-  console da API** (`E-mail (envio de desenvolvimento, não enviado)…`). A
-  exigência de e-mail confirmado para entrar é `Auth:RequireConfirmedEmail`,
-  desligada até a T-18; o envio real e a recuperação de senha são da T-22.
+- **E-mails (confirmação e redefinição de senha):** entregues ao `IEmailSender`
+  escolhido por `Email:Provider`. Em desenvolvimento (`log`, o padrão), o link
+  aparece **no console da API** (`E-mail (envio de desenvolvimento, não
+  enviado)…`). Nos ambientes do Azure, `acs` envia pelo Azure Communication
+  Services (T-22; configuração em [`DEPLOY.md`](DEPLOY.md)). A exigência de e-mail
+  confirmado para entrar é `Auth:RequireConfirmedEmail`, desligada até a T-18.
 - **Senhas do V0:** contas com hash bcrypt (importadas do Supabase Auth) entram
   normalmente e o hash é regravado no formato do Identity no primeiro login.
 - **Limite de tentativas:** cadastro, login e confirmação aceitam
@@ -225,7 +229,10 @@ backend/
 | `Jwt:Issuer` / `Jwt:Audience` | `appsettings.json` | Emissor e audiência do JWT |
 | `Auth:RequireConfirmedEmail` | `appsettings.json` (`false`) | Exige e-mail confirmado para entrar — ligar na T-18 |
 | `Auth:FrontendBaseUrl` | `appsettings.json` | Base dos links enviados por e-mail |
-| `RateLimit:Auth:PermitLimit` / `WindowSeconds` | `appsettings.json` (10 / 60) | Limite de tentativas em cadastro, login e confirmação |
+| `RateLimit:Auth:PermitLimit` / `WindowSeconds` | `appsettings.json` (10 / 60) | Limite de tentativas nos endpoints públicos de `/auth` (menos renovação e logout) |
+| `Email:Provider` | padrão `log` | `log` (console) ou `acs` (Azure Communication Services) — T-22 |
+| `Email:AcsConnectionString` / `Email:Sender` | só no App Service | Credencial e remetente do ACS (com `acs`, sem elas a API não sobe) |
+| `ForwardedHeaders:Enabled` | padrão `false` | Lê o IP do cliente do `X-Forwarded-For` atrás do proxy do App Service — T-17 |
 
 Fora de Development, os valores vêm de variáveis de ambiente (é assim que a
 T-17 vai configurar o App Service), com `__` no lugar de `:`:
@@ -235,6 +242,8 @@ T-17 vai configurar o App Service), com `__` no lugar de `:`:
 - `Cors__AllowedOriginPatterns__0`, …
 - `Jwt__SigningKey` (segredo — gere um valor aleatório de 48+ caracteres por ambiente)
 - `Auth__RequireConfirmedEmail`, `Auth__FrontendBaseUrl`
+- `Email__Provider`, `Email__AcsConnectionString` (segredo), `Email__Sender`
+- `ForwardedHeaders__Enabled`
 
 > **Nunca** versione a string de conexão do Supabase, a chave JWT de produção ou
 > qualquer outro segredo. As únicas credenciais no repositório são as locais (o

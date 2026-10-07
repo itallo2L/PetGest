@@ -1,4 +1,5 @@
 import type { Backend } from '../types'
+import { createApiAccount } from './account'
 import { createApiAuth } from './auth'
 import { createApiPetshop, createApiProducts } from './catalog'
 import { ApiClient, type ApiClientDeps } from './client'
@@ -10,5 +11,6 @@ export function createApiBackend(apiUrl: string, deps?: ApiClientDeps): Backend 
     auth: createApiAuth(client),
     products: createApiProducts(client),
     petshop: createApiPetshop(client),
+    account: createApiAccount(client),
   }
 }

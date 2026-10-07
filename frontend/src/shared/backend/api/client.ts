@@ -132,8 +132,9 @@ export class ApiClient {
       response = await this.send(method, path, options.body, auth)
     }
     if (!response.ok) throw await toBackendError(response)
-    if (response.status === 204) return undefined as T
-    return (await response.json()) as T
+    // 204, e também 202 da recuperação de senha (T-22): sucesso sem corpo.
+    const text = await response.text()
+    return (text ? JSON.parse(text) : undefined) as T
   }
 
   /**
@@ -214,6 +215,8 @@ const CODE_TO_KIND: Record<string, BackendErrorKind> = {
   product_not_found: 'not_found',
   petshop_not_found: 'not_found',
   invalid_refresh_token: 'session_expired',
+  invalid_confirmation: 'invalid_link',
+  invalid_reset: 'invalid_link',
 }
 
 /** `ProblemDetails` da API (com a extensão `code` — T-14/T-15) → `BackendError`. */

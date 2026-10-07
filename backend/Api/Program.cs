@@ -38,6 +38,7 @@ if (string.IsNullOrWhiteSpace(app.Configuration.GetConnectionString("Default")))
 }
 
 JwtSettings.Validate(app.Configuration);
+EmailSettings.Validate(app.Configuration, app.Environment);
 
 // Antes de tudo que lê o IP ou o esquema da requisição (rate limit, links).
 app.UsePetGestProxy();

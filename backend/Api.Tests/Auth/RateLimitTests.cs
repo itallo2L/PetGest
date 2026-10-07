@@ -41,4 +41,18 @@ public class RateLimitTests(DatabaseFixture fixture)
 
         Assert.Equal(HttpStatusCode.TooManyRequests, (await api.LoginAsync(AuthApi.NewEmail())).StatusCode);
     }
+
+    [Fact]
+    public async Task Pedido_de_redefinicao_acima_do_limite_recebe_429()
+    {
+        using var api = new AuthApi(fixture, new Dictionary<string, string?> { ["RateLimit:Auth:PermitLimit"] = "2" });
+
+        var statuses = new List<HttpStatusCode>();
+        for (var i = 0; i < 3; i++)
+        {
+            statuses.Add((await api.PostAsync("/auth/forgot-password", new { email = AuthApi.NewEmail() })).StatusCode);
+        }
+
+        Assert.Equal([HttpStatusCode.Accepted, HttpStatusCode.Accepted, HttpStatusCode.TooManyRequests], statuses);
+    }
 }

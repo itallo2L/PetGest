@@ -3,6 +3,8 @@ import { Icon } from '../../shared/ui/Icon'
 
 interface PasswordFieldProps {
   id: string
+  /** Padrão: "Senha". */
+  label?: string
   value: string
   onChange: (value: string) => void
   autoComplete: 'current-password' | 'new-password'
@@ -10,13 +12,13 @@ interface PasswordFieldProps {
 }
 
 /** Senha com botão de mostrar/ocultar, como no protótipo. */
-export function PasswordField({ id, value, onChange, autoComplete, placeholder }: PasswordFieldProps) {
+export function PasswordField({ id, label = 'Senha', value, onChange, autoComplete, placeholder }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false)
 
   return (
     <div className="field">
       <label className="field__label" htmlFor={id}>
-        Senha
+        {label}
       </label>
       <div className="field-with-action">
         <input

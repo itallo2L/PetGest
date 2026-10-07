@@ -86,8 +86,22 @@ export interface PetshopBackend {
   update(id: string, input: StoreInput): Promise<Store>
 }
 
+/** Links enviados por e-mail (T-22): confirmação e redefinição de senha. Só a API do V1
+ * tem; no Supabase (V0) é `undefined` e as telas escondem o que depende disso. */
+export interface AccountBackend {
+  /** Sempre resolve: a API não revela se o e-mail tem conta. */
+  requestPasswordReset(email: string): Promise<void>
+  /** `invalid_link` = link inválido, expirado ou já usado; `weak_password` = senha curta. */
+  resetPassword(userId: string, code: string, password: string): Promise<void>
+  /** `invalid_link` = link inválido ou expirado. Confirmar de novo é inofensivo. */
+  confirmEmail(userId: string, code: string): Promise<void>
+  /** Sempre resolve, como `requestPasswordReset`. */
+  resendConfirmation(email: string): Promise<void>
+}
+
 export interface Backend {
   auth: AuthBackend
   products: ProductsBackend
   petshop: PetshopBackend
+  account?: AccountBackend
 }

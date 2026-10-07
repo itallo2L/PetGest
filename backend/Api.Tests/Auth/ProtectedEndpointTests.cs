@@ -25,6 +25,9 @@ public class ProtectedEndpointTests(DatabaseFixture fixture) : IDisposable
         "POST /auth/refresh",
         "POST /auth/logout",
         "POST /auth/confirm-email",
+        "POST /auth/forgot-password",
+        "POST /auth/reset-password",
+        "POST /auth/resend-confirmation",
     ];
 
     private readonly AuthApi _api = new(fixture);

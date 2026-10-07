@@ -6,6 +6,8 @@ export type BackendErrorKind =
   | 'weak_password'
   | 'rate_limited'
   | 'email_not_confirmed'
+  /** Link de confirmação ou de redefinição de senha inválido, expirado ou já usado (T-22). */
+  | 'invalid_link'
   | 'ean_taken'
   /** A conta já tem loja (criar a loja de novo é tratado como sucesso). */
   | 'petshop_exists'

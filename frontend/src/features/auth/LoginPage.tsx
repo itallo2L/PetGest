@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation } from 'react-router'
-import { getBackend } from '../../shared/backend'
+import { getBackend, isBackendError } from '../../shared/backend'
 import { focusField, isTouchScreen } from '../../shared/ui/touch'
 import { AuthLayout } from './AuthLayout'
 import { EMAIL_RE, toFormMessage, type FormMessage } from './authErrors'
 import { FormError } from './FormError'
 import type { FromState } from './guards'
 import { PasswordField } from './PasswordField'
+import { ResendConfirmation } from './ResendConfirmation'
 
 export function LoginPage() {
   const location = useLocation()
@@ -14,6 +15,8 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<FormMessage | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [unconfirmed, setUnconfirmed] = useState(false)
+  const hasAccountLinks = getBackend().account !== undefined
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -30,11 +33,13 @@ export function LoginPage() {
     }
 
     setError(null)
+    setUnconfirmed(false)
     setSubmitting(true)
     try {
       await getBackend().auth.signIn(trimmed, password)
     } catch (signInError) {
       setError(toFormMessage(signInError))
+      setUnconfirmed(isBackendError(signInError) && signInError.kind === 'email_not_confirmed')
       setSubmitting(false)
     }
     // Sucesso: a guarda de rota leva para a página de origem assim que a
@@ -69,12 +74,20 @@ export function LoginPage() {
           placeholder="Sua senha"
         />
 
+        {hasAccountLinks && (
+          <p className="auth-forgot">
+            <Link to="/esqueci-senha">Esqueci minha senha</Link>
+          </p>
+        )}
+
         <FormError message={error} />
 
         <button type="submit" className="btn btn--primary auth-submit" disabled={submitting}>
           {submitting ? 'Entrando…' : 'Entrar'}
         </button>
       </form>
+
+      {unconfirmed && <ResendConfirmation key={email.trim()} email={email.trim()} />}
 
       <p className="auth-hint">
         Ainda não tem conta?{' '}

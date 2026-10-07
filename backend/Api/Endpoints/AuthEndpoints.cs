@@ -4,8 +4,9 @@ using PetGest.Api.Services;
 
 namespace PetGest.Api.Endpoints;
 
-// /auth (spec api-auth). Só /auth/me exige token; os demais abrem ou encerram sessão e
-// são públicos — cadastro, login e confirmação com limite de tentativas (design D8).
+// /auth (spec api-auth). Só /auth/me exige token; os demais abrem ou encerram sessão ou
+// tratam dos links enviados por e-mail e são públicos — todos, menos renovação e logout,
+// com limite de tentativas (design D8 da T-14; T-22).
 public static class AuthEndpoints
 {
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
@@ -68,6 +69,45 @@ public static class AuthEndpoints
             .WithName("ConfirmEmail")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        // Recuperação de senha (T-22): 202 exista ou não a conta.
+        group.MapPost("/forgot-password", async (ForgotPasswordRequest request, AuthService auth, CancellationToken ct) =>
+            {
+                await auth.ForgotPasswordAsync(request, ct);
+                return Results.Accepted();
+            })
+            .AllowAnonymous()
+            .RequireRateLimiting(AuthRateLimitSettings.PolicyName)
+            .WithName("ForgotPassword")
+            .Produces(StatusCodes.Status202Accepted)
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        group.MapPost("/reset-password", async (ResetPasswordRequest request, AuthService auth, CancellationToken ct) =>
+            {
+                var error = await auth.ResetPasswordAsync(request, ct);
+                return error?.ToResult() ?? Results.NoContent();
+            })
+            .AllowAnonymous()
+            .RequireRateLimiting(AuthRateLimitSettings.PolicyName)
+            .WithName("ResetPassword")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesValidationProblem()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        // Reenvio da confirmação (T-22): 202 exista ou não a conta, confirmada ou não.
+        group.MapPost("/resend-confirmation", async (ResendConfirmationRequest request, AuthService auth, CancellationToken ct) =>
+            {
+                await auth.ResendConfirmationAsync(request, ct);
+                return Results.Accepted();
+            })
+            .AllowAnonymous()
+            .RequireRateLimiting(AuthRateLimitSettings.PolicyName)
+            .WithName("ResendConfirmation")
+            .Produces(StatusCodes.Status202Accepted)
+            .ProducesValidationProblem()
             .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
         group.MapGet("/me", async (ITenantContext tenant, AuthService auth) =>

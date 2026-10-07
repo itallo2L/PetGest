@@ -11,6 +11,7 @@ public static class AuthErrorCodes
     public const string EmailNotConfirmed = "email_not_confirmed";
     public const string InvalidRefreshToken = "invalid_refresh_token";
     public const string InvalidConfirmation = "invalid_confirmation";
+    public const string InvalidReset = "invalid_reset";
 }
 
 public static class AuthErrors
@@ -26,6 +27,9 @@ public static class AuthErrors
 
     public static readonly ApiError InvalidConfirmation =
         new(StatusCodes.Status400BadRequest, AuthErrorCodes.InvalidConfirmation, "Link de confirmação inválido ou expirado.");
+
+    public static readonly ApiError InvalidReset =
+        new(StatusCodes.Status400BadRequest, AuthErrorCodes.InvalidReset, "Link de redefinição de senha inválido ou expirado.");
 
     public static readonly ApiError EmailTaken =
         new(StatusCodes.Status409Conflict, AuthErrorCodes.EmailTaken, "Já existe uma conta com este e-mail.");

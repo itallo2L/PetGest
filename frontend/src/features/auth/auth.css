@@ -80,6 +80,25 @@
 }
 .auth-submit:disabled { opacity: 0.7; cursor: progress; }
 
+/* Texto corrido das telas de link (T-22): confirmação, redefinição, "confira seu e-mail". */
+.auth-message {
+  margin-bottom: var(--space-5);
+  text-align: center;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.auth-message strong { color: var(--text); word-break: break-all; }
+
+/* "Esqueci minha senha", logo abaixo do campo de senha. */
+.auth-forgot {
+  margin-top: calc(-1 * var(--space-2));
+  text-align: right;
+  font-size: var(--fs-sm);
+}
+
+/* Reenvio da confirmação abaixo do formulário de entrar. */
+.auth-form + .auth-form { margin-top: var(--space-4); }
+
 .auth-hint {
   margin-top: var(--space-5);
   text-align: center;

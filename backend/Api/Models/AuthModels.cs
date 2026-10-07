@@ -24,6 +24,17 @@ public record ConfirmEmailRequest(
     [property: Required] Guid UserId,
     [property: Required] string Code);
 
+// Recuperação de senha e reenvio da confirmação (T-22). As respostas não dizem se existe
+// conta com o e-mail.
+public record ForgotPasswordRequest([property: Required, MaxLength(256)] string Email);
+
+public record ResetPasswordRequest(
+    [property: Required] Guid UserId,
+    [property: Required] string Code,
+    [property: Required] string Password);
+
+public record ResendConfirmationRequest([property: Required, MaxLength(256)] string Email);
+
 // Sessão devolvida por cadastro, login e renovação.
 public record SessionResponse(
     string AccessToken,

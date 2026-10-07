@@ -397,6 +397,14 @@ Saiu da T-14 (decisão do usuário, 2026-10-03). Vem depois da T-16 e é
 pré-requisito da T-18 — a virada liga a exigência de e-mail confirmado, e
 sem envio real ninguém consegue confirmar.
 
+**Status:** implementada em 2026-10-07 (`openspec/changes/T-22-transactional-email/`, specs `api-auth` e `account-links`); falta o usuário criar o recurso de e-mail no Azure e testar com uma caixa real (tarefas 3.x).
+Provedor: **Azure Communication Services Email** com domínio gerenciado do Azure
+(sem domínio próprio), pela API REST com HMAC; `Email:Provider` = `log`|`acs`.
+`/auth/forgot-password` e `/auth/resend-confirmation` respondem `202` sempre;
+`/auth/reset-password` com código próprio de 1 hora e uso único, que confirma o
+e-mail e encerra as sessões. Telas `/esqueci-senha`, `/redefinir-senha` e
+`/confirmar-email` e reenvio na tela de entrar, só no modo `api`.
+
 - **Escolher o provedor de e-mail** (em aberto desde a T-11: ex.: Azure
   Communication Services, Resend) e implementar o adaptador de
   `IEmailSender` no lugar do `LogEmailSender`; remetente e domínio

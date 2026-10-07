@@ -148,6 +148,22 @@ Depois, *Deployments > (última prévia da dev) > Redeploy*. Production
 continua sem essas variáveis até a T-18 (sem `VITE_BACKEND`, o build é
 `supabase`).
 
+## E-mail (T-22)
+
+Uma vez, no grupo de recursos `petgest` (serve para os dois ambientes):
+
+1. Crie um recurso **Email Communication Services** (*Serviços de Comunicação
+   por Email*), região de dados **Brazil**.
+2. Nele, *Provisionar domínios > Adicionar domínio > Domínio do Azure*. O Azure
+   cria um domínio `<id>.azurecomm.net` já verificado (SPF/DKIM incluídos).
+3. Crie um recurso **Communication Services**, região de dados **Brazil**.
+4. No Communication Services: *Email > Domínios > Conectar domínio* e escolha
+   o domínio do passo 2.
+5. No Communication Services: *Configurações > Chaves*, copie a
+   **Connection string** (é um segredo).
+6. O remetente é `DoNotReply@<id>.azurecomm.net` (aparece no domínio, em
+   *MailFrom addresses*).
+
 ## Configurações das tarefas seguintes
 
 Valem para os dois ambientes, cada um com os próprios valores:

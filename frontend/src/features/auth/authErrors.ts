@@ -24,6 +24,8 @@ export function toFormMessage(error: unknown): FormMessage {
       return { text: 'Muitas tentativas. Aguarde um minuto e tente de novo.' }
     case 'email_not_confirmed':
       return { text: 'Confirme seu e-mail antes de entrar: abra o link que enviamos para ele.' }
+    case 'invalid_link':
+      return { text: 'Este link é inválido, expirou ou já foi usado.' }
     case 'ean_taken':
       return { text: 'O código de barras já pertence a outro produto da loja.' }
     case 'session_expired':

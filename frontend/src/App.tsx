@@ -1,7 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { CompleteSignupPage } from './features/auth/CompleteSignupPage'
+import { ConfirmEmailPage } from './features/auth/ConfirmEmailPage'
+import { ForgotPasswordPage } from './features/auth/ForgotPasswordPage'
 import { PublicOnly, RequireNoPetshop, RequireReady } from './features/auth/guards'
 import { LoginPage } from './features/auth/LoginPage'
+import { ResetPasswordPage } from './features/auth/ResetPasswordPage'
 import { SessionProvider } from './features/auth/SessionProvider'
 import { SignupPage } from './features/auth/SignupPage'
 import { SettingsPage } from './features/petshop/SettingsPage'
@@ -32,9 +35,14 @@ function App() {
           <Routes>
             <Route path="/spike" element={<SpikePage />} />
 
+            {/* Links enviados por e-mail (T-22): abrem logado ou não. */}
+            <Route path="/confirmar-email" element={<ConfirmEmailPage />} />
+            <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
+
             <Route element={<PublicOnly />}>
               <Route path="/entrar" element={<LoginPage />} />
               <Route path="/criar-conta" element={<SignupPage />} />
+              <Route path="/esqueci-senha" element={<ForgotPasswordPage />} />
             </Route>
 
             <Route element={<RequireNoPetshop />}>

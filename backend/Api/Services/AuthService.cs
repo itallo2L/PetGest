@@ -171,18 +171,77 @@ public class AuthService(
             return AuthErrors.InvalidConfirmation;
         }
 
-        string token;
-        try
-        {
-            token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
-        }
-        catch (FormatException)
+        if (DecodeCode(request.Code) is not { } token)
         {
             return AuthErrors.InvalidConfirmation;
         }
 
         var result = await users.ConfirmEmailAsync(user, token);
         return result.Succeeded ? null : AuthErrors.InvalidConfirmation;
+    }
+
+    // Sempre "aceito" (design D2 da T-22): a resposta não revela se o e-mail tem conta.
+    public async Task ForgotPasswordAsync(ForgotPasswordRequest request, CancellationToken ct)
+    {
+        var user = await users.FindByEmailAsync(request.Email.Trim());
+        if (user is null)
+        {
+            return;
+        }
+
+        try
+        {
+            var token = await users.GeneratePasswordResetTokenAsync(user);
+            var link = Link("redefinir-senha", user, token);
+            await emailSender.SendAsync(EmailTemplates.PasswordReset(user.Email!, link), ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            logger.LogError(ex, "Falha ao enviar o e-mail de redefinição de senha para o usuário {UserId}.", user.Id);
+        }
+    }
+
+    // Troca a senha, confirma o e-mail (o link chegou nele) e encerra todas as sessões
+    // abertas da conta (design D3 da T-22).
+    public async Task<ApiError?> ResetPasswordAsync(ResetPasswordRequest request, CancellationToken ct)
+    {
+        var user = await users.FindByIdAsync(request.UserId.ToString());
+        if (user is null || DecodeCode(request.Code) is not { } token)
+        {
+            return AuthErrors.InvalidReset;
+        }
+
+        // O Identity confere o código antes da senha e só troca o carimbo de segurança
+        // quando dá certo: com senha fraca, o mesmo link continua valendo para tentar de novo.
+        var result = await users.ResetPasswordAsync(user, token, request.Password);
+        if (!result.Succeeded)
+        {
+            var passwordErrors = result.Errors.Where(e => e.Code.StartsWith("Password", StringComparison.Ordinal)).ToArray();
+            return passwordErrors.Length > 0 ? WeakPassword(IdentityResult.Failed(passwordErrors)) : AuthErrors.InvalidReset;
+        }
+
+        if (!user.EmailConfirmed)
+        {
+            user.EmailConfirmed = true;
+            await users.UpdateAsync(user);
+        }
+
+        await db.RefreshTokens
+            .Where(t => t.UserId == user.Id && t.RevokedAt == null)
+            .ExecuteUpdateAsync(s => s.SetProperty(t => t.RevokedAt, sessions.Now), ct);
+        return null;
+    }
+
+    // Sempre "aceito", como a recuperação de senha: só envia para conta existente e ainda
+    // não confirmada.
+    public async Task ResendConfirmationAsync(ResendConfirmationRequest request, CancellationToken ct)
+    {
+        var user = await users.FindByEmailAsync(request.Email.Trim());
+        if (user is null || user.EmailConfirmed)
+        {
+            return;
+        }
+        await SendConfirmationAsync(user, ct);
     }
 
     public async Task<MeResponse?> GetMeAsync(Guid userId, Guid? petshopId)
@@ -201,18 +260,38 @@ public class AuthService(
         try
         {
             var token = await users.GenerateEmailConfirmationTokenAsync(user);
-            var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            var link = $"{Settings.FrontendBaseUrl.TrimEnd('/')}/confirmar-email?user={user.Id}&code={code}";
-            await emailSender.SendAsync(new EmailMessage(
-                user.Email!,
-                "Confirme seu e-mail no PetGest",
-                $"Para confirmar o e-mail da sua conta no PetGest, abra o link:\n{link}"), ct);
+            var link = Link("confirmar-email", user, token);
+            await emailSender.SendAsync(EmailTemplates.Confirmation(user.Email!, link), ct);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             logger.LogError(ex, "Falha ao enviar o e-mail de confirmação para o usuário {UserId}.", user.Id);
         }
     }
+
+    // Links dos e-mails abrem telas do frontend: /{página}?user={id}&code={código base64url}.
+    private string Link(string page, AppUser user, string token)
+    {
+        var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        return $"{Settings.FrontendBaseUrl.TrimEnd('/')}/{page}?user={user.Id}&code={code}";
+    }
+
+    private static string? DecodeCode(string code)
+    {
+        try
+        {
+            return Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+        }
+        catch (FormatException)
+        {
+            return null;
+        }
+    }
+
+    private static ApiError WeakPassword(IdentityResult result) =>
+        new(StatusCodes.Status400BadRequest, AuthErrorCodes.WeakPassword,
+            "A senha precisa ter pelo menos 6 caracteres.",
+            new Dictionary<string, string[]> { ["password"] = result.Errors.Select(e => e.Description).ToArray() });
 
     private static ApiError ToSignupError(IdentityResult result)
     {
@@ -225,9 +304,7 @@ public class AuthService(
         var passwordErrors = result.Errors.Where(e => e.Code.StartsWith("Password", StringComparison.Ordinal)).ToArray();
         if (passwordErrors.Length > 0)
         {
-            return new ApiError(StatusCodes.Status400BadRequest, AuthErrorCodes.WeakPassword,
-                "A senha precisa ter pelo menos 6 caracteres.",
-                new Dictionary<string, string[]> { ["password"] = passwordErrors.Select(e => e.Description).ToArray() });
+            return WeakPassword(IdentityResult.Failed(passwordErrors));
         }
 
         return new ApiError(StatusCodes.Status400BadRequest, AuthErrorCodes.InvalidRequest, "Dados de cadastro inválidos.",

@@ -37,9 +37,12 @@ public static class AuthSetup
                 // A exigência de e-mail confirmado é a configuração Auth:RequireConfirmedEmail (D6).
                 options.SignIn.RequireConfirmedEmail = false;
                 options.Lockout.AllowedForNewUsers = false;
+                // Código de redefinição com validade própria (design D3 da T-22).
+                options.Tokens.PasswordResetTokenProvider = PasswordResetTokenProvider.ProviderName;
             })
             .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<PasswordResetTokenProvider>(PasswordResetTokenProvider.ProviderName);
 
         // Os códigos enviados por e-mail são assinados pelo Data Protection. As chaves
         // ficam no banco (design D1 da T-17): no App Service, chaves só em memória ou no
@@ -58,8 +61,18 @@ public static class AuthSetup
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<PetshopService>();
-        // Envio de desenvolvimento (só log); a T-22 troca pelo provedor real.
-        services.TryAddSingleton<IEmailSender, LogEmailSender>();
+        // Envio de e-mail por Email:Provider (design D1 da T-22): `log` em desenvolvimento,
+        // `acs` (Azure Communication Services) nos ambientes publicados. A configuração é
+        // conferida na inicialização (EmailSettings.Validate).
+        services.AddOptions<EmailSettings>().BindConfiguration(EmailSettings.Section);
+        services.AddHttpClient<AcsEmailSender>();
+        services.TryAddScoped<IEmailSender>(provider =>
+        {
+            var settings = provider.GetRequiredService<IOptions<EmailSettings>>().Value;
+            return string.Equals(settings.Provider.Trim(), EmailSettings.AcsProvider, StringComparison.OrdinalIgnoreCase)
+                ? provider.GetRequiredService<AcsEmailSender>()
+                : ActivatorUtilities.CreateInstance<LogEmailSender>(provider);
+        });
 
         // JWT de acesso (design D3): `sub` continua `sub` (sem mapeamento de claims) e
         // sem tolerância de relógio — expira aos 15 minutos, não aos 20.
@@ -89,7 +102,8 @@ public static class AuthSetup
         services.AddAuthorizationBuilder()
             .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
 
-        // Limite de tentativas em cadastro, login e confirmação, por IP de origem (D8).
+        // Limite de tentativas em cadastro, login, confirmação, recuperação de senha e
+        // reenvio da confirmação, por IP de origem (D8 da T-14; T-22).
         // Atrás do proxy do App Service, o IP certo depende de ForwardedHeaders (T-17).
         services.AddOptions<AuthRateLimitSettings>().BindConfiguration(AuthRateLimitSettings.Section);
         services.AddRateLimiter(options =>
