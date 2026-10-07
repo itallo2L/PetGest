@@ -144,7 +144,8 @@ public class OpenAiProductDraftExtractor(HttpClient http, IOptions<AiSettings> o
         JsonElement fields;
         try
         {
-            fields = JsonDocument.Parse(output).RootElement.Clone();
+            using var parsed = JsonDocument.Parse(output);
+            fields = parsed.RootElement.Clone();
         }
         catch (JsonException ex)
         {

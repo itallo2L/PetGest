@@ -26,7 +26,9 @@ public class OpenAiSettings
     public string BaseUrl { get; set; } = "https://api.openai.com/v1/";
 
     // Modelo multimodal que lê a foto e estrutura o texto da voz; modelo de transcrição
-    // para o áudio. Trocáveis por configuração, sem mudar código (design D1).
+    // para o áudio. Trocáveis por configuração, sem mudar código (design D1). O modelo
+    // precisa aceitar imagem, `temperature` e `response_format: json_schema` (famílias
+    // gpt-4.1/gpt-4o); modelos de raciocínio recusam `temperature` e dariam `ai_failed`.
     public string Model { get; set; } = "gpt-4.1-mini";
     public string TranscriptionModel { get; set; } = "gpt-4o-mini-transcribe";
     public int TimeoutSeconds { get; set; } = 45;
