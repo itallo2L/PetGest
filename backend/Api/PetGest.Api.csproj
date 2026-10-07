@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <RootNamespace>PetGest.Api</RootNamespace>
+    <!-- Segredos locais de desenvolvimento (ex.: Ai:OpenAI:ApiKey) fora do repositório,
+         gravados com "dotnet user-secrets set" (comando completo no backend/README.md). -->
+    <UserSecretsId>petgest-api-dev</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

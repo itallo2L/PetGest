@@ -5,6 +5,10 @@ import { getBackend } from '../backend'
 import { Icon, type IconName } from './Icon'
 import { storeInitials } from './storeInitials'
 
+/** Versão em uso, pelo backend do build (T-16): o V0 é o Supabase, o V1 é a API. */
+const TAGLINE =
+  import.meta.env.VITE_BACKEND === 'api' ? 'V1 — cadastro de produtos' : 'V0 — cadastro por código de barras'
+
 const NAV: { to: string; label: string; icon: IconName }[] = [
   { to: '/produtos', label: 'Produtos', icon: 'box' },
 ]
@@ -30,7 +34,7 @@ export function Sidebar({ open, onClose, closeButtonRef }: SidebarProps) {
         </span>
         <span className="brand__text">
           <strong className="brand__name">PetGest</strong>
-          <span className="brand__tagline">V0 — cadastro por código de barras</span>
+          <span className="brand__tagline">{TAGLINE}</span>
         </span>
         <button
           type="button"

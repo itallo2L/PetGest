@@ -404,6 +404,8 @@ até 30 s), microfone solto em toda saída, "Entendemos: …" no aviso, origem `
 
 ## T-21 — Teste ponta a ponta em campo e fechamento do V1
 
+**Status:** roteiro pronto em 2026-10-07 (`openspec/changes/T-21-v1-field-test/`: `roteiro-v1.md`, `relatorio-v1.md` e `como-testar-agora.md` para testar já pela rede local); o teste é do usuário, e o V1 só fecha com ele em produção (depois da T-18).
+
 - Estender o roteiro da T-10 com foto+IA e voz+IA (embalagens reais,
   ambiente de petshop com ruído) e rodar em Android e iPhone, em
   produção, com rede móvel.

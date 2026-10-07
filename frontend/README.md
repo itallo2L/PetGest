@@ -8,8 +8,20 @@ escolhido no build pela variável `VITE_BACKEND` (T-16):
 - `api` — a **API do V1** (ASP.NET Core, em [`backend/`](../backend/README.md)),
   ainda não publicada. A produção troca para ela na virada da T-18.
 
-As telas são as mesmas nos dois modos. Decisões em [`PLANOMVP.md`](../PLANOMVP.md),
-etapas em [`ROADMAPV0.md`](../ROADMAPV0.md) e [`ROADMAPV1.md`](../ROADMAPV1.md).
+As telas do V0 são as mesmas nos dois modos. O modo `api` acrescenta o que só a API
+do V1 tem, e esconde isso no modo `supabase`:
+
+- **Links por e-mail (T-22):** "Esqueci minha senha" na tela de entrar, telas
+  `/esqueci-senha`, `/redefinir-senha` e `/confirmar-email`, e reenvio da confirmação.
+- **Cadastro por IA (T-19/T-20):** bloco "Preencher com IA" no cadastro de produto,
+  com "Foto" (câmera traseira; a foto vai reduzida para JPEG) e "Voz" (gravação com
+  `MediaRecorder`), que preenchem o próprio formulário para o usuário conferir. O bloco
+  só aparece quando a API tem a IA configurada (`GET /products/drafts/availability`).
+
+Decisões em [`PLANOMVP.md`](../PLANOMVP.md), etapas em
+[`ROADMAPV0.md`](../ROADMAPV0.md) e [`ROADMAPV1.md`](../ROADMAPV1.md). Para testar o
+V1 inteiro no celular pela rede local, veja
+[`openspec/changes/T-21-v1-field-test/como-testar-agora.md`](../openspec/changes/T-21-v1-field-test/como-testar-agora.md).
 
 ## Rodar localmente
 

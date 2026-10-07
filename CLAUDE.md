@@ -15,7 +15,9 @@ barras + dados da loja. Projeto solo, sem equipe.
   `tests/` (testes das políticas de RLS).
 - `openspec/` — specs vigentes em `openspec/specs/` e uma change por
   tarefa dos roadmaps. Arquivadas até agora: T-02, T-03, T-11 a T-15; as changes
-  T-01, T-04 a T-10 e T-16 ainda estão abertas em `openspec/changes/`.
+  T-01, T-04 a T-10 e T-16 a T-22 ainda estão abertas em `openspec/changes/`
+  (as do V1 esperam tarefas do usuário: recursos no Azure, chaves, testes de
+  campo e a virada).
 - `index.html` / `script.js` / `style.css` na raiz — o **protótipo
   navegável original**, sem backend (login fake, scanner que sorteia
   resultados, produtos em memória). Serviu de referência visual para o
@@ -27,8 +29,16 @@ barras + dados da loja. Projeto solo, sem equipe.
   `TenantWriteGuard`) e, desde a T-14, contas do Identity com sessão por
   JWT + refresh token (`/auth/*`), todo endpoint protegido por padrão, e,
   desde a T-15, produtos e loja (`/products`, `/petshop`). O frontend fala
-  com ela no modo `VITE_BACKEND=api` (T-16); produção segue no Supabase. Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
-  rodados pelo GitHub Actions (`.github/workflows/backend.yml`). Não é
+  com ela no modo `VITE_BACKEND=api` (T-16); produção segue no Supabase.
+  Desde 2026-10-07 (branch `entrega-da-v1-completa`): pronta para o Azure
+  App Service (T-17: chaves do Data Protection no banco, `ForwardedHeaders`,
+  padrões de conexão para o pooler, job `deploy` no workflow, roteiro em
+  `backend/DEPLOY.md`), e-mail pelo Azure Communication Services e
+  recuperação de senha (T-22), cadastro por foto e voz com IA atrás de
+  `IProductDraftExtractor` (T-19/T-20, OpenAI provisória) e a virada da
+  produção preparada e ensaiada em `backend/deploy/t18/` (T-18, **não
+  executada**). Postgres 17 local via Docker Compose e testes em `Api.Tests/`,
+  rodados pelo GitHub Actions (`.github/workflows/backend.yml`). Ainda não
   publicada nem toca a produção. Instruções em `backend/README.md`.
 
 ## Fase atual: V1 em desenvolvimento, produção no V0
@@ -86,9 +96,10 @@ barras + dados da loja. Projeto solo, sem equipe.
 frontend/
   src/
     features/
-      auth/       (login, cadastro, sessão, proteção de rota)
+      auth/       (login, cadastro, sessão, proteção de rota; no modo api,
+                   esqueci/redefinir senha e confirmar e-mail — T-22)
       scanner/    (câmera + barcode-detector)
-      products/   (listagem, cadastro/edição)
+      products/   (listagem, cadastro/edição; ai/ = foto e voz com IA, T-19/T-20)
       petshop/    (dados da loja)
     shared/
       backend/            (único acesso das telas ao backend: getBackend();
@@ -100,12 +111,16 @@ supabase/
 backend/          (V1 — deploy independente do frontend, PLANOMVP.md §4.3)
   Api/            (projeto único ASP.NET Core, minimal APIs)
     Endpoints/    (um arquivo por área: MapXxxEndpoints())
-    Services/     (regras de negócio)
+    Services/     (regras de negócio; Ai/ = extrator de IA e normalização, T-19)
     Data/         (AppDbContext, isolamento por petshop, Entities/,
                    Configurations/ com os nomes do schema do V0, Migrations/)
     Models/       (DTOs de request/response)
   Api.Tests/      (xUnit + WebApplicationFactory, contra Postgres real;
-                   Data/ com isolamento, invariantes e compatibilidade com o V0)
+                   Data/ com isolamento, invariantes, compatibilidade com o V0
+                   e o ensaio da virada da T-18)
+  deploy/         (petgest_api_role.sql — papel da API no banco, T-17;
+                   t18/ — scripts numerados da virada da produção)
+  DEPLOY.md       (Azure App Service, ambientes test/production, segredos)
   docker-compose.yml  (Postgres 17 de desenvolvimento, porta 5450)
 ```
 

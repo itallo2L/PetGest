@@ -25,6 +25,17 @@ dotnet run --project Api                  # API em http://localhost:5080
 A API **não** aplica migrations ao subir: rode `dotnet ef database update`
 sempre que puxar uma migration nova.
 
+Segredos de desenvolvimento ficam **fora do repositório**, no `user-secrets` (só em
+Development). Para ligar o cadastro por foto e voz (T-19/T-20) localmente:
+
+```bash
+dotnet user-secrets set "Ai:OpenAI:ApiKey" "sk-..." --project Api
+```
+
+Qualquer configuração também pode ir na linha de comando, depois de `--`. Por
+exemplo, para os links dos e-mails abrirem no celular pela rede local:
+`dotnet run --project Api -- --Auth:FrontendBaseUrl=https://<ip>:5183`.
+
 | Endereço | O que é |
 |---|---|
 | `http://localhost:5080/health` | `200 Healthy` com o banco no ar; `503 Unhealthy` sem ele |
