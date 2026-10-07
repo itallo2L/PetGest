@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PetGest.Api.Data.Entities;
@@ -9,8 +10,10 @@ namespace PetGest.Api.Data;
 // por isso ficam aqui e não no registro do Program.cs.
 // Contas do Identity sem papéis (papel único — design D1 da T-14), no schema `identity`.
 // As tabelas do Identity não têm filtro de tenant: o login precisa achar o usuário.
+// As chaves do Data Protection também moram aqui (design D1 da T-17), para os códigos
+// enviados por e-mail continuarem válidos depois de um reinício ou novo deploy.
 public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenant)
-    : IdentityUserContext<AppUser, Guid>(options)
+    : IdentityUserContext<AppUser, Guid>(options), IDataProtectionKeyContext
 {
     private static readonly TenantWriteGuard WriteGuard = new();
 
@@ -18,6 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     // Os filtros referenciam estas propriedades (e não variáveis capturadas) para o EF
     // ler o valor de cada instância; uma variável congelaria o tenant no modelo em cache.

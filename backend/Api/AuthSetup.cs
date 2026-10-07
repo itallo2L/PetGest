@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -40,9 +41,12 @@ public static class AuthSetup
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-        // Os códigos de confirmação de e-mail são assinados pelo Data Protection; a
-        // persistência das chaves no App Service é da T-17.
-        services.AddDataProtection();
+        // Os códigos enviados por e-mail são assinados pelo Data Protection. As chaves
+        // ficam no banco (design D1 da T-17): no App Service, chaves só em memória ou no
+        // disco da instância mudariam a cada reinício ou deploy e invalidariam os links.
+        services.AddDataProtection()
+            .SetApplicationName("petgest-api")
+            .PersistKeysToDbContext<AppDbContext>();
 
         // Validade do código de confirmação de e-mail (spec api-auth: 24 horas).
         services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(24));

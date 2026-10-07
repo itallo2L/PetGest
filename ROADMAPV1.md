@@ -270,6 +270,15 @@ para o celular), primeiros testes de unidade do frontend (Vitest).
 
 ## T-17 — Deploy do backend no Azure
 
+**Status:** código e roteiro prontos em 2026-10-07 (`openspec/changes/T-17-azure-deploy/`); falta o usuário criar os recursos (tarefas 3.x).
+Chaves do Data Protection no banco (`identity.data_protection_keys`);
+`ForwardedHeaders:Enabled` com só a última entrada do `X-Forwarded-For`; padrões de
+conexão para o pooler (keepalive 30 s, ociosa 60 s, pool 10) sem retry automático;
+job `deploy` no workflow `backend` (`dev` → ambiente `test`, `main` → `production`,
+artefato `migrations.sql` idempotente, conferência de `/health`); papel `petgest_api`
+em `backend/deploy/petgest_api_role.sql`; ambiente de teste = segundo projeto
+Supabase gratuito + App Service F1. Passo a passo em `backend/DEPLOY.md`.
+
 - Backend em **Azure App Service** (tier gratuito/básico), HTTPS padrão,
   CI/CD via GitHub Actions (§4.4).
 - App Service na região **Brazil South**, perto do Supabase em São Paulo

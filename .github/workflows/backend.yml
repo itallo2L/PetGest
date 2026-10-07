@@ -1,7 +1,10 @@
-# Build e testes da API do V1 (T-12, design D9). Sem deploy — Azure entra na T-17.
+# Build, testes e deploy da API do V1 (T-12, design D9; deploy da T-17, design D4).
+# O deploy só roda em push: `dev` publica no ambiente "test" e `main` no "production",
+# cada um com as próprias variáveis e segredos (Settings > Environments no GitHub).
 name: backend
 
 on:
+  workflow_dispatch:
   push:
     branches: [dev, main]
     paths:
@@ -47,3 +50,50 @@ jobs:
       - run: dotnet restore PetGest.slnx
       - run: dotnet build PetGest.slnx --no-restore -c Release
       - run: dotnet test PetGest.slnx --no-build -c Release
+
+  deploy:
+    needs: build-test
+    if: github.event_name != 'pull_request' && (github.ref_name == 'dev' || github.ref_name == 'main')
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'test' }}
+    concurrency: backend-deploy-${{ github.ref_name }}
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+
+      - run: dotnet publish Api -c Release -o ${{ runner.temp }}/api
+
+      # Script idempotente de todas as migrations, para aplicar no banco do ambiente
+      # (SQL Editor do Supabase). A API não aplica migrations ao subir.
+      - run: dotnet tool restore
+      - run: dotnet ef migrations script --idempotent --project Api -o ${{ runner.temp }}/migrations.sql
+      - uses: actions/upload-artifact@v4
+        with:
+          name: migrations-${{ github.ref_name }}
+          path: ${{ runner.temp }}/migrations.sql
+
+      # Sem o App Service configurado no ambiente, o deploy é pulado (não falha).
+      - name: Deploy no Azure App Service
+        if: vars.AZURE_WEBAPP_NAME != ''
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ runner.temp }}/api
+
+      - name: Conferir /health depois do deploy
+        if: vars.AZURE_WEBAPP_NAME != ''
+        run: |
+          for i in $(seq 1 30); do
+            status=$(curl -s -o /dev/null -w "%{http_code}" "https://${{ vars.AZURE_WEBAPP_NAME }}.azurewebsites.net/health" || true)
+            [ "$status" = "200" ] && echo "API no ar" && exit 0
+            sleep 10
+          done
+          echo "A API não respondeu 200 em /health (último status: $status)" && exit 1

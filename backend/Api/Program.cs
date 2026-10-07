@@ -11,12 +11,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantContext, ClaimsTenantContext>();
 
 // A string de conexão é lida da configuração final (depois do Build), para que
-// variáveis de ambiente e os testes possam sobrescrevê-la. Convenção de nomes e
+// variáveis de ambiente e os testes possam sobrescrevê-la, e recebe os padrões de
+// conexão para o pooler do Supabase (DatabaseSetup, T-17). Convenção de nomes e
 // TenantWriteGuard ficam no próprio AppDbContext (OnConfiguring).
 builder.Services.AddDbContext<AppDbContext>((services, options) =>
-    options.UseNpgsql(services.GetRequiredService<IConfiguration>().GetConnectionString("Default")));
+    options.UseNpgsql(DatabaseSetup.WithDefaults(
+        services.GetRequiredService<IConfiguration>().GetConnectionString("Default") ?? "")));
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 builder.Services.AddPetGestAuth();
+builder.Services.AddPetGestProxy();
 builder.Services.AddFrontendCors(builder.Configuration);
 builder.Services.AddPetGestOpenApi();
 // Validação embutida (DataAnnotations) dos DTOs de request — .NET 10.
@@ -36,6 +39,8 @@ if (string.IsNullOrWhiteSpace(app.Configuration.GetConnectionString("Default")))
 
 JwtSettings.Validate(app.Configuration);
 
+// Antes de tudo que lê o IP ou o esquema da requisição (rate limit, links).
+app.UsePetGestProxy();
 app.UseExceptionHandler();
 app.UseCors();
 

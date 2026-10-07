@@ -2,7 +2,8 @@
 
 API do PetGest **V1** (ASP.NET Core, .NET 10), em desenvolvimento. A produção
 (`pet-gest.vercel.app`) continua no V0, sobre o Supabase, até a T-18 — esta API
-ainda não é publicada nem se conecta ao banco de produção. Decisões em
+não se conecta ao banco de produção antes disso. Publicação no Azure App Service:
+[`DEPLOY.md`](DEPLOY.md) (T-17). Decisões em
 [`PLANOMVP.md`](../PLANOMVP.md) §4 e etapas em [`ROADMAPV1.md`](../ROADMAPV1.md).
 
 ## Pré-requisitos
@@ -47,6 +48,7 @@ migration `V0Schema` como aplicada. Migrations em `Api/Data/Migrations/`:
 | `ProductSourceAi` | `source` aceita `photo_ai`/`voice_ai`; coluna `ai_raw_response jsonb` (só para origens de IA) |
 | `IdentitySchema` | Schema `identity`: contas do Identity (`users`, `user_claims`, `user_logins`, `user_tokens`) e `refresh_tokens` |
 | `ProfilesUserFk` | FK de `profiles.id` para `identity.users` (troca a do V0 para `auth.users`, se existir) |
+| `DataProtectionKeys` | `identity.data_protection_keys`: chaves que assinam os links enviados por e-mail, persistidas entre reinícios e deploys (T-17) |
 
 Na T-18, a importação das contas do Supabase acontece **entre** `IdentitySchema` e
 `ProfilesUserFk` — a ordem é ensaiada pelo `SchemaCompatibilityTests`.

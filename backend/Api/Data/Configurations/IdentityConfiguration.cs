@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -71,5 +72,16 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.HasIndex(t => t.TokenHash).IsUnique().HasDatabaseName("refresh_tokens_token_hash_key");
         builder.HasIndex(t => t.FamilyId).HasDatabaseName("refresh_tokens_family_id_idx");
         builder.HasIndex(t => t.UserId).HasDatabaseName("refresh_tokens_user_id_idx");
+    }
+}
+
+// Chaves do Data Protection (design D1 da T-17): assinam os códigos de confirmação de
+// e-mail e de redefinição de senha. Sem filtro de tenant, como as contas.
+public class DataProtectionKeyConfiguration : IEntityTypeConfiguration<DataProtectionKey>
+{
+    public void Configure(EntityTypeBuilder<DataProtectionKey> builder)
+    {
+        builder.ToTable("data_protection_keys", IdentitySchema.Name);
+        builder.HasKey(k => k.Id).HasName("data_protection_keys_pkey");
     }
 }
