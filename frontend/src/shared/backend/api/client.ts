@@ -32,6 +32,7 @@ export interface ApiClientDeps {
 }
 
 export interface RequestOptions {
+  /** Objeto vira JSON; `FormData` vai como `multipart/form-data` (foto e áudio, T-19/T-20). */
   body?: unknown
   /** Chamada com token de acesso (padrão). As de `/auth` que abrem sessão não usam. */
   auth?: boolean
@@ -176,13 +177,15 @@ export class ApiClient {
 
   private async send(method: string, path: string, body: unknown, auth: boolean): Promise<Response> {
     const headers: Record<string, string> = { Accept: 'application/json' }
-    if (body !== undefined) headers['Content-Type'] = 'application/json'
+    const isForm = typeof FormData !== 'undefined' && body instanceof FormData
+    // FormData: o navegador põe o Content-Type com o boundary do multipart.
+    if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json'
     if (auth && this.accessToken) headers.Authorization = `Bearer ${this.accessToken}`
     try {
       return await this.deps.fetch(`${this.baseUrl}${path}`, {
         method,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
       })
     } catch (error) {
       throw new BackendError('network', { cause: error })
@@ -217,6 +220,9 @@ const CODE_TO_KIND: Record<string, BackendErrorKind> = {
   invalid_refresh_token: 'session_expired',
   invalid_confirmation: 'invalid_link',
   invalid_reset: 'invalid_link',
+  ai_unavailable: 'ai_unavailable',
+  ai_failed: 'ai_failed',
+  invalid_file: 'invalid_file',
 }
 
 /** `ProblemDetails` da API (com a extensão `code` — T-14/T-15) → `BackendError`. */

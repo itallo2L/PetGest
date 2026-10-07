@@ -16,7 +16,13 @@ describe('account (API)', () => {
     await backend.account!.requestPasswordReset('dono@loja.test')
 
     expect(fake.calls).toEqual([
-      { method: 'POST', path: '/auth/forgot-password', body: { email: 'dono@loja.test' }, authorization: null },
+      {
+        method: 'POST',
+        path: '/auth/forgot-password',
+        body: { email: 'dono@loja.test' },
+        authorization: null,
+        contentType: 'application/json',
+      },
     ])
     expect(fake.store.get(REFRESH_TOKEN_KEY)).toBe('r1')
   })

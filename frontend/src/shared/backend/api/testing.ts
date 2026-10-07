@@ -32,8 +32,10 @@ export function json(status: number, body?: unknown): Response {
 export interface Call {
   method: string
   path: string
+  /** JSON já lido, ou o próprio `FormData` (envio de arquivos). */
   body: unknown
   authorization: string | null
+  contentType: string | null
 }
 
 type Handler = (call: Call) => Response | Promise<Response>
@@ -56,8 +58,9 @@ export function fakeDeps(handlers: Record<string, Handler>) {
       const call: Call = {
         method: init?.method ?? 'GET',
         path: url.pathname.replace(/^\/api/, ''),
-        body: init?.body ? JSON.parse(String(init.body)) : undefined,
+        body: init?.body instanceof FormData ? init.body : init?.body ? JSON.parse(String(init.body)) : undefined,
         authorization: headers.get('Authorization'),
+        contentType: headers.get('Content-Type'),
       }
       calls.push(call)
       const handler = handlers[`${call.method} ${call.path}`]

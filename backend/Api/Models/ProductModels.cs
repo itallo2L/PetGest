@@ -14,15 +14,18 @@ public static class ProductLimits
     public const string EanPattern = @"^\d{8,14}$";
 }
 
-// Rascunho de produto confirmado pelo usuário: o que o scanner produz hoje e o que foto
-// e voz vão produzir (PLANOMVP.md §4.3). Origem só `barcode`/`manual` até a T-19/T-20.
+// Rascunho de produto confirmado pelo usuário: o que o scanner, a foto e a voz produzem
+// (PLANOMVP.md §4.3). Com origem `photo_ai`/`voice_ai`, o `DraftId` devolvido por
+// /products/drafts liga o produto à resposta bruta da IA (design D4 da T-19).
 public record ProductDraft(
     [property: Required, MaxLength(ProductLimits.NameMaxLength)] string Name,
     [property: Required, MaxLength(ProductLimits.CategoryMaxLength)] string Category,
     [property: Required, Range(0d, ProductLimits.MaxPrice)] decimal? Price,
     [property: RegularExpression(ProductLimits.EanPattern, ErrorMessage = "O código de barras precisa ter de 8 a 14 dígitos.")] string? Ean,
-    [property: AllowedValues(ProductSourceExtensions.Barcode, ProductSourceExtensions.Manual, null,
-        ErrorMessage = "A origem precisa ser 'barcode' ou 'manual'.")] string? Source = null);
+    [property: AllowedValues(ProductSourceExtensions.Barcode, ProductSourceExtensions.Manual,
+        ProductSourceExtensions.PhotoAI, ProductSourceExtensions.VoiceAI, null,
+        ErrorMessage = "A origem precisa ser 'barcode', 'manual', 'photo_ai' ou 'voice_ai'.")] string? Source = null,
+    Guid? DraftId = null);
 
 // Edição: substitui os campos e mantém a origem (como o update do V0, que não envia source).
 public record ProductUpdate(

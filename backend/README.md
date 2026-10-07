@@ -155,6 +155,9 @@ responde `404`, igual a um que não existe.
 | `POST /products` | Cadastra (`201`); corpo `ProductDraft`: `name`, `category`, `price`, `ean?`, `source?` (`barcode`/`manual`) |
 | `PUT /products/{id}` | Substitui nome, categoria, preço e código; a origem não muda |
 | `DELETE /products/{id}` | Exclui (`204`) |
+| `GET /products/drafts/availability` | Se o cadastro por foto e por voz está disponível (provedor de IA configurado) — T-19 |
+| `POST /products/drafts/photo` | Foto da embalagem (`multipart`, campo `image`) → rascunho `photo_ai` para o formulário — T-19 |
+| `POST /products/drafts/voice` | Áudio (`multipart`, campo `audio`) → transcrição + rascunho `voice_ai` — T-20 |
 | `GET /petshop` | Dados da loja: `id`, `name`, `email`, `phone` |
 | `PUT /petshop` | Salva nome, e-mail de contato e telefone (vazio → sem telefone) |
 | `POST /petshop` | Cria a loja de uma conta que ainda não tem (`201`, `sessionRenewalRequired: true`) |
@@ -232,6 +235,10 @@ backend/
 | `RateLimit:Auth:PermitLimit` / `WindowSeconds` | `appsettings.json` (10 / 60) | Limite de tentativas nos endpoints públicos de `/auth` (menos renovação e logout) |
 | `Email:Provider` | padrão `log` | `log` (console) ou `acs` (Azure Communication Services) — T-22 |
 | `Email:AcsConnectionString` / `Email:Sender` | só no App Service | Credencial e remetente do ACS (com `acs`, sem elas a API não sobe) |
+| `Ai:OpenAI:ApiKey` | só no App Service (ou `--Ai:OpenAI:ApiKey=` local) | Chave da OpenAI; sem ela, foto e voz ficam indisponíveis (`503 ai_unavailable`) — T-19 |
+| `Ai:OpenAI:Model` / `TranscriptionModel` | padrão `gpt-4.1-mini` / `gpt-4o-mini-transcribe` | Modelos da foto/estruturação e da transcrição |
+| `Ai:OpenAI:BaseUrl` | padrão `https://api.openai.com/v1/` | Endpoint compatível com a API da OpenAI (o ensaio local usou um servidor falso) |
+| `RateLimit:Ai:PermitLimit` / `WindowSeconds` | padrão 20 / 60 | Extrações por IA por usuário |
 | `ForwardedHeaders:Enabled` | padrão `false` | Lê o IP do cliente do `X-Forwarded-For` atrás do proxy do App Service — T-17 |
 
 Fora de Development, os valores vêm de variáveis de ambiente (é assim que a
@@ -243,6 +250,7 @@ T-17 vai configurar o App Service), com `__` no lugar de `:`:
 - `Jwt__SigningKey` (segredo — gere um valor aleatório de 48+ caracteres por ambiente)
 - `Auth__RequireConfirmedEmail`, `Auth__FrontendBaseUrl`
 - `Email__Provider`, `Email__AcsConnectionString` (segredo), `Email__Sender`
+- `Ai__OpenAI__ApiKey` (segredo), `Ai__OpenAI__Model`, `Ai__OpenAI__TranscriptionModel`
 - `ForwardedHeaders__Enabled`
 
 > **Nunca** versione a string de conexão do Supabase, a chave JWT de produção ou

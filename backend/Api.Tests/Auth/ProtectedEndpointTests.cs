@@ -137,6 +137,7 @@ public class ProtectedEndpointTests(DatabaseFixture fixture) : IDisposable
             "GET /products", "GET /products/{id:guid}", "GET /products/by-ean/{ean}",
             "POST /products", "PUT /products/{id:guid}", "DELETE /products/{id:guid}",
             "GET /petshop", "PUT /petshop", "POST /petshop",
+            "GET /products/drafts/availability", "POST /products/drafts/photo", "POST /products/drafts/voice",
         ];
         Assert.Subset(routes.Select(r => r.Route).ToHashSet(), protectedRoutes.ToHashSet());
         Assert.Empty(protectedRoutes.Intersect(anonymous));

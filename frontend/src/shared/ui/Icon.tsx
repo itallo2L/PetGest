@@ -21,11 +21,14 @@ export type IconName =
   | 'flash'
   | 'logout'
   | 'menu'
+  | 'mic'
   | 'paw'
   | 'plus'
   | 'refresh'
   | 'search'
   | 'settings'
+  | 'sparkles'
+  | 'stop'
 
 interface IconProps {
   name: IconName

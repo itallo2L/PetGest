@@ -75,7 +75,8 @@ export interface ProductsBackend {
   list(): Promise<Product[]>
   /** Produto da loja com o código, ou `null` (desfechos do scanner). */
   findByEan(ean: string): Promise<Product | null>
-  create(input: ProductInput, source: 'barcode' | 'manual'): Promise<Product>
+  /** `draftId` = rascunho da IA de onde o produto veio (origens `photo_ai`/`voice_ai`). */
+  create(input: ProductInput, source: ProductSource, draftId?: string): Promise<Product>
   update(id: string, input: ProductInput): Promise<Product>
   remove(id: string): Promise<void>
 }
@@ -84,6 +85,28 @@ export interface PetshopBackend {
   get(): Promise<Store>
   /** `id` é o que veio de `get()`; quem garante que é a loja da sessão é o backend. */
   update(id: string, input: StoreInput): Promise<Store>
+}
+
+/** Rascunho sugerido pela IA para o formulário de cadastro (T-19/T-20). Qualquer campo
+ * pode faltar: o usuário confere e completa antes de salvar. */
+export interface ProductSuggestion {
+  draftId: string
+  source: 'photo_ai' | 'voice_ai'
+  name: string | null
+  category: string | null
+  price: number | null
+  ean: string | null
+  /** O que a IA entendeu da fala (só na voz). */
+  transcript: string | null
+}
+
+/** Cadastro por foto e por voz (T-19/T-20). Só a API do V1 tem; no Supabase é `undefined`. */
+export interface DraftsBackend {
+  /** Se o provedor de IA está configurado na API. */
+  availability(): Promise<{ photo: boolean; voice: boolean }>
+  /** `ai_unavailable`, `ai_failed`, `invalid_file` ou `rate_limited` em caso de erro. */
+  fromPhoto(image: Blob): Promise<ProductSuggestion>
+  fromVoice(audio: Blob): Promise<ProductSuggestion>
 }
 
 /** Links enviados por e-mail (T-22): confirmação e redefinição de senha. Só a API do V1
@@ -104,4 +127,5 @@ export interface Backend {
   products: ProductsBackend
   petshop: PetshopBackend
   account?: AccountBackend
+  drafts?: DraftsBackend
 }

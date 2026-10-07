@@ -3,6 +3,7 @@ import { createApiAccount } from './account'
 import { createApiAuth } from './auth'
 import { createApiPetshop, createApiProducts } from './catalog'
 import { ApiClient, type ApiClientDeps } from './client'
+import { createApiDrafts } from './drafts'
 
 /** Backend do V1: a API própria (T-14/T-15). Importado só no modo `api`. */
 export function createApiBackend(apiUrl: string, deps?: ApiClientDeps): Backend {
@@ -12,5 +13,6 @@ export function createApiBackend(apiUrl: string, deps?: ApiClientDeps): Backend 
     products: createApiProducts(client),
     petshop: createApiPetshop(client),
     account: createApiAccount(client),
+    drafts: createApiDrafts(client),
   }
 }

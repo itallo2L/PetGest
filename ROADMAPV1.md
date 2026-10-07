@@ -349,6 +349,18 @@ Supabase gratuito + App Service F1. Passo a passo em `backend/DEPLOY.md`.
 
 ## T-19 — Cadastro de produto por foto + IA
 
+**Status:** implementada na branch em 2026-10-07 (`openspec/changes/T-19-photo-ai/`, specs `api-product-drafts`, `api-products` e `product-ai-capture`); faltam o teste de bancada e a chave da IA (tarefas 3.x, do usuário). Ligar em produção espera a T-18.
+Provedor **provisório: OpenAI** (uma chave para foto e voz, saída em JSON Schema
+estrito, mesma família no Azure OpenAI), pela API REST atrás do
+`IProductDraftExtractor` — o bench da T-11 não pôde ser feito sem fotos e sem chave, e
+decide antes da produção. `GET /products/drafts/availability` e
+`POST /products/drafts/photo`; normalização (categoria entre as sete, código com
+dígito verificador, preço só se visível); rascunho em memória por 30 min ligado ao
+produto pelo `draftId`, que grava a resposta bruta (com o consumo de tokens) em
+`ai_raw_response`; limite de 20 extrações/min por usuário. Frontend: "Preencher com
+IA" → "Foto" no cadastro (câmera traseira, JPEG ≤ 1600 px), preenche o próprio
+formulário, origem `photo_ai` ao salvar.
+
 - **Primeiro passo: escolher o provedor de IA** (T-11, D6) com o teste de
   bancada — ~20 fotos de embalagens reais e ~10 áudios, os mesmos para
   OpenAI, Azure OpenAI e Google; critérios na ordem: acerto dos campos em
@@ -368,6 +380,12 @@ Supabase gratuito + App Service F1. Passo a passo em `backend/DEPLOY.md`.
 - Ref: `PLANOMVP.md` §2.3, §4.1, §4.3.
 
 ## T-20 — Cadastro de produto por voz + IA
+
+**Status:** implementada na branch em 2026-10-07 (`openspec/changes/T-20-voice-ai/`); falta o teste no celular com a chave da IA (tarefas 3.x, do usuário).
+`POST /products/drafts/voice`: transcrição em PT-BR (`gpt-4o-mini-transcribe`) e o
+mesmo Chat Completions estruturado da foto; transcrição na resposta bruta. Frontend:
+botão "Voz" com gravador em modal (`MediaRecorder`, WebM no Chrome, MP4 no Safari,
+até 30 s), microfone solto em toda saída, "Entendemos: …" no aviso, origem `voice_ai`.
 
 - Frontend: gravação de áudio com `MediaRecorder` no cadastro de produto
   (§2.1).

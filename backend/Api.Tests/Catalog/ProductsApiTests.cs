@@ -133,8 +133,19 @@ public class ProductsApiTests(DatabaseFixture fixture) : IAsyncLifetime
     [Theory]
     [InlineData("photo_ai")]
     [InlineData("voice_ai")]
+    public async Task Origem_de_ia_sem_rascunho_grava_sem_resposta_bruta(string source)
+    {
+        var created = await CreateAsync(_a, "Produto por IA", source: source);
+
+        Assert.Equal(source, created.Source);
+        await using var db = fixture.Anonymous();
+        Assert.Null((await db.Products.IgnoreQueryFilters().SingleAsync(p => p.Id == created.Id)).AiRawResponse);
+    }
+
+    [Theory]
     [InlineData("qualquer")]
-    public async Task Origem_fora_de_barcode_e_manual_e_recusada(string source)
+    [InlineData("PHOTO_AI")]
+    public async Task Origem_desconhecida_e_recusada(string source)
     {
         var response = await Post(_a, new { name = "X", category = "X", price = 1, source });
 

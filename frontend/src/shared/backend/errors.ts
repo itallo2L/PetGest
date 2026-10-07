@@ -9,6 +9,12 @@ export type BackendErrorKind =
   /** Link de confirmação ou de redefinição de senha inválido, expirado ou já usado (T-22). */
   | 'invalid_link'
   | 'ean_taken'
+  /** Cadastro por foto/voz (T-19/T-20): IA não configurada na API. */
+  | 'ai_unavailable'
+  /** A IA falhou ou demorou demais — dá para tentar de novo ou preencher à mão. */
+  | 'ai_failed'
+  /** Arquivo de foto/áudio recusado (formato ou tamanho). */
+  | 'invalid_file'
   /** A conta já tem loja (criar a loja de novo é tratado como sucesso). */
   | 'petshop_exists'
   | 'not_found'

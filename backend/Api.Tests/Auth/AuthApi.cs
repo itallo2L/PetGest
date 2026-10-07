@@ -25,7 +25,8 @@ public sealed partial class AuthApi : IDisposable
     public AuthApi(
         DatabaseFixture fixture,
         IReadOnlyDictionary<string, string?>? settings = null,
-        IEmailSender? emailSender = null)
+        IEmailSender? emailSender = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         Time = new FakeTimeProvider(DateTimeOffset.UtcNow);
         _factory = new ApiFactory(
@@ -37,6 +38,7 @@ public sealed partial class AuthApi : IDisposable
                 services.AddSingleton(emailSender ?? Emails);
                 services.RemoveAll<TimeProvider>();
                 services.AddSingleton<TimeProvider>(Time);
+                configureServices?.Invoke(services);
             });
         Client = _factory.CreateClient();
     }

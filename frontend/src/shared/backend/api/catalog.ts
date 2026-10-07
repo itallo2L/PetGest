@@ -26,9 +26,11 @@ export function createApiProducts(client: ApiClient): ProductsBackend {
       }
     },
 
-    async create(input, source) {
+    async create(input, source, draftId) {
       return toProduct(
-        await client.request('POST', '/products', { body: { ...input, source } satisfies Schemas['ProductDraft'] }),
+        await client.request('POST', '/products', {
+          body: { ...input, source, draftId: draftId ?? null } satisfies Schemas['ProductDraft'],
+        }),
       )
     },
 

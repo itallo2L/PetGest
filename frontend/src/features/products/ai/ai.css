@@ -1,0 +1,93 @@
+/* ==========================================================================
+   CADASTRO POR IA (T-19 foto, T-20 voz) — bloco "Preencher com IA" no topo
+   do formulário de produto, aviso do que foi preenchido e gravador de voz.
+   ========================================================================== */
+
+.ai-fill {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+}
+
+.ai-fill__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.ai-fill__label .icon { color: var(--primary); }
+
+.ai-fill__actions { display: flex; gap: var(--space-2); }
+.ai-fill__actions .btn { flex: 1; justify-content: center; min-height: 44px; }
+
+/* O input de arquivo só existe para abrir a câmera; o botão "Foto" o aciona. */
+.ai-fill__file { display: none; }
+
+.ai-fill__error,
+.voice__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  color: var(--danger-strong);
+}
+
+.ai-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  color: var(--primary-active);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+}
+.ai-notice .icon { flex: none; margin-top: 2px; }
+.ai-notice--warn { background: var(--warning-soft); color: var(--warning-strong); }
+
+.ai-notice__transcript {
+  display: block;
+  margin-top: var(--space-1);
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* Gravador de voz */
+.voice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  text-align: center;
+}
+
+.voice__pulse {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--danger-soft);
+  color: var(--danger-strong);
+  animation: voice-pulse 1.4s ease-in-out infinite;
+}
+
+.voice__status { font-weight: 600; }
+.voice__hint { font-size: var(--fs-sm); color: var(--text-muted); max-width: 32ch; }
+
+@keyframes voice-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.35); }
+  50% { box-shadow: 0 0 0 12px rgb(239 68 68 / 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice__pulse { animation: none; }
+}

@@ -17,7 +17,7 @@ public static class ProductErrorCodes
 // Catálogo da loja (spec api-products; design D1–D3 da T-15). Nada aqui filtra petshop à
 // mão: os filtros globais da T-13 restringem toda consulta à loja do token, então produto
 // inexistente e produto de outra loja caem no mesmo `null` → 404.
-public class ProductService(AppDbContext db, ITenantContext tenant)
+public class ProductService(AppDbContext db, ITenantContext tenant, ProductDraftService drafts)
 {
     private static readonly ApiError NotFound =
         new(StatusCodes.Status404NotFound, ProductErrorCodes.ProductNotFound, "Produto não encontrado.");
@@ -61,14 +61,19 @@ public class ProductService(AppDbContext db, ITenantContext tenant)
             return EanTaken(ean!, owner);
         }
 
-        // PetshopId fica vazio: o TenantWriteGuard preenche com o petshop do token.
+        var source = draft.Source is null ? ProductSource.Manual : ProductSourceExtensions.FromWire(draft.Source);
+
+        // PetshopId fica vazio: o TenantWriteGuard preenche com o petshop do token. A
+        // resposta bruta da IA só vem de um rascunho desta loja e da mesma origem; sem ele
+        // (expirado, de outra loja), o produto é salvo sem ela (design D4 da T-19).
         var product = new Product
         {
             Name = draft.Name.Trim(),
             Category = draft.Category.Trim(),
             Price = draft.Price.Value,
             Ean = ean,
-            Source = draft.Source is null ? ProductSource.Manual : ProductSourceExtensions.FromWire(draft.Source),
+            Source = source,
+            AiRawResponse = source is ProductSource.PhotoAI or ProductSource.VoiceAI ? drafts.TakeRaw(draft.DraftId, source) : null,
         };
         db.Products.Add(product);
 

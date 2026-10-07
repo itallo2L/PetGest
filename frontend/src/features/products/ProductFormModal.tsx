@@ -9,7 +9,9 @@ import { Modal } from '../../shared/ui/Modal'
 import { useToast } from '../../shared/ui/toastContext'
 import { categoryOptions, CATEGORIES } from './categories'
 import { formatPrice, isValidBarcode, normalizeBarcode, parsePrice, priceToInput } from './productFormat'
-import { getBackend, isBackendError } from '../../shared/backend'
+import { getBackend, isBackendError, type ProductSuggestion } from '../../shared/backend'
+import { AiFill } from './ai/AiFill'
+import { applySuggestion } from './ai/aiHelpers'
 import type { Product, ProductInput } from './types'
 
 interface ProductFormModalProps {
@@ -56,6 +58,9 @@ export function ProductFormModal({
   const [saving, setSaving] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  /** Rascunho da IA que preencheu o formulário (T-19/T-20): define a origem ao salvar. */
+  const [aiDraft, setAiDraft] = useState<Pick<ProductSuggestion, 'draftId' | 'source' | 'transcript'> | null>(null)
+  const [aiNotice, setAiNotice] = useState<{ text: string; ok: boolean } | null>(null)
 
   function invalid(text: string, fieldId: string) {
     setError({ text })
@@ -77,10 +82,14 @@ export function ProductFormModal({
     setError(null)
     setSaving(true)
     try {
-      // `barcode` só se o código salvo é o que a câmera leu; a edição não muda `source`.
-      const source = input.ean && input.ean === scannedEan ? 'barcode' : 'manual'
+      // Veio da IA → `photo_ai`/`voice_ai`, mesmo com campos corrigidos à mão (a IA sugere,
+      // o usuário confirma — design D7 da T-19). Senão, `barcode` só se o código salvo é o
+      // que a câmera leu. A edição não muda `source`.
+      const source = aiDraft ? aiDraft.source : input.ean && input.ean === scannedEan ? 'barcode' : 'manual'
       const { products } = getBackend()
-      const saved = isCreate ? await products.create(input, source) : await products.update(product.id, input)
+      const saved = isCreate
+        ? await products.create(input, source, aiDraft?.draftId)
+        : await products.update(product.id, input)
       showToast({ type: 'success', title: isCreate ? 'Produto cadastrado' : 'Produto atualizado', text: saved.name })
       onSaved(saved, isCreate)
     } catch (err) {
@@ -113,6 +122,32 @@ export function ProductFormModal({
       setConfirmingDelete(false)
       setError(toFormMessage(err))
     }
+  }
+
+  function handleSuggestion(suggestion: ProductSuggestion) {
+    const { fields, recognized } = applySuggestion({ name, category, price, ean }, suggestion)
+    setName(fields.name)
+    setCategory(fields.category)
+    setPrice(fields.price)
+    setEan(fields.ean)
+    setError(null)
+    if (!recognized) {
+      setAiNotice({
+        text:
+          suggestion.source === 'photo_ai'
+            ? 'Não reconhecemos um produto nesta foto. Tente outra, com a embalagem de frente e bem iluminada, ou preencha à mão.'
+            : 'Não entendemos o produto no áudio. Tente de novo falando o nome, a categoria e o preço, ou preencha à mão.',
+        ok: false,
+      })
+      return
+    }
+    setAiDraft({ draftId: suggestion.draftId, source: suggestion.source, transcript: suggestion.transcript })
+    setAiNotice({
+      text:
+        (suggestion.source === 'photo_ai' ? 'Preenchido pela IA a partir da foto.' : 'Preenchido pela IA a partir da sua fala.') +
+        (suggestion.price === null ? ' Confira os campos e informe o preço antes de salvar.' : ' Confira os campos antes de salvar.'),
+      ok: true,
+    })
   }
 
   /** Leitor aberto pelo campo de código: o próprio produto em edição conta como "novo". */
@@ -162,6 +197,17 @@ export function ProductFormModal({
         }
       >
         <form className="form" id={formId} onSubmit={handleSubmit} noValidate>
+          {isCreate && <AiFill disabled={busy} onSuggestion={handleSuggestion} />}
+          {aiNotice && (
+            <p className={`ai-notice${aiNotice.ok ? '' : ' ai-notice--warn'}`} role="status">
+              <Icon name={aiNotice.ok ? 'sparkles' : 'alert'} size="sm" />
+              <span>
+                {aiNotice.text}
+                {aiDraft?.transcript && <span className="ai-notice__transcript">Entendemos: “{aiDraft.transcript}”</span>}
+              </span>
+            </p>
+          )}
+
           <div className="field">
             <label className="field__label" htmlFor={`${formId}-name`}>
               Nome do produto

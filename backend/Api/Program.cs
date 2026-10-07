@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>((services, options) =>
 builder.Services.AddHealthChecks().AddDbContextCheck<AppDbContext>();
 builder.Services.AddPetGestAuth();
 builder.Services.AddPetGestProxy();
+builder.Services.AddPetGestAi();
 builder.Services.AddFrontendCors(builder.Configuration);
 builder.Services.AddPetGestOpenApi();
 // Validação embutida (DataAnnotations) dos DTOs de request — .NET 10.
@@ -65,13 +66,16 @@ app.Use((context, next) =>
     return next(context);
 });
 
-app.UseRateLimiter();
+// O limite de tentativas roda depois da autenticação: o de /auth conta por IP, e o da IA
+// (T-19) conta por usuário, que só é conhecido depois de ler o token.
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapHealthEndpoints();
 app.MapAuthEndpoints();
 app.MapProductEndpoints();
+app.MapProductDraftEndpoints();
 app.MapPetshopEndpoints();
 
 app.Run();
