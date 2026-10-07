@@ -194,7 +194,7 @@ public class SchemaCompatibilityTests : IAsyncLifetime
 
     // ---- Infra -------------------------------------------------------------------
 
-    private static async Task RecreateDatabaseAsync(string name)
+    internal static async Task RecreateDatabaseAsync(string name)
     {
         await using var conn = new NpgsqlConnection(DatabaseFixture.ConnectionStringFor("postgres"));
         await conn.OpenAsync();
@@ -205,13 +205,13 @@ public class SchemaCompatibilityTests : IAsyncLifetime
         NpgsqlConnection.ClearAllPools();
     }
 
-    private static async Task ExecuteAsync(NpgsqlConnection conn, string sql)
+    internal static async Task ExecuteAsync(NpgsqlConnection conn, string sql)
     {
         await using var cmd = new NpgsqlCommand(sql, conn);
         await cmd.ExecuteNonQueryAsync();
     }
 
-    private static string RepositoryRoot()
+    internal static string RepositoryRoot()
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {

@@ -308,6 +308,13 @@ Supabase gratuito + App Service F1. Passo a passo em `backend/DEPLOY.md`.
 
 ## T-18 — Migração dos dados e virada da produção
 
+**Status:** preparada em 2026-10-07 (`openspec/changes/T-18-production-cutover/`), **não executada** — começa só depois da T-10 arquivada, pelo usuário, seguindo o `runbook.md`.
+Scripts numerados em `backend/deploy/t18/` (conferência antes, baseline, migrations
+geradas pelo EF, importação das contas, conferência depois) e ensaio automático
+`T18RehearsalTests` com os mesmos arquivos e a API contra o banco virado. **Mudança
+de ordem (design D4):** a Data API do Supabase é fechada só **depois** da
+observação, porque fechá-la na janela quebraria o rollback para o V0.
+
 - **Pré-requisitos:** T-10 e T-22 arquivadas (T-11, D1) e projeto Supabase
   no plano Pro — no gratuito ele pausa após 7 dias sem uso, e com a API em
   cima uma pausa derruba a produção.
