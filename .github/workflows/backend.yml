@@ -74,6 +74,8 @@ jobs:
       # (SQL Editor do Supabase). A API não aplica migrations ao subir.
       - run: dotnet tool restore
       - run: dotnet ef migrations script --idempotent --project Api -o ${{ runner.temp }}/migrations.sql
+      # O EF grava com BOM (UTF-8), e o SQL Editor do Supabase recusa o CREATE da 1ª linha.
+      - run: sed -i '1s/^\xEF\xBB\xBF//' ${{ runner.temp }}/migrations.sql
       - uses: actions/upload-artifact@v4
         with:
           name: migrations-${{ github.ref_name }}
