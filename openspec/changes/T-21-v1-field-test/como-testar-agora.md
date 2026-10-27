@@ -21,10 +21,10 @@ tente de novo. Se continuar, use a opção B.
 
 ### Opção B — sem Docker (Postgres portátil pelo npm)
 
-Foi o que eu usei nesta madrugada. No PowerShell, **fora** da pasta do projeto:
+No PowerShell, **fora** da pasta do projeto (em `%LOCALAPPDATA%`, que o Windows não limpa sozinho, ao contrário da pasta temporária):
 
 ```powershell
-mkdir $env:TEMP\petgest-pg; cd $env:TEMP\petgest-pg
+mkdir $env:LOCALAPPDATA\petgest-pg; cd $env:LOCALAPPDATA\petgest-pg
 npm init -y
 npm install @embedded-postgres/windows-x64@17.10.0-beta.17 pg
 "petgest_dev" | Out-File pw.txt -Encoding ascii
