@@ -60,7 +60,9 @@ export function ProductFormModal({
   const [deleting, setDeleting] = useState(false)
   /** Rascunho da IA que preencheu o formulário (T-19/T-20): define a origem ao salvar. */
   const [aiDraft, setAiDraft] = useState<Pick<ProductSuggestion, 'draftId' | 'source' | 'transcript'> | null>(null)
-  const [aiNotice, setAiNotice] = useState<{ text: string; ok: boolean } | null>(null)
+  /** Aviso do último preenchimento por IA; na voz, leva a transcrição também quando a IA não
+   * reconheceu o produto, para o usuário ver o que foi ouvido. */
+  const [aiNotice, setAiNotice] = useState<{ text: string; ok: boolean; transcript?: string } | null>(null)
 
   function invalid(text: string, fieldId: string) {
     setError({ text })
@@ -131,13 +133,17 @@ export function ProductFormModal({
     setPrice(fields.price)
     setEan(fields.ean)
     setError(null)
+    const transcript = suggestion.transcript?.trim() || undefined
     if (!recognized) {
       setAiNotice({
         text:
           suggestion.source === 'photo_ai'
             ? 'Não reconhecemos um produto nesta foto. Tente outra, com a embalagem de frente e bem iluminada, ou preencha à mão.'
-            : 'Não entendemos o produto no áudio. Tente de novo falando o nome, a categoria e o preço, ou preencha à mão.',
+            : transcript
+              ? 'Não entendemos o produto no áudio. Tente de novo falando o nome, a categoria e o preço, ou preencha à mão.'
+              : 'Não ouvimos nenhuma fala no áudio. Confira se o microfone certo está selecionado e fale mais perto dele, ou preencha à mão.',
         ok: false,
+        transcript,
       })
       return
     }
@@ -147,6 +153,7 @@ export function ProductFormModal({
         (suggestion.source === 'photo_ai' ? 'Preenchido pela IA a partir da foto.' : 'Preenchido pela IA a partir da sua fala.') +
         (suggestion.price === null ? ' Confira os campos e informe o preço antes de salvar.' : ' Confira os campos antes de salvar.'),
       ok: true,
+      transcript,
     })
   }
 
@@ -203,7 +210,11 @@ export function ProductFormModal({
               <Icon name={aiNotice.ok ? 'sparkles' : 'alert'} size="sm" />
               <span>
                 {aiNotice.text}
-                {aiDraft?.transcript && <span className="ai-notice__transcript">Entendemos: “{aiDraft.transcript}”</span>}
+                {aiNotice.transcript && (
+                  <span className="ai-notice__transcript">
+                    {aiNotice.ok ? 'Entendemos' : 'Ouvimos'}: “{aiNotice.transcript}”
+                  </span>
+                )}
               </span>
             </p>
           )}
